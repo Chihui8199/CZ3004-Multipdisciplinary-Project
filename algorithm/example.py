@@ -8,6 +8,8 @@ def get_random_action():
 
 def main():
     env = make_env("RobotMove-v0")
+    env.add_obstacle(x=30, y=30)
+    env.set_car(x=15, y=15)
     # TODO: not yet usable; but below is the most simplified way of using it
     # done = False
     # while not done:
