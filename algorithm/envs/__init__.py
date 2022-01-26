@@ -19,6 +19,4 @@ register(
 
 
 def make_env(id: str, **kwargs):
-    env = gym.make(id, **kwargs)
-    env.reset()
-    return env
+    return gym.make(id, **kwargs)

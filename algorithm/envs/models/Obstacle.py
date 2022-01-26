@@ -1,7 +1,6 @@
 from typing import List, Tuple
 
-from envs.models import Direction, Sign
-from envs.models.entity import Entity
+from envs.models import Direction, Sign, Entity
 
 
 class Obstacle(Entity):
@@ -23,7 +22,7 @@ class Obstacle(Entity):
         :param length: length of the obstacle in cm, default to be 10
         """
         # TODO: the exact default values need to be confirmed
-        super(Obstacle, self).__init__(x=x, y=y, length=length, width=width)
+        super().__init__(x=x, y=y, length=length, width=width)
         self.x_offset = width / 2 + self.BEST_VIEW_DISTANCE
         self.y_offset = length / 2 + self.BEST_VIEW_DISTANCE
         self.explored = False
