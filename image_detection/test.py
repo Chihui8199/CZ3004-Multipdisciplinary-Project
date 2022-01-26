@@ -2,6 +2,9 @@ import cv2;
 
 num1 = cv2.CascadeClassifier('no1.xml');
 num2 = cv2.CascadeClassifier('num2new.xml');
+num3 = cv2.CascadeClassifier('no3new.xml');
+num4 = cv2.CascadeClassifier('no4new.xml');
+num5 = cv2.CascadeClassifier('no5.xml');
 
 video = cv2.VideoCapture(0);
 
@@ -9,8 +12,11 @@ while True:
     check, frame = video.read();
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    one = num1.detectMultiScale(frame,scaleFactor=1.1, minNeighbors=3);
-    two = num2.detectMultiScale(frame,scaleFactor=1.1, minNeighbors=3);
+    one = num1.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=3)
+    two = num2.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
+    three = num3.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
+    four = num4.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
+    five = num5.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
     
     one_found = len(one)
     if one_found != 0:
@@ -24,7 +30,26 @@ while True:
         for x,y,w,h in two:
             frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
             cv2.putText(frame, 'Num2', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
+            
+    three_found = len(three)
+    if three_found != 0:
+        for x,y,w,h in three:
+            frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
+            cv2.putText(frame, 'Num3', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
+    cv2.imshow('Image Recognition', frame);
     
+    four_found = len(four)
+    if four_found != 0:
+        for x,y,w,h in four:
+            frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
+            cv2.putText(frame, 'Num4', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
+            
+    five_found = len(five)
+    if five_found != 0:
+        for x,y,w,h in five:
+            frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
+            cv2.putText(frame, 'Num5', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
+            
     cv2.imshow('Image Recognition', frame);
 
     key = cv2.waitKey(1);
@@ -34,3 +59,4 @@ while True:
 
 video.release();
 cv2.destroyAllWindows();
+
