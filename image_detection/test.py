@@ -2,8 +2,8 @@ import cv2
 from imutils.video import WebcamVideoStream
 
 num1 = cv2.CascadeClassifier('no1.xml');
-num2 = cv2.CascadeClassifier('num2new.xml');
-num3 = cv2.CascadeClassifier('no3new.xml');
+num2 = cv2.CascadeClassifier('finalno2.xml');
+num3 = cv2.CascadeClassifier('num3.xml');
 num4 = cv2.CascadeClassifier('no4new.xml');
 num5 = cv2.CascadeClassifier('no5.xml');
 
@@ -16,11 +16,11 @@ while True:
     frame = video.read();
     #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     
-    one = num1.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=3)
-    two = num2.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
-    three = num3.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
-    four = num4.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
-    five = num5.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=1)
+    one = num1.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=4)
+    two = num2.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=2)
+    three = num3.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=2)
+    four = num4.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=2)
+    five = num5.detectMultiScale(frame,scaleFactor=1.05, minNeighbors=2)
     
     one_found = len(one)
     if one_found != 0:
@@ -69,3 +69,4 @@ while True:
 
 video.release();
 cv2.destroyAllWindows();
+
