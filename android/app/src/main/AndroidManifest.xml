@@ -8,6 +8,19 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.CX3004" />
+        android:theme="@style/Theme.CX3004">
+        <activity
+            android:name=".Page"
+            android:exported="false" />
+        <activity
+            android:name=".ImageRecognition"
+            android:exported="false" />
+        <activity
+            android:name=".BluetoothSettings"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+    </application>
 
 </manifest>
