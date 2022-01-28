@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_bluetooth_page.xml" value="0.28306159420289856" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_bluetooth_settings.xml" value="0.276268115942029" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_image_recognition.xml" value="0.28306159420289856" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_main.xml" value="0.28306159420289856" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_page.xml" value="0.276268115942029" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
