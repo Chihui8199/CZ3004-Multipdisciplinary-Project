@@ -8,6 +8,8 @@ from envs.models import Entity
 def collide_with(a: Entity, b: Entity) -> bool:
     """
     detect if two entities collide with each other
+    reference:
+    https://cfonheart.github.io/2018/09/11/%E8%AE%A1%E7%AE%97%E6%97%8B%E8%BD%AC%E7%9F%A9%E5%BD%A2%E7%9B%B8%E4%BA%A4%E9%9D%A2%E7%A7%AF/
     :param a:
     :param b:
     :return: True if they collide, False otherwise

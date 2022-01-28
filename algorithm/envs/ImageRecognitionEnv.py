@@ -126,13 +126,16 @@ class ImageRecognitionEnv(gym.Env):
         self.car.set(final_pos.x, final_pos.y, final_pos.z)
         # TODO: may have more to be done
 
-    def recognize(self, ):
+    def recognize(self, vision_x: int, sign: Sign):
         """
         this is to be used when the car recognized something (bull eye / float)
         ideally this should only be called after stepping
+        :param vision_x: the x position of the recognized sign in the image, ranging from [0, 600]
+        :param sign:
         :return: True if all tasks are completed TODO: to be discussed
         """
         # TODO: not yet sure of how to represent this, this part need to partner with the vision team (ds not confirmed)
+        # we need to confirm which exact surface of which obstacle is it recognizing
         pass
 
     def reset(self):
