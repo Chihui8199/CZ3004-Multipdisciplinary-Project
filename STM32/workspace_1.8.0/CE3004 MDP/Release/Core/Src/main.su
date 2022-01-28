@@ -1,0 +1,15 @@
+main.c:996:6:pid	16	static
+main.c:660:6:led	8	static
+main.c:679:6:display	32	static
+main.c:802:6:left_encoder_task	56	static
+main.c:855:6:right_encoder_task	56	static
+main.c:1030:6:getrps	48	static
+main.c:955:6:forward	8	static
+main.c:285:6:SystemClock_Config	88	static,ignoring_inline_asm
+main.c:168:5:main	112	static,ignoring_inline_asm
+main.c:644:6:HAL_UART_RxCpltCallback	0	static
+main.c:702:6:left_motor	16	static
+main.c:752:6:right_motor	16	static
+main.c:907:6:servo	8	static
+main.c:933:6:uart	16	static
+main.c:1074:6:Error_Handler	0	static,ignoring_inline_asm
