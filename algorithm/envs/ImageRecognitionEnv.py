@@ -1,3 +1,5 @@
+from typing import List
+
 import gym
 
 from envs.models import *
@@ -48,38 +50,70 @@ class ImageRecognitionEnv(gym.Env):
     def set_car(self, **kwargs):
         self.car = Car(**kwargs)
 
-    def step(self, action):
-        """
-        move the car
-        :param action: [0]: velocity, negative for move backwards; [1]: angle; [2]: time to move
-        :return: observation: np.array; TODO: add more return and determine observation format
-        """
-        # TODO: below is just a scratch, representing the general workflow
-        done = False
-        traj = self.car.get_traj(action)
+    def _check_collision(self, traj: List[Entity]):
         for shadow in traj:
             for wall in self.walls:
                 if wall.collide_with(shadow):
-                    done = True
-                    break
+                    return False
             for obstacle in self.obstacles:
                 if obstacle.collide_with(shadow):
-                    done = True
-                    break
-        if done:
-            # TODO: do something if there is a collide
-            pass
-        # TODO: do something if the action is doable
-        # e.g. put the car to its new pos
-        final_pos = traj[-1]
-        self.car.set(final_pos.x, final_pos.y, final_pos.z)
+                    return False
+
+    def _get_obs_from_car_pos(self, pos):
+        """
+        This is a helper function, pos doesn't need to be the exact car position
+        :param pos:
+        :return:
+        """
         pass
+
+    def _get_car_pos_from_obs(self, obs) -> Entity:
+        """
+        This is for the step function, to extract the car pos from the observation
+        (if the obs is more than just the car pos)
+        :param obs:
+        :return:
+        """
+        pass
+
+    def step(self, obs):
+        """
+        update the status of the env by putting the car in position
+        :param obs: result[0] from try_step
+        :return: None; if not feasible, an exception will be thrown
+        """
+        # TODO: below is just a scratch, representing the general workflow
+        final_pos = self._get_car_pos_from_obs(obs)
+        if self._check_collision([final_pos]):
+            # ideally this should not happen
+            raise ValueError(f"invalid car position! Observation: {obs};\n "
+                             f"you should run try_step() first, and do not call step() if done=True")
+        self.car.set(final_pos.x, final_pos.y, final_pos.z)
+        # TODO: may have more to be done
+
+    def try_step(self, action):
+        """
+        if we shall use it as a simulator, so the env must can trail and error
+        so instead of directly step, we can have a try_step function
+        :param action: the action you wish to execute;
+        [0]: velocity, negative for move backwards; [1]: angle; [2]: time to move
+        :return: obs: position status of the car
+        done: false if the action is feasible
+        cost: the length of the path
+        """
+        traj, cost = self.car.get_traj(action)
+        done = self._check_collision(traj)
+        if done:
+            cost = float('inf')
+            pass  # TODO: do something
+        else:
+            pass
 
     def recognize(self, ):
         """
         this is to be used when the car recognized something (bull eye / float)
         ideally this should only be called after stepping
-        :return:
+        :return: True if all tasks are completed TODO: to be discussed
         """
         # TODO: not yet sure of how to represent this, this part need to partner with the vision team (ds not confirmed)
         pass

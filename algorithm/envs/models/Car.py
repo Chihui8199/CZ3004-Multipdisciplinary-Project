@@ -1,5 +1,5 @@
 import math
-from typing import List
+from typing import List, Tuple
 
 import torch
 
@@ -27,9 +27,9 @@ class Car(Entity):
         super().__init__(x=x, y=y, length=length, width=width)
         self.rectification_model = rectification_model
 
-    def get_traj(self, action) -> List[Entity]:
+    def get_traj(self, action) -> Tuple[List[Entity], float]:
         """
-        simulate the traj as if no obstacles, no boundaries
+        simulate the traj as if no obstacles, no boundaries; and calculate length of the traj
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
         the simplest way is to return a list of sampled positions (as entities)
         """
