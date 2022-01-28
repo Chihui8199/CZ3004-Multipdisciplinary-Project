@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 import gym
@@ -33,10 +34,10 @@ class ImageRecognitionEnv(gym.Env):
                     |         |
                     ===========
         """
-        self.walls.append(Entity(-1, self.length / 2, Direction.NORTH.value, 2, self.length))
-        self.walls.append(Entity(self.width + 1, self.length / 2, Direction.NORTH.value, 2, self.length))
-        self.walls.append(Entity(self.width / 2, -1, Direction.NORTH.value, self.width + 4, 2))
-        self.walls.append(Entity(self.width / 2, self.length + 1, Direction.NORTH.value, self.width + 4, 2))
+        self.walls.append(Entity(-1, self.length / 2, self.length, 2))
+        self.walls.append(Entity(self.width + 1, self.length / 2, self.length, 2))
+        self.walls.append(Entity(self.width / 2, -1, 2, self.width + 4))
+        self.walls.append(Entity(self.width / 2, self.length + 1, 2, self.width + 4))
 
     def add_obstacle(self, **kwargs) -> int:
         """
@@ -44,20 +45,36 @@ class ImageRecognitionEnv(gym.Env):
         return the id, -1 for not successful
         """
         # TODO: check collision
-        # self.obstacles.append(Obstacle(**kwargs))
-        pass
+        obstacle = Obstacle(**kwargs)
+        collision = self._check_collision([obstacle],
+                                          include_current_car=True)
+        if collision:
+            logging.warning(f"attempting to add an collided obstacle! {kwargs}")
+            return -1
+        idx = len(self.obstacles)
+        self.obstacles.append(obstacle)
+        return idx
 
     def set_car(self, **kwargs):
         self.car = Car(**kwargs)
 
-    def _check_collision(self, traj: List[Entity]):
-        for shadow in traj:
+    def _check_collision(self, traj: List[Entity], include_current_car: bool = False):
+        """
+        Check if the passed-in entity collide with any exisiting entity
+        :param traj: list of entities to test collision
+        :return: True if they do collide
+        """
+        for shadow in traj:  # meh, a bit ugly, can use map() later
             for wall in self.walls:
                 if wall.collide_with(shadow):
-                    return False
+                    return True
             for obstacle in self.obstacles:
                 if obstacle.collide_with(shadow):
-                    return False
+                    return True
+            if include_current_car and self.car is not None:
+                if self.car.collide_with(shadow):
+                    return True
+        return False
 
     def _get_obs_from_car_pos(self, pos):
         """
@@ -76,6 +93,24 @@ class ImageRecognitionEnv(gym.Env):
         """
         pass
 
+    def try_step(self, action):
+        """
+        if we shall use it as a simulator, so the env must can trail and error
+        so instead of directly step, we can have a try_step function
+        :param action: the action you wish to execute;
+        [0]: velocity, negative for move backwards; [1]: angle; [2]: time to move
+        :return: obs: position status of the car
+        done: false if the action is feasible
+        cost: the length of the path
+        """
+        traj, cost = self.car.get_traj(action)
+        collision = self._check_collision(traj)
+        if collision:
+            cost = float('inf')
+            pass  # TODO: do something
+        else:
+            pass
+
     def step(self, obs):
         """
         update the status of the env by putting the car in position
@@ -90,24 +125,6 @@ class ImageRecognitionEnv(gym.Env):
                              f"you should run try_step() first, and do not call step() if done=True")
         self.car.set(final_pos.x, final_pos.y, final_pos.z)
         # TODO: may have more to be done
-
-    def try_step(self, action):
-        """
-        if we shall use it as a simulator, so the env must can trail and error
-        so instead of directly step, we can have a try_step function
-        :param action: the action you wish to execute;
-        [0]: velocity, negative for move backwards; [1]: angle; [2]: time to move
-        :return: obs: position status of the car
-        done: false if the action is feasible
-        cost: the length of the path
-        """
-        traj, cost = self.car.get_traj(action)
-        done = self._check_collision(traj)
-        if done:
-            cost = float('inf')
-            pass  # TODO: do something
-        else:
-            pass
 
     def recognize(self, ):
         """

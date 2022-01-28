@@ -1,5 +1,5 @@
 from envs.models import Direction
-
+from envs.helpers import collide_with
 
 class Entity:
     """
@@ -30,4 +30,4 @@ class Entity:
         :param other:
         :return:
         """
-        pass
+        return collide_with(self, other)

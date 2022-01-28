@@ -8,6 +8,7 @@ def main():
     controller = RandomController()
     env = make_env("RobotMove-v0")
     env.add_obstacle(x=30, y=30)
+    env.add_obstacle(x=31, y=31)  # this will give you an warning, cuz this is not a valid pos
     env.set_car(x=15, y=15)
     # TODO: not yet usable; but below is the most simplified way of using it
     obs = env.reset()
