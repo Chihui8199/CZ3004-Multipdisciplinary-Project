@@ -26,8 +26,8 @@ while True:
     one_found = len(one)
     if one_found != 0:
         test = os.system("echo “num1” > /dev/rfcomm0")
-        #print("`cd ~` ran with exit code %d" % test)
         for x,y,w,h in one:
+            test2 = os.system("echo %d > /dev/rfcomm0" %(x))
             frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
             cv2.putText(frame, 'Num1', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
             cv2.imshow('Image Recognition', frame)
@@ -38,6 +38,7 @@ while True:
     if two_found != 0:
         test = os.system("echo “num2” > /dev/rfcomm0")
         for x,y,w,h in two:
+            test2 = os.system("echo %d > /dev/rfcomm0" %(x))
             frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
             cv2.putText(frame, 'Num2', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
             cv2.imshow('Image Recognition', frame)
@@ -47,6 +48,7 @@ while True:
     if three_found != 0:
         test = os.system("echo “num3” > /dev/rfcomm0")
         for x,y,w,h in three:
+            test2 = os.system("echo %d > /dev/rfcomm0" %(x))
             frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
             cv2.putText(frame, 'Num3', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
             cv2.imshow('Image Recognition', frame)
@@ -56,6 +58,7 @@ while True:
     if four_found != 0:
         test = os.system("echo “num4” > /dev/rfcomm0")
         for x,y,w,h in four:
+            test2 = os.system("echo %d > /dev/rfcomm0" %(x))
             frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
             cv2.putText(frame, 'Num4', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
             cv2.imshow('Image Recognition', frame)
@@ -65,6 +68,7 @@ while True:
     if five_found != 0:
         test = os.system("echo “num5” > /dev/rfcomm0")
         for x,y,w,h in five:
+            test2 = os.system("echo %d > /dev/rfcomm0" %(x))
             frame = cv2.rectangle(frame, (x,y), (x+w,y+h), (0,255,0), 3);
             cv2.putText(frame, 'Num5', (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0,255,0), 3)
             cv2.imshow('Image Recognition', frame)
