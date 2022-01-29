@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="sectionHeader"   parent="android:Widget.Holo.Light.TextView">
+        <item name="android:drawableBottom">@drawable/section_header</item>
+        <item name="android:drawablePadding">4dp</item>
+        <item name="android:paddingStart">@dimen/header_padding</item>
+        <item name="android:paddingTop">@dimen/header_padding</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">@dimen/header_size</item>
+    </style>
+</resources>
