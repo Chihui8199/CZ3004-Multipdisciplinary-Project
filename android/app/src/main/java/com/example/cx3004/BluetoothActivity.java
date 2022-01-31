@@ -29,18 +29,18 @@ public class BluetoothActivity extends AppCompatActivity {
     public ArrayList<BluetoothDevice> myBTDevicesArrayList = new ArrayList<>();
     public DeviceAdapterList myFoundAdapterListItem;
 
-    ListView lvNewDevices;
+    ListView lvDiscoveredDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_bluetooth_settings);
+        setContentView(R.layout.fragment_bluetooth_settings);
 
         myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
         // On/Off Button
-        Button btnOnOff = findViewById(R.id.bluetoothSwitch);
-        ListView lvNewDevices = findViewById(R.id.lvNewDevices);
+        Button btnOnOff = findViewById(R.id.bluetooth_switch);
+       // ListView lvNewDevices = findViewById(R.id.discovered_device_list);
 
         // Register Enable/Disable Bluetooth Broadcast Receiver
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -222,7 +222,7 @@ public class BluetoothActivity extends AppCompatActivity {
                 myBTDevicesArrayList.add(device);
                 Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
                 myFoundAdapterListItem = new DeviceAdapterList(context, R.layout.device_adapter_view, myBTDevicesArrayList);
-                lvNewDevices.setAdapter(myFoundAdapterListItem);
+                lvDiscoveredDevices.setAdapter(myFoundAdapterListItem);
             }
         }
     };

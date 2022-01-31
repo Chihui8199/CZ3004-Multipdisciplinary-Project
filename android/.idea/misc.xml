@@ -21,6 +21,10 @@
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/fragment_bluetooth_settings.xml" value="0.3333333333333333" />
         <entry key="app/src/main/res/layout/activity_bluetooth_settings.xml" value="0.2942708333333333" />
         <entry key="app/src/main/res/layout/activity_image_recognition.xml" value="0.2942708333333333" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.16927083333333334" />
+        <entry key="app/src/main/res/layout/device_adapter_view.xml" value="0.16927083333333334" />
+        <entry key="app/src/main/res/layout/discovered_device_view.xml" value="0.16927083333333334" />
+        <entry key="app/src/main/res/layout/fragment_bluetooth_settings.xml" value="0.4036281179138322" />
       </map>
     </option>
   </component>
