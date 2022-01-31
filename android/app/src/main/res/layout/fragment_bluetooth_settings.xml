@@ -57,32 +57,55 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+
+<!--            TO DO: Unable to use this layout as it has to be in List View, can just beautify the part below-->
+<!--        <LinearLayout-->
+<!--            android:id="@+id/paired_device_display"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_weight="1"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TextView-->
+<!--                android:id="@+id/paired_device_header"-->
+<!--                style="@style/sectionHeader"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="@string/header_paired_device"-->
+<!--                android:textColor="@color/black"/>-->
+
+
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+<!--                android:id="@+id/paired_device_list"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:paddingStart="@dimen/text_padding"-->
+<!--                android:paddingEnd="@dimen/text_padding"/>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <include layout="@layout/discovered_device_view"/>-->
         <LinearLayout
-            android:id="@+id/paired_device_display"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
+            android:layout_height="0dp"
+            android:layout_weight="0.6"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/paired_device_header"
-                style="@style/sectionHeader"
+            <ListView
+                android:id="@+id/lvPairedDevices"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/header_paired_device"
-                android:textColor="@color/black"/>
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
 
+            </ListView>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/paired_device_list"
+            <ListView
+                android:id="@+id/lvNewDevices"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:paddingStart="@dimen/text_padding"
-                android:paddingEnd="@dimen/text_padding"/>
+                android:layout_height="fill_parent"
+                android:layout_weight="1" />
 
         </LinearLayout>
-
-        <include layout="@layout/discovered_device_view"/>
 
         <LinearLayout
             android:id="@+id/message_display"

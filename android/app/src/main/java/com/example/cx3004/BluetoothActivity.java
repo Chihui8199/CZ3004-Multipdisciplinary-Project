@@ -29,7 +29,7 @@ public class BluetoothActivity extends AppCompatActivity {
     public ArrayList<BluetoothDevice> myBTDevicesArrayList = new ArrayList<>();
     public DeviceAdapterList myFoundAdapterListItem;
 
-    ListView lvDiscoveredDevices;
+    ListView lvNewDevices;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,7 @@ public class BluetoothActivity extends AppCompatActivity {
 
         // On/Off Button
         Button btnOnOff = findViewById(R.id.bluetooth_switch);
-       // ListView lvNewDevices = findViewById(R.id.discovered_device_list);
+        lvNewDevices = findViewById(R.id.lvNewDevices);
 
         // Register Enable/Disable Bluetooth Broadcast Receiver
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -125,14 +125,14 @@ public class BluetoothActivity extends AppCompatActivity {
      */
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void checkBTPermission() {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             int permissionCheck = 0;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION")
                         + this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
             }
-            if(permissionCheck != 0){
-                this.requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+            if (permissionCheck != 0) {
+                this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                         1001);
             }
         }
@@ -216,13 +216,12 @@ public class BluetoothActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             final String action = intent.getAction();
             Log.d(TAG, "SEARCHING!");
-
             if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-                BluetoothDevice device = intent.getParcelableExtra (BluetoothDevice.EXTRA_DEVICE);
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 myBTDevicesArrayList.add(device);
                 Log.d(TAG, "onReceive: " + device.getName() + ": " + device.getAddress());
                 myFoundAdapterListItem = new DeviceAdapterList(context, R.layout.device_adapter_view, myBTDevicesArrayList);
-                lvDiscoveredDevices.setAdapter(myFoundAdapterListItem);
+                lvNewDevices.setAdapter(myFoundAdapterListItem);
             }
         }
     };
