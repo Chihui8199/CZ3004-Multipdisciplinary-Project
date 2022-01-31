@@ -3,17 +3,24 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/bordered_box.xml" value="0.194" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/cricle.xml" value="0.3385" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/ic_baseline_menu_24.xml" value="0.3385" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/ic_launcher_background.xml" value="0.3385" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/menu_icon.xml" value="0.194" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/rounded_box.xml" value="0.3385" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/section_header.xml" value="0.3385" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/send_button.xml" value="0.3385" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/drawable/send_icon.xml" value="0.3385" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_bluetooth_page.xml" value="0.28306159420289856" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_bluetooth_settings.xml" value="0.276268115942029" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_image_recognition.xml" value="0.28306159420289856" />
-        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_main.xml" value="0.28306159420289856" />
-        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_page.xml" value="0.276268115942029" />
-        <entry key="app/src/main/res/layout/activity_bluetooth_settings.xml" value="0.375" />
-        <entry key="app/src/main/res/layout/activity_image_recognition.xml" value="0.254981884057971" />
-        <entry key="app/src/main/res/layout/activity_main.xml" value="0.18645833333333334" />
-        <entry key="app/src/main/res/layout/activity_page.xml" value="0.1" />
-        <entry key="app/src/main/res/layout/device_adapter_view.xml" value="0.16770833333333332" />
-        <entry key="app/src/main/res/layout/fragment_bt_check.xml" value="0.26614583333333336" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/activity_page.xml" value="0.1279226618705036" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/discovered_device_view.xml" value="0.27180755395683454" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/fragment_bluetooth_settings.xml" value="0.3333333333333333" />
+        <entry key="app/src/main/res/layout/activity_bluetooth_settings.xml" value="0.2942708333333333" />
+        <entry key="app/src/main/res/layout/activity_image_recognition.xml" value="0.2942708333333333" />
       </map>
     </option>
   </component>
