@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -42,7 +43,7 @@ public class BluetoothActivity extends AppCompatActivity {
     EditText message_list;
     StringBuilder incomingMsg;
     Intent connectIntent;
-    Button btnSend;
+    ImageButton btnSend;
     EditText sendMessage;
 
 
@@ -74,8 +75,6 @@ public class BluetoothActivity extends AppCompatActivity {
         message_list = findViewById(R.id.message_list);
         sendMessage = findViewById(R.id.sender_input_text);
         btnSend = findViewById(R.id.sendBtn);
-
-
 
         //Register BroadcastReceiver for ACTION_FOUND (ENABLE/DISABLE BLUETOOTH)
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
