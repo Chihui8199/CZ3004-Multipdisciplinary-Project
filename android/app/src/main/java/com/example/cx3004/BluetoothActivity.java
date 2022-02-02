@@ -16,12 +16,15 @@ import android.bluetooth.BluetoothAdapter;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -29,12 +32,19 @@ import java.util.Set;
 public class BluetoothActivity extends AppCompatActivity {
     private static final String TAG = "BTCheck";
 
+    Context mContext;
     BluetoothAdapter myBluetoothAdapter;
     static BluetoothDevice myBTDevice;
     Button btnOnOff;
     ListView lvFoundDevices;
     ListView lvPairedDevices;
     ProgressDialog myProgressDialog;
+    EditText message_list;
+    StringBuilder incomingMsg;
+    Intent connectIntent;
+    Button btnSend;
+    EditText sendMessage;
+
 
     //Array List to hold bluetooth devices discovered
     public ArrayList<BluetoothDevice> myBTDevicesArrayList = new ArrayList<>();
@@ -42,6 +52,11 @@ public class BluetoothActivity extends AppCompatActivity {
     //Array List to hold bluetooth devices paired
     public ArrayList<BluetoothDevice> myBTPairedDevicesArrayList = new ArrayList<>();
     public DeviceAdapterList myPairedDeviceAdapterListItem;
+
+
+    public static BluetoothDevice getBluetoothDevice(){
+        return myBTDevice;
+    }
 
 
     @Override
@@ -56,6 +71,11 @@ public class BluetoothActivity extends AppCompatActivity {
         btnOnOff = findViewById(R.id.bluetooth_button);
         lvFoundDevices = findViewById(R.id.lvNewDevices);
         lvPairedDevices = findViewById(R.id.lvPairedDevices);
+        message_list = findViewById(R.id.message_list);
+        sendMessage = findViewById(R.id.sender_input_text);
+        btnSend = findViewById(R.id.sendBtn);
+
+
 
         //Register BroadcastReceiver for ACTION_FOUND (ENABLE/DISABLE BLUETOOTH)
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -73,6 +93,8 @@ public class BluetoothActivity extends AppCompatActivity {
         IntentFilter bondFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         registerReceiver(bondingBroadcastReceiver, bondFilter);
 
+        // Register broadcast when there's incoming message
+        LocalBroadcastManager.getInstance(this).registerReceiver(incomingMsgBroadCastReceiver, new IntentFilter("IncomingMsg"));
 
         btnOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,7 +128,6 @@ public class BluetoothActivity extends AppCompatActivity {
                             // Assign selected device info to myBTDevice
                             myBTDevice = myBTDevicesArrayList.get(i);
 
-
                         }
 
                     }
@@ -128,6 +149,16 @@ public class BluetoothActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        // OnClick Listener for Send button
+        btnSend.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View view) {
+                byte[] bytes = sendMessage.getText().toString().getBytes(Charset.defaultCharset());
+                BluetoothCom.writeMsg(bytes);
+                message_list.append(sendMessage.getText().toString()+"\n");
+                sendMessage.setText("");
+            }
+        });
     }
 
     // Enable Bluetooth
@@ -268,11 +299,11 @@ public class BluetoothActivity extends AppCompatActivity {
                         // Discover devices
                         startSearch();
 
-//                        // Start BluetoothConnectionService to listen for connection
-//                        connectIntent = new Intent(getContext(), BluetoothComms.class);
-//                        connectIntent.putExtra("serviceType", "listen");
-//                        getActivity().startService(connectIntent);
-//
+                      // Start BluetoothConnectionService to listen for connection
+                        connectIntent = new Intent(mContext, BluetoothCom.class);
+                        connectIntent.putExtra("serviceType", "listen");
+                        startService(connectIntent);
+
                         // Check Paired Devices list
                         checkPairedDevice();
                         break;
@@ -369,6 +400,17 @@ public class BluetoothActivity extends AppCompatActivity {
         }
     };
 
+    // Broadcast Receiver for incoming message
+    BroadcastReceiver incomingMsgBroadCastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(TAG, "Receiving Message!");
+            String msg = intent.getStringExtra("receivingMsg");
+            incomingMsg.append(msg + "\n");
+            message_list.append(incomingMsg);
+        }
+    };
+
 
     // Unregister receivers
     @Override
@@ -379,6 +421,7 @@ public class BluetoothActivity extends AppCompatActivity {
         unregisterReceiver(discoverStatusBroadcastReceiver);
         unregisterReceiver(discoveringDevicesBroadcastReceiver);
         unregisterReceiver(bondingBroadcastReceiver);
+        unregisterReceiver(incomingMsgBroadCastReceiver);
     }
 
 }

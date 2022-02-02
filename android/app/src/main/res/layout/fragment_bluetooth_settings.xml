@@ -115,16 +115,22 @@
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="@dimen/header_size" />
 
-            <androidx.recyclerview.widget.RecyclerView
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+            <EditText
                 android:id="@+id/message_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_margin="@dimen/item_padding"
                 android:background="@drawable/rounded_box"
-                android:padding="@dimen/text_padding">
+                android:scrollbars="vertical"
+                android:inputType="textMultiLine"
+                android:hint="No messages yet~"
+                android:padding="@dimen/text_padding"
+                />
 
-            </androidx.recyclerview.widget.RecyclerView>
+<!--            </androidx.recyclerview.widget.RecyclerView>-->
+
 
             <LinearLayout
                 android:id="@+id/message_sender"
@@ -146,8 +152,20 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:background="@drawable/rounded_box"
-                        android:hint="@string/sender_hint" />
+                        android:hint="@string/sender_hint"
+                        android:inputType="textMultiLine"
+                        android:singleLine="true"
+                        />
+
                 </com.google.android.material.textfield.TextInputLayout>
+
+                <Button
+                    android:id="@+id/sendBtn"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:foreground="@android:drawable/ic_menu_send"
+                    android:foregroundGravity="center" />
 
                 <ImageButton
                     android:id="@+id/imageButton"
@@ -160,6 +178,7 @@
                     android:minHeight="@dimen/button_size"
                     android:scaleType="fitCenter"
                     android:src="@drawable/send_button" />
+
             </LinearLayout>
 
         </LinearLayout>
