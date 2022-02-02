@@ -21,9 +21,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/title_activity_main"
+            android:text="@string/title_blank_page"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="@dimen/title_size" />
+
 
         <ImageButton
             android:id="@+id/nav_button"
@@ -34,8 +35,19 @@
             android:contentDescription="@string/nav_button_description"
             android:scaleType="fitCenter"
             app:srcCompat="@drawable/menu_icon"
-            />
+            android:onClick="showPopup"/>
+        <!--
+        <androidx.appcompat.widget.ActionMenuView
+            android:id="@+id/nav_button"
+            android:layout_width="@dimen/button_size"
+            android:layout_height="@dimen/button_size"
+            android:layout_gravity="end"
+            android:background="@drawable/menu_icon"
+            android:contentDescription="@string/nav_button_description"
+            android:scaleType="fitCenter">
 
+        </androidx.appcompat.widget.ActionMenuView>
+        -->
 
     </androidx.appcompat.widget.Toolbar>
 
