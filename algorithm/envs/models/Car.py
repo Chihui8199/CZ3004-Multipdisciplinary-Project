@@ -25,24 +25,62 @@ class Car(Entity):
         :param rectification_model: model used to rectify the position of the car after moving
         """
         super().__init__(x=x, y=y, length=length, width=width)
+        self.length = length
+        self.width = width
         self.rectification_model = rectification_model
 
-    def get_traj(self, action) -> Tuple[List[Entity], float]:
+    def get_traj(self, action, sample_rate: float = 0.1) -> Tuple[List[Entity], float]:
         """
         simulate the traj as if no obstacles, no boundaries; and calculate length of the traj
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
         the simplest way is to return a list of sampled positions (as entities)
         """
-        pass
+        # traj is a array of car positions, cost is the length of the path
+        v, angle, t = action[0], action[1], action[2]
+        # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
+        traj_list = []
+        samples = t / sample_rate
+        cost = v * t
 
-    def set(self, x, y, z):
-        """
-        set the new position of the car (as if pick up the car and put it down directly)
-        :param x:
-        :param y:
-        :param z:
-        :return:
-        """
-        self.x = x
-        self.y = y
-        self.z = z
+        # whether car rotating
+        if math.fabs(angle) < pow(10, -3):
+            # no rotation
+            for i in range(samples):
+                time = i * sample_rate
+                traj = Entity(
+                    x=self.x + v * time * math.cos(math.pi/2+self.z),
+                    y=self.y + v * time * math.sin(math.pi/2+self.z),
+                    z=self.z,
+                    length=self.length,
+                    width=self.width
+                )
+                traj_list.append(traj)
+        else:
+            radius = self.length / (2 * math.sin(angle))
+            for i in range(samples):
+                time = i * sample_rate
+                x = self.x - radius * math.cos(angle) + radius * math.cos(v * time / radius + angle)
+                y = self.y - radius * math.sin(angle) + radius * math.sin(v * time / radius + angle)
+                traj = Entity(
+                    x=x,
+                    y=y,
+                    z=math.atan2(math.sin(v * time / radius + angle), math.cos(v * time / radius + angle)),
+                    length=self.length,
+                    width=self.width
+                )
+                traj_list.append(traj)
+
+        return traj_list, cost
+
+
+def set(self, x, y, z):
+    """
+    set the new position of the car (as if pick up the car and put it down directly)
+    :param x:
+    :param y:
+    :param z:
+    :return:
+    """
+    self.x = x
+    self.y = y
+    self.z = z
