@@ -34,10 +34,10 @@ class ImageRecognitionEnv(gym.Env):
                     |         |
                     ===========
         """
-        self.walls.append(Entity(-1, self.length / 2, self.length, 2))
-        self.walls.append(Entity(self.width + 1, self.length / 2, self.length, 2))
-        self.walls.append(Entity(self.width / 2, -1, 2, self.width + 4))
-        self.walls.append(Entity(self.width / 2, self.length + 1, 2, self.width + 4))
+        self.walls.append(Entity(x=-1, y=self.length / 2, length=self.length, width=2))
+        self.walls.append(Entity(x=self.width + 1, y=self.length / 2, length=self.length, width=2))
+        self.walls.append(Entity(x=self.width / 2, y=-1, length=2, width=self.width + 4))
+        self.walls.append(Entity(x=self.width / 2, y=self.length + 1, length=2, width=self.width + 4))
 
     def add_obstacle(self, **kwargs) -> int:
         """
@@ -76,13 +76,21 @@ class ImageRecognitionEnv(gym.Env):
                     return True
         return False
 
-    def _get_obs_from_car_pos(self, pos):
+    def _get_obs_from_car_pos(self, pos: Entity):
         """
         This is a helper function, pos doesn't need to be the exact car position
         :param pos:
         :return:
         """
-        pass
+        # the obs is firstly about the position of the car, [0:3]
+        obs = [pos.get_positioning_status()]
+
+        # later is the points to go for
+        for obstacle in self.obstacles:
+            obs += obstacle.get_points_to_visit()
+
+        # TODO: may add more
+        return obs
 
     def _get_car_pos_from_obs(self, obs) -> Entity:
         """
@@ -91,9 +99,9 @@ class ImageRecognitionEnv(gym.Env):
         :param obs:
         :return:
         """
-        pass
+        return Entity(x=obs[0][0], y=obs[0][1], z=obs[0][2], length=self.car.length, width=self.car.width)
 
-    def try_step(self, action):
+    def step(self, action):
         """
         if we shall use it as a simulator, so the env must can trail and error
         so instead of directly step, we can have a try_step function
@@ -106,25 +114,26 @@ class ImageRecognitionEnv(gym.Env):
         traj, cost = self.car.get_traj(action)
         collision = self._check_collision(traj)
         if collision:
-            cost = float('inf')
-            pass  # TODO: do something
+            return None, float('inf'), True, None  # obs, cost, done, additional info (None for now)
         else:
-            pass
+            obs = self._get_obs_from_car_pos(traj[-1])
+            return obs, cost, False, None
 
-    def step(self, obs):
+    def update(self, rectified_car_pos: Car):
         """
         update the status of the env by putting the car in position
-        :param obs: result[0] from try_step
-        :return: None; if not feasible, an exception will be thrown
+        :param rectified_car_pos:
+        :return:
         """
         # TODO: below is just a scratch, representing the general workflow
-        final_pos = self._get_car_pos_from_obs(obs)
-        if self._check_collision([final_pos]):
-            # ideally this should not happen
-            raise ValueError(f"invalid car position! Observation: {obs};\n "
-                             f"you should run try_step() first, and do not call step() if done=True")
-        self.car.set(final_pos.x, final_pos.y, final_pos.z)
-        # TODO: may have more to be done
+        if self._check_collision([rectified_car_pos]):
+            # ideally this should not happen, but we need to handle it
+            # TODO: in case the position is really not valid, we should have a fallback strategy
+            raise ValueError(f"invalid car position! x: {rectified_car_pos.get_positioning_status()};\n ")
+        self.car.set(rectified_car_pos.x, rectified_car_pos.y, rectified_car_pos.z)
+
+    def get_current_obs(self):
+        return self._get_obs_from_car_pos(self.car)
 
     def recognize(self, vision_x: int, sign: Sign):
         """
@@ -143,7 +152,7 @@ class ImageRecognitionEnv(gym.Env):
         clear the board and reset the car position
         :return:
         """
-        pass
+        return self._get_obs_from_car_pos(self.car)
 
     def render(self, mode="human"):
         """

@@ -1,39 +1,74 @@
 import logging
+import time
 
 from controllers import RandomController
 from envs import make_env
+from envs.models import Car
+
+
+def round_to_two(l: list):
+    return ['%.2f' % elem for elem in l]
 
 
 def main():
+    # choose one controller
     controller = RandomController()
+
+    # set up simulator
     env = make_env("RobotMove-v0")
-    env.add_obstacle(x=30, y=30)
-    env.add_obstacle(x=31, y=31)  # this will give you an warning, cuz this is not a valid pos
-    env.set_car(x=15, y=15)
-    # TODO: not yet usable; but below is the most simplified way of using it
+    env.set_car(x=15, y=15, rectification_model=None)
+    env.add_obstacle(x=100, y=100)
+
+    # start simulating
     obs = env.reset()
-    completed = False
-    while not completed:  # FIXME: don't run this yet, will caught in inf loop
+    while len(obs) > 1:  # TODO: don't run this yet, will caught in inf loop
+        # len(obs) > 1 means there are still points to visit
+
         # get an action based on the current obs
         action = controller.act(obs)
 
         # see if the action is feasible
-        obs_, cost, done = env.try_step(action)
+        obs_, cost, done, _ = env.step(action)
 
         if done:
+            logging.debug(f"collision detected for act: {round_to_two(action)}, retrying...")
             continue  # means the act is not valid, just get another one
 
-        # transfer the status of the env
-        env.step(obs_)
+        # TODO: actually execute the command, need to talk to the robot team
+        # something like: robot.do(action)
+        time.sleep(action[-1])  # as if it's done, we get some sensor_data
 
-        logging.info(f"observation: {obs}, action: {action}, cost: {cost}")
+        # TODO: rectify the position through the sensor data posted back by the robot team
+        # either do this manually or use the rectification_model
+        # something like: rectified_car_pos = model.rectify(obs, action, sensor_data)
 
-        # update the obs
-        obs = obs_
+        # transfer the status of the env aft
+        # here just used the simulated pos
+        env.update(rectified_car_pos=Car(x=obs_[0][0], y=obs_[0][1], z=obs_[0][2]))
 
         # TODO: try recognize something and call env.recognize(...) not finalized yet
         # if all sign recognized, set completed = True
-        
+        # do image recognition
+        # if recognized:
+        #   env.recognize(..., ...)
+
+        # update the latest obs at the end of one step
+        obs_ = env.get_current_obs()
+
+        # this is just an adhoc print to let you know what's going on
+        logging.info(f"\n\n"
+                     f"car position: {round_to_two(obs[0])},\n"
+                     f"action: {round_to_two(action)},\n"
+                     f"cost: {round_to_two([cost])[0]},\n"
+                     f"updated car position: {round_to_two(obs_[0])}\n\n")
+
+        obs = obs_
+
 
 if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='[%(asctime)s] {%(pathname)s:%(lineno)d} %(levelname)s - %(message)s',
+        datefmt='%H:%M:%S'
+    )
     main()

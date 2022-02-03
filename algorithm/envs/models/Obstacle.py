@@ -54,7 +54,7 @@ class Obstacle(Entity):
         if content not in [Sign.UNKNOWN, Sign.BULLS_EYE]:
             self.explored = True
 
-    def get_points_to_visit(self) -> List[Tuple[float, float, float]]:
+    def get_points_to_visit(self) -> List[List[float]]:
         """
         get the coordinates to go to recognize the remaining surfaces
         :return:
@@ -71,11 +71,11 @@ class Obstacle(Entity):
         for i, surface in enumerate(self.surfaces):
             if surface.sign == Sign.UNKNOWN:  # not visited
                 if i == 0:
-                    coords.append((self.x, self.y + self.y_offset, surface.to_be_viewed_at.value))
+                    coords.append([self.x, self.y + self.y_offset, surface.to_be_viewed_at.value])
                 elif i == 1:
-                    coords.append((self.x - self.x_offset, self.y, surface.to_be_viewed_at.value))
+                    coords.append([self.x - self.x_offset, self.y, surface.to_be_viewed_at.value])
                 elif i == 2:
-                    coords.append((self.x, self.y - self.y_offset, surface.to_be_viewed_at.value))
+                    coords.append([self.x, self.y - self.y_offset, surface.to_be_viewed_at.value])
                 else:
-                    coords.append((self.x + self.x_offset, self.y, surface.to_be_viewed_at.value))
+                    coords.append([self.x + self.x_offset, self.y, surface.to_be_viewed_at.value])
         return coords
