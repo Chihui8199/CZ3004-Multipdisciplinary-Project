@@ -2,6 +2,7 @@ import math
 from typing import List, Tuple
 
 import torch
+import numpy as np
 
 from envs.models import Entity, Direction
 
@@ -30,7 +31,7 @@ class Car(Entity):
         self.width = width
         self.rectification_model = rectification_model
 
-    def get_traj(self, action, sample_rate: float = 0.01) -> Tuple[List[Entity], float]:
+    def get_traj(self, action, sample_rate: float = 0.01, noise: bool = False) -> Tuple[List[Entity], float]:
         """
         simulate the traj as if no obstacles, no boundaries; and calculate length of the traj
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
@@ -40,10 +41,8 @@ class Car(Entity):
         v, angle, t = action[0], action[1], action[2]
         # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
         traj_list = []
-        samples = math.floor(t / sample_rate)  # TODO: confirm if to round up or down
-        if samples == 0:  # time too short, consider it as 1 sample
-            samples = 1
-            sample_rate = t
+        samples = max(1, math.floor(t / sample_rate))  # if time too short, consider it as 1 sample
+        sample_rate = t / samples
         cost = abs(v) * t
 
         # whether car rotating
@@ -58,6 +57,8 @@ class Car(Entity):
                     length=self.length,
                     width=self.width
                 )
+                if noise:
+                    traj.add_noise()
                 traj_list.append(traj)
         else:
             radius = self.length / (2 * math.sin(angle))
@@ -72,6 +73,8 @@ class Car(Entity):
                     length=self.length,
                     width=self.width
                 )
+                if noise:
+                    traj.add_noise()
                 traj_list.append(traj)
 
         return traj_list, cost

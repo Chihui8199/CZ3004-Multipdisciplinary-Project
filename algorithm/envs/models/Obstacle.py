@@ -1,3 +1,4 @@
+import random
 from typing import List, Tuple
 
 from envs.models import Direction, Sign, Entity
@@ -13,16 +14,19 @@ class Obstacle(Entity):
         def __init__(self, to_be_viewed_at: Direction):
             self.to_be_viewed_at = to_be_viewed_at
             self.sign = Sign.UNKNOWN
+            self.gt = Sign.UNKNOWN  # only used in mock
 
-    def __init__(self, x: float, y: float, length: float = 10, width: float = 10):
+    def __init__(self, x: float, y: float, length: float = 10, width: float = 10, mock: bool = False):
         """
         :param x: x coordinate of the center of the obstacle (x-distance in cm to the origin)
         :param y: y coordinate of the center the obstacle (y-distance in cm to the origin)
         :param width: width of the obstacle in cm, default to be 10
         :param length: length of the obstacle in cm, default to be 10
+        :param mock: True if to randomly allocate the surfaces
         """
         # TODO: the exact default values need to be confirmed
         super().__init__(x=x, y=y, length=length, width=width)
+        self.mock = mock
         self.x_offset = width / 2 + self.BEST_VIEW_DISTANCE
         self.y_offset = length / 2 + self.BEST_VIEW_DISTANCE
         self.explored = False
@@ -42,6 +46,14 @@ class Obstacle(Entity):
             self.Surface(Direction.NORTH),
             self.Surface(Direction.WEST),
         ]
+
+        if self.mock:
+            pic_idx = random.randint(0, 3)
+            for i, s in enumerate(self.surfaces):
+                if i == pic_idx:
+                    s.gt = Sign.ALPHA_A  # mock target img as the specific value is not important
+                else:
+                    s.gt = Sign.BULLS_EYE
 
     def recognize_face(self, surface_id: int, content: Sign):
         """
