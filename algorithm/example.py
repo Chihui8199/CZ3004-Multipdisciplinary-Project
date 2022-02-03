@@ -35,15 +35,17 @@ def main():
             continue  # means the act is not valid, just get another one
 
         # TODO: actually execute the command, need to talk to the robot team
+        env.clear_sensor_data()  # clear old data
         # something like: robot.do(action)
+        # inside robot.do, call env.record_sensor_data(...) whenever appropriate
         time.sleep(action[-1])  # as if it's done, we get some sensor_data
 
         # TODO: rectify the position through the sensor data posted back by the robot team
         # either do this manually or use the rectification_model
-        # something like: rectified_car_pos = model.rectify(obs, action, sensor_data)
+        # something like: rectified_car_pos = model.rectify(obs, action, env.get_sensor_data())
 
         # transfer the status of the env aft
-        # here just used the simulated pos
+        # here just use the simulated pos (as if it's perfect simulation)
         env.update(rectified_car_pos=Car(x=obs_[0][0], y=obs_[0][1], z=obs_[0][2]))
 
         # TODO: try recognize something and call env.recognize(...) not finalized yet

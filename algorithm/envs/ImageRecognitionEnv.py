@@ -1,4 +1,6 @@
 import logging
+from time import time
+from collections import deque
 from typing import List
 
 import gym
@@ -20,9 +22,9 @@ class ImageRecognitionEnv(gym.Env):
         self.width = width
         self.length = length
         self.walls = []
-        # TODO: there should be better way to store obstacles other than keeping a list
         self.obstacles = []
         self.car = None
+        self.sensor_data = deque([], maxlen=1000)  # the point is, not need to keep too much old data
         self._add_walls()
 
     def _add_walls(self):
@@ -135,6 +137,25 @@ class ImageRecognitionEnv(gym.Env):
     def get_current_obs(self):
         return self._get_obs_from_car_pos(self.car)
 
+    def clear_sensor_data(self):
+        """
+        remove outdated sensor data
+        :return:
+        """
+        self.sensor_data.clear()
+
+    def record_sensor_data(self, data):
+        """
+        Record sensor data, format to be confirmed with the robot team
+        note that this api can be async called, any time, whenever received a sensor data
+        :param data:
+        :return:
+        """
+        self.sensor_data.append((time(), data))  # TODO: timestamp may not be needed, but I just leave it here for now
+
+    def get_sensor_data(self):
+        return list(self.sensor_data)
+
     def recognize(self, vision_x: int, sign: Sign):
         """
         this is to be used when the car recognized something (bull eye / float)
@@ -164,7 +185,7 @@ class ImageRecognitionEnv(gym.Env):
 
     def reset(self):
         """
-        clear the board and reset the car position
+        this is not really used as we don't really reset the car after moving
         :return:
         """
         return self._get_obs_from_car_pos(self.car)
