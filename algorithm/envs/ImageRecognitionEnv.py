@@ -138,14 +138,29 @@ class ImageRecognitionEnv(gym.Env):
     def recognize(self, vision_x: int, sign: Sign):
         """
         this is to be used when the car recognized something (bull eye / float)
-        ideally this should only be called after stepping
+        this should be called async (i.e. upon detecting something), and once when the car stopped moving
         :param vision_x: the x position of the recognized sign in the image, ranging from [0, 600]
         :param sign:
-        :return: True if all tasks are completed TODO: to be discussed
+        :return: None
         """
         # TODO: not yet sure of how to represent this, this part need to partner with the vision team (ds not confirmed)
-        # we need to confirm which exact surface of which obstacle is it recognizing
-        pass
+
+        # For now:
+        # for simplicity, we only consider one as recognized when it's right in front of the car:
+        if vision_x <= 250 or vision_x >= 350:
+            pass
+        # identify which obstacle and surface is it recognizing
+        # then call recognize_face(...) of that obstacle
+
+        """
+        Q: why is it so hard?
+        A: 
+        1. multiple signs seen, which is which? important for path planing
+        2. important for rectify the position of the car as well!
+        
+        It may be the easiest by do experiments and measure by hand, rather than try to do it mathematically
+        unless you do know the camera lens well, like how it bends (p.s. I know nothing abt it -- Xinyi)
+        """
 
     def reset(self):
         """
