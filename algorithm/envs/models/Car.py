@@ -39,7 +39,7 @@ class Car(Entity):
         v, angle, t = action[0], action[1], action[2]
         # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
         traj_list = []
-        samples = t / sample_rate
+        samples = math.floor(t / sample_rate)  # TODO: confirm if to round up or down
         cost = v * t
 
         # whether car rotating
@@ -72,15 +72,14 @@ class Car(Entity):
 
         return traj_list, cost
 
-
-def set(self, x, y, z):
-    """
-    set the new position of the car (as if pick up the car and put it down directly)
-    :param x:
-    :param y:
-    :param z:
-    :return:
-    """
-    self.x = x
-    self.y = y
-    self.z = z
+    def set(self, x, y, z):
+        """
+        set the new position of the car (as if pick up the car and put it down directly)
+        :param x:
+        :param y:
+        :param z:
+        :return:
+        """
+        self.x = x
+        self.y = y
+        self.z = z
