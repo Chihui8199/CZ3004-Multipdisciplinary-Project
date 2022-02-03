@@ -1,5 +1,5 @@
 from envs.models import Direction
-from envs.helpers import collide_with
+from helpers import collide_with
 
 
 class Entity:
