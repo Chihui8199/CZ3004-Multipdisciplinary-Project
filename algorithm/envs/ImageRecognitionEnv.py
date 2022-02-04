@@ -1,6 +1,7 @@
 import logging
 import math
 import random
+from threading import Thread
 from time import time
 from collections import deque
 from typing import List, Union, Tuple
@@ -111,13 +112,17 @@ class ImageRecognitionEnv(gym.Env):
 
         # then is about the obstacle [is_explored, x, y, one-hot encoding of target surface]
         for obstacle in self.obstacles:
-            obs.append([1 if obstacle.explored else 0] +
+            obs.append([obstacle.surfaces[obstacle.target_surface_id].sign.value] +
                        [obstacle.x, obstacle.y] +
                        [1 if s.is_target else 0 for s in obstacle.surfaces])
 
         if self.rl_mode:
             # we need to flat the observation into 1d
             obs = list(chain.from_iterable(obs))
+
+            # and there is no need for the agent to know the exact sign content
+            for i in range(3, len(obs), 7):
+                obs[i] = 0 if obs[i] == -1 else 1
 
         # TODO: may add more
         return obs
@@ -181,8 +186,8 @@ class ImageRecognitionEnv(gym.Env):
             recog_distance_reward += d * recog_distances_discount_factor
             recog_distances_discount_factor **= 2
 
-        # keep it alive first
-        ep_len_factor = 1.
+        # TODO: investigating if we need this
+        ep_len_factor = -1.
         ep_len_reward = 0 if self.steps == 0 else math.log(self.steps)
 
         reward = path_factor * path_cost + speed_factor * speed_cost + time_factor * time_cost + \
@@ -329,8 +334,8 @@ class ImageRecognitionEnv(gym.Env):
             self.set_car(x=random.uniform(30, self.width - 30), y=random.uniform(30, self.length - 30))
             self.obstacles = []
             for i in range(5):
-                while self.add_obstacle(x=random.uniform(30, self.width - 30),
-                                        y=random.uniform(30, self.length - 30),
+                while self.add_obstacle(x=random.randint(30, int(self.width - 30)),
+                                        y=random.randint(30, int(self.length - 30)),
                                         target_face_id=random.randint(0, 3),
                                         mock=True) == -1:
                     continue  # TODO: actually this may make the obstacles too close to each other
@@ -345,4 +350,43 @@ class ImageRecognitionEnv(gym.Env):
         :param mode:
         :return:
         """
-        pass
+        ui_thread = Thread(target=self._render)
+        ui_thread.start()
+
+    def _render(self):
+        from matplotlib.animation import FuncAnimation
+        import matplotlib.pyplot as plt
+
+        def _update(*args):
+            obstacles_x = []
+            obstacles_y = []
+            points_x = []
+            points_y = []
+            for o in self.obstacles:
+                point = o.get_best_point_to_visit()
+                obstacles_x.append(o.x)
+                obstacles_y.append(o.y)
+                if len(point) > 0:
+                    points_x.append(point[0])
+                    points_y.append(point[1])
+            obstacles.set_data(obstacles_x, obstacles_y)
+            nodes.set_data(points_x, points_y)
+            car.set_data([self.car.x], [self.car.y])
+            info.set_text("x: {:.2f} y: {:.2f}".format(self.car.x, self.car.y))
+
+            return info, obstacles, nodes, car,
+
+        fig, ax = plt.subplots()
+        ax.grid()
+
+        ax.set_xlim(0, 200)
+        ax.set_ylim(0, 200)
+
+        info = ax.text(5, 5, "")
+        obstacles, = ax.plot([], [], marker="s", ls="")
+        nodes, = ax.plot([], [], marker="o", ls="")
+        car, = ax.plot([], [], marker="^", ls="")
+
+        anim = FuncAnimation(fig, _update, interval=100, blit=True)
+        fig.tight_layout()
+        plt.show()

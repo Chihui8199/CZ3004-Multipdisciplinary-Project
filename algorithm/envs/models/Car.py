@@ -12,12 +12,12 @@ class Car(Entity):
     Represents the robot car
     """
     # TODO: these bounds are just placeholders, the numbers/units are unclear
-    VELOCITY_LB = -1
-    VELOCITY_UP = 1
-    ANGLE_LB = - math.pi / 4
-    ANGLE_UB = math.pi / 4
+    VELOCITY_LB = -2
+    VELOCITY_UP = 2
+    ANGLE_LB = -0.73
+    ANGLE_UB = 0.73
     TIME_LB = 0.5
-    TIME_UP = 3
+    TIME_UP = 2
 
     def __init__(self, rectification_model: torch.nn.Module = None,
                  x: float = 15, y: float = 15,

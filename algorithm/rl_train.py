@@ -15,7 +15,7 @@ def round_to_two(l: list):
 
 
 timestamp = time()
-log_filename = f"ddpg_train_log_{timestamp}.log"
+log_filename = f"log/ddpg_train_log_{timestamp}.log"
 print(f"logging to file: ", log_filename)
 logging.basicConfig(
         filename=log_filename,
@@ -25,6 +25,7 @@ logging.basicConfig(
     )
 
 env = make_env("RobotMove-v0", mock=True, rl_mode=True)
+env.render()
 
 # the noise objects for DDPG
 n_actions = 3
@@ -33,11 +34,11 @@ action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=floa
 
 model = DDPG(MlpPolicy, env, verbose=1, action_noise=action_noise)
 model.learn(total_timesteps=100000)
-model.save(f"ddpg_{timestamp}")
+model.save(f"log/ddpg_{timestamp}")
 
 del model # remove to demonstrate saving and loading
 
-model = DDPG.load(f"ddpg_{timestamp}")
+model = DDPG.load(f"log/ddpg_{timestamp}")
 
 obs = env.reset()
 done = False

@@ -21,6 +21,7 @@ def main():
 
     # start simulating
     obs = env.reset()
+    env.render()
     while True:  # TODO: will caught in inf loop, but this is just for workflow demo
         # len(obs) > 1 means there are still points to visit
 
