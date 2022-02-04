@@ -62,14 +62,15 @@ class Car(Entity):
                 traj_list.append(traj)
         else:
             radius = self.length / (2 * math.sin(angle))
+
             for i in range(samples):
                 time = i * sample_rate
-                x = self.x - radius * math.cos(angle) + radius * math.cos(v * time / radius + angle)
-                y = self.y - radius * math.sin(angle) + radius * math.sin(v * time / radius + angle)
+                x = self.x - radius * math.cos(self.z) + radius * math.cos(v * time / radius + self.z)
+                y = self.y - radius * math.sin(self.z) + radius * math.sin(v * time / radius + self.z)
                 traj = Entity(
                     x=x,
                     y=y,
-                    z=math.atan2(math.sin(v * time / radius + angle), math.cos(v * time / radius + angle)),
+                    z=v * time / radius + self.z,
                     length=self.length,
                     width=self.width
                 )
