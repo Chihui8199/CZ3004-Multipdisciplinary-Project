@@ -29,7 +29,7 @@ env = make_env("RobotMove-v0", mock=True, rl_mode=True)
 # the noise objects for DDPG
 n_actions = 3
 param_noise = None
-action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=float(0.8) * np.ones(n_actions))
+action_noise = OrnsteinUhlenbeckActionNoise(mean=np.zeros(n_actions), sigma=float(0.5) * np.ones(n_actions))
 
 model = DDPG(MlpPolicy, env, verbose=1, action_noise=action_noise)
 model.learn(total_timesteps=100000)

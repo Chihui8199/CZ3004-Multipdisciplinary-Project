@@ -88,17 +88,13 @@ class Obstacle(Entity):
 
         to be viewed at "North"
         """
-        coords = []
         if self.explored:
-            return coords  # no more points to be visited
-        for i, surface in enumerate(self.surfaces):
-            if surface.sign == Sign.UNKNOWN:  # not visited
-                if i == 0:
-                    return [self.x, self.y + self.y_offset, surface.to_be_viewed_at.value]
-                elif i == 1:
-                    return [self.x - self.x_offset, self.y, surface.to_be_viewed_at.value]
-                elif i == 2:
-                    return [self.x, self.y - self.y_offset, surface.to_be_viewed_at.value]
-                else:
-                    return [self.x + self.x_offset, self.y, surface.to_be_viewed_at.value]
-        return coords
+            return []  # no more points to be visited
+        if self.target_surface_id == 0:
+            return [self.x, self.y + self.y_offset, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+        elif self.target_surface_id == 1:
+            return [self.x - self.x_offset, self.y, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+        elif self.target_surface_id == 2:
+            return [self.x, self.y - self.y_offset, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+        else:
+            return [self.x + self.x_offset, self.y, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
