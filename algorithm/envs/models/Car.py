@@ -16,7 +16,7 @@ class Car(Entity):
     VELOCITY_UP = 1
     ANGLE_LB = - math.pi / 4
     ANGLE_UB = math.pi / 4
-    TIME_LB = 0
+    TIME_LB = 0.5
     TIME_UP = 3
 
     def __init__(self, rectification_model: torch.nn.Module = None,

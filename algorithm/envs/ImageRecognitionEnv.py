@@ -130,10 +130,10 @@ class ImageRecognitionEnv(gym.Env):
         path_factor = -1
 
         speed_factor = -5
-        speed_cost = act[0]
+        speed_cost = abs(act[0])
 
         time_factor = -1
-        time_cost = act[2]  # the time of driving
+        time_cost = 0  # the time of driving, TODO: disabled for now
 
         distances = []
         recog_distances = []
@@ -197,6 +197,7 @@ class ImageRecognitionEnv(gym.Env):
             action = self._denorm_actions(action)
         if self.mock:
             self.steps += 1
+            logging.debug(f"action: {action}")
 
         traj, path_cost = self.car.get_traj(action)
         collision = self._check_collision(traj)
@@ -210,6 +211,7 @@ class ImageRecognitionEnv(gym.Env):
                         if ((p[0] - self.car.x) ** 2 + (p[1] - self.car.y) ** 2) ** 0.5 < 20. and \
                                 min((2 * math.pi) - abs(p[2] - self.car.z), abs(p[2] - self.car.z)) < 0.5:
                             # means tha car is close enough to recognize
+                            logging.info("the car has arrived at a proper position")
                             j = 0
                             for s_id, s in enumerate(o.surfaces):
                                 # this is a really silly and unreliable way of finding the surface
