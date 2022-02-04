@@ -17,11 +17,11 @@ def main():
     # set up simulator
     env = make_env("RobotMove-v0")
     env.set_car(x=15, y=15, rectification_model=None)
-    env.add_obstacle(x=100, y=100)
+    env.add_obstacle(x=100, y=100, target_face_id=0)
 
     # start simulating
     obs = env.reset()
-    while len(obs) > 1:  # TODO: don't run this yet, will caught in inf loop
+    while True:  # TODO: will caught in inf loop, but this is just for workflow demo
         # len(obs) > 1 means there are still points to visit
 
         # get an action based on the current obs
@@ -31,6 +31,9 @@ def main():
         obs_, cost, done, _ = env.step(action)
 
         if done:
+            if env.completed:
+                logging.info("task completed!")
+                break
             logging.debug(f"collision detected for act: {round_to_two(action)}, retrying...")
             continue  # means the act is not valid, just get another one
 

@@ -4,6 +4,7 @@ import random
 from time import time
 from collections import deque
 from typing import List, Union, Tuple
+from itertools import chain
 
 import gym
 import numpy as np
@@ -31,6 +32,7 @@ class ImageRecognitionEnv(gym.Env):
         self.steps = 0
         self.points_to_visit = 0
 
+        self.completed = False
         self.width = width
         self.length = length
         self.walls = []
@@ -43,8 +45,8 @@ class ImageRecognitionEnv(gym.Env):
             self.action_space = gym.spaces.Box(low=np.array([-1.] * 3),  # TODO: norm not implemented yet
                                                high=np.array([1.] * 3),
                                                dtype=np.float32)
-            self.observation_space = gym.spaces.Box(low=np.array([0.] * 33),
-                                                    high=np.array([200.] * 33),
+            self.observation_space = gym.spaces.Box(low=np.array([0.] * 38),
+                                                    high=np.array([200.] * 38),
                                                     dtype=np.float32)
 
     def _add_walls(self):
@@ -104,31 +106,38 @@ class ImageRecognitionEnv(gym.Env):
         :param pos:
         :return:
         """
-        # the obs is firstly about the position of the car, [0:3]
+        # the obs is firstly about the position of the car
+        obs = [pos.get_positioning_status()]
 
-        # later is the points to go for
-        if not self.rl_mode:
-            obs = [pos.get_positioning_status()]
-            for obstacle in self.obstacles:
-                obs += obstacle.get_points_to_visit()
-        else:
+        # then is about the obstacle [is_explored, x, y, one-hot encoding of target surface]
+        for obstacle in self.obstacles:
+            obs.append([1 if obstacle.explored else 0] +
+                       [obstacle.x, obstacle.y] +
+                       [1 if s.is_target else 0 for s in obstacle.surfaces])
 
-            # rl mode, we need to include different info inside the obs
-            obs = pos.get_positioning_status()
-            for obstacle in self.obstacles:
-                obs += [obstacle.x, obstacle.y] + [0 if s.sign == Sign.UNKNOWN else 1 for s in obstacle.surfaces]
+        if self.rl_mode:
+            # we need to flat the observation into 1d
+            obs = list(chain.from_iterable(obs))
 
         # TODO: may add more
         return obs
 
-    def _get_car_pos_from_obs(self, obs) -> Entity:
+    def _get_car_pos_from_obs(self, obs) -> Car:
         """
         This is for the step function, to extract the car pos from the observation
         (if the obs is more than just the car pos)
         :param obs:
         :return:
         """
-        return Entity(x=obs[0][0], y=obs[0][1], z=obs[0][2], length=self.car.length, width=self.car.width)
+        if self.rl_mode:
+            x = obs[0]
+            y = obs[1]
+            z = obs[2]
+        else:
+            x = obs[0][0]
+            y = obs[0][1]
+            z = obs[0][2]
+        return Car(x=x, y=y, z=z, length=self.car.length, width=self.car.width)
 
     def _calculate_reward(self, obs, act, path_cost, ):
         path_factor = -1
@@ -146,15 +155,15 @@ class ImageRecognitionEnv(gym.Env):
         recognition_factor = 50.  # TODO: magic number
         points_to_visit = 0
         for obstacle in self.obstacles:
-            points = obstacle.get_points_to_visit()
-            if len(points) != 0:  # the obstacle has not been finished yet
-                points_to_visit += len(points)
+            if not obstacle.explored:  # the obstacle has not been finished yet
+                points_to_visit += 1
                 distances.append(self.car.get_euclidean_distance(obstacle))
             else:
                 recog_distances.append(self.car.get_euclidean_distance(obstacle))
         recognition_reward = self.points_to_visit - points_to_visit
         self.points_to_visit = points_to_visit
         if recognition_reward != 0:
+            # should add a verbose setting so that can disable the logging
             logging.info(f"new faces solved! {recognition_reward}")
 
         # stay close to the unexplored/unsolved obstacles
@@ -174,11 +183,17 @@ class ImageRecognitionEnv(gym.Env):
 
         # keep it alive first
         ep_len_factor = 1.
-        ep_len_reward = math.log(self.steps)
+        ep_len_reward = 0 if self.steps == 0 else math.log(self.steps)
 
         reward = path_factor * path_cost + speed_factor * speed_cost + time_factor * time_cost + \
                  distance_factor * distance_cost + recog_distance_factor * recog_distance_reward + \
                  recognition_factor * recognition_reward + ep_len_factor * ep_len_reward
+
+        # TODO: adhoc copy paste here, very ugly, will remove later (or refactor)
+        logging.debug(f"reward: {reward} = {path_factor * path_cost} + "
+                      f"{speed_factor * speed_cost} + {time_factor * time_cost} + "
+                      f"{distance_factor * distance_cost} + {recog_distance_factor * recog_distance_reward} + "
+                      f"{recognition_factor * recognition_reward} + { ep_len_factor * ep_len_reward}")
 
         return reward
 
@@ -204,7 +219,6 @@ class ImageRecognitionEnv(gym.Env):
         if self.rl_mode:
             action = self._denorm_actions(action)
         if self.mock:
-            self.steps += 1
             logging.debug(f"action: {action}")
 
         traj, path_cost = self.car.get_traj(action)
@@ -214,28 +228,17 @@ class ImageRecognitionEnv(gym.Env):
         else:
             if self.mock:
                 self.car.set(traj[-1].x, traj[-1].y, traj[-1].z)  # no need to set separately in mock
+                self.steps += 1
                 for o in self.obstacles:  # check if it has any chance of recognizing one obstacle
                     if o.explored:
                         continue
-                    reg_ids = []
-                    for i, p in enumerate(o.get_points_to_visit()):
-                        if ((p[0] - self.car.x) ** 2 + (p[1] - self.car.y) ** 2) ** 0.5 < 20. and \
-                                min((2 * math.pi) - abs(p[2] - self.car.z), abs(p[2] - self.car.z)) < 0.5:
-                            # means tha car is close enough to recognize
-                            logging.info("the car has arrived at a proper position")
-                            reg_ids.append(i)
-
-                    j = 0
-                    for s_id, s in enumerate(o.surfaces):
-                        # this is a really silly and unreliable way of finding the surface
-                        if s.sign != Sign.UNKNOWN:  # see if it contributes to the points to visit
-                            continue
-                        if j in reg_ids:
-                            o.recognize_face(s_id, s.gt)
-                            logging.info("done recognizing one surface")
-                            break
-                        j += 1
-
+                    p = o.get_best_point_to_visit()
+                    if ((p[0] - self.car.x) ** 2 + (p[1] - self.car.y) ** 2) ** 0.5 < 20. and \
+                            min((2 * math.pi) - abs(p[2] - self.car.z), abs(p[2] - self.car.z)) < 0.5:
+                        # means tha car is close enough to recognize
+                        logging.info("the car has arrived at a proper position")
+                        # mock target img sign as the specific value is not important
+                        o.recognize_face(o.target_surface_id, Sign.ALPHA_A)
                 obs = self.get_current_obs()
             else:
                 obs = self._get_obs_from_car_pos(traj[-1])
@@ -245,6 +248,7 @@ class ImageRecognitionEnv(gym.Env):
                 is_done &= o.explored  # All explored
 
             if is_done:
+                self.completed = True
                 logging.info("successfully completed one ep with no collision!")
 
             return obs, self._calculate_reward(obs, action, path_cost), is_done, dict()
@@ -258,6 +262,7 @@ class ImageRecognitionEnv(gym.Env):
         # TODO: below is just a scratch, representing the general workflow
         if self.mock:
             logging.warning("you should not use update in a mock env")
+        self.steps += 1
         if self._check_collision([rectified_car_pos]):
             # ideally this should not happen, but we need to handle it
             # TODO: in case the position is really not valid, we should have a fallback strategy
@@ -326,10 +331,12 @@ class ImageRecognitionEnv(gym.Env):
             for i in range(5):
                 while self.add_obstacle(x=random.uniform(30, self.width - 30),
                                         y=random.uniform(30, self.length - 30),
+                                        target_face_id=random.randint(0, 3),
                                         mock=True) == -1:
                     continue  # TODO: actually this may make the obstacles too close to each other
             self.steps = 0
-            self.points_to_visit = 4 * 5
+            self.points_to_visit = 5
+        self.completed = False
         return self._get_obs_from_car_pos(self.car)
 
     def render(self, mode="human"):

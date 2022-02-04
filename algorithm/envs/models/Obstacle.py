@@ -1,5 +1,6 @@
+import logging
 import random
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from envs.models import Direction, Sign, Entity
 
@@ -11,12 +12,13 @@ class Obstacle(Entity):
     """
 
     class Surface:
-        def __init__(self, to_be_viewed_at: Direction):
+        def __init__(self, to_be_viewed_at: Direction, is_target: bool = False):
             self.to_be_viewed_at = to_be_viewed_at
             self.sign = Sign.UNKNOWN
             self.gt = Sign.UNKNOWN  # only used in mock
+            self.is_target = is_target
 
-    def __init__(self, x: float, y: float, length: float = 10, width: float = 10, mock: bool = False):
+    def __init__(self, x: float, y: float, target_face_id: int, length: float = 10, width: float = 10, mock: bool = False):
         """
         :param x: x coordinate of the center of the obstacle (x-distance in cm to the origin)
         :param y: y coordinate of the center the obstacle (y-distance in cm to the origin)
@@ -47,13 +49,15 @@ class Obstacle(Entity):
             self.Surface(Direction.WEST),
         ]
 
-        if self.mock:
-            pic_idx = random.randint(0, 3)
-            for i, s in enumerate(self.surfaces):
-                if i == pic_idx:
-                    s.gt = Sign.ALPHA_A  # mock target img as the specific value is not important
-                else:
-                    s.gt = Sign.BULLS_EYE
+        self.target_surface_id = target_face_id
+
+        for i, s in enumerate(self.surfaces):
+            if i == target_face_id:
+                s.is_target = True
+            else:
+                s.gt = Sign.BULLS_EYE
+
+        self.target_surface = self.surfaces[target_face_id]
 
     def recognize_face(self, surface_id: int, content: Sign):
         """
@@ -62,32 +66,39 @@ class Obstacle(Entity):
         :return:
         """
         assert 0 <= surface_id <= 3, "surface id has to be 0, 1, 2 or 3"
-        self.surfaces[surface_id].sign = content
         if content not in [Sign.UNKNOWN, Sign.BULLS_EYE]:
+            if not self.surfaces[surface_id].is_target:
+                logging.warning(f"unexpected sign {content} at surface {surface_id}! skipped...")
+                return
             self.explored = True
+        self.surfaces[surface_id].sign = content
 
-    def get_points_to_visit(self) -> List[List[float]]:
+    def get_best_point_to_visit(self) -> Union[None, List[float]]:
         """
-        get the coordinates to go to recognize the remaining surfaces
-        :return:
-        e.g.:
-        [
-            [x1, y1, z1],
-            [x2, y2, z2],
-            ...
-        ]
+        get the coordinates to go to recognize the target surface
+        :return: [x1, y1, to_be_viewed_at]
+        e.g.
+
+        |        |
+        |obstacle|
+        ________
+         surface
+
+           car
+
+        to be viewed at "North"
         """
         coords = []
         if self.explored:
-            return coords  # no more points to be visites
+            return coords  # no more points to be visited
         for i, surface in enumerate(self.surfaces):
             if surface.sign == Sign.UNKNOWN:  # not visited
                 if i == 0:
-                    coords.append([self.x, self.y + self.y_offset, surface.to_be_viewed_at.value])
+                    return [self.x, self.y + self.y_offset, surface.to_be_viewed_at.value]
                 elif i == 1:
-                    coords.append([self.x - self.x_offset, self.y, surface.to_be_viewed_at.value])
+                    return [self.x - self.x_offset, self.y, surface.to_be_viewed_at.value]
                 elif i == 2:
-                    coords.append([self.x, self.y - self.y_offset, surface.to_be_viewed_at.value])
+                    return [self.x, self.y - self.y_offset, surface.to_be_viewed_at.value]
                 else:
-                    coords.append([self.x + self.x_offset, self.y, surface.to_be_viewed_at.value])
+                    return [self.x + self.x_offset, self.y, surface.to_be_viewed_at.value]
         return coords
