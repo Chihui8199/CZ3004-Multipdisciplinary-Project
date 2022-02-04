@@ -26,7 +26,11 @@ class ImageRecognitionEnv(gym.Env):
         """
         self.mock = mock
         self.rl_mode = rl_mode
+
+        # below attributes only used in mock
         self.steps = 0
+        self.points_to_visit = 0
+
         self.width = width
         self.length = length
         self.walls = []
@@ -139,20 +143,24 @@ class ImageRecognitionEnv(gym.Env):
         recog_distances = []
         recog_distances_discount_factor = 0.5
         distances_discount_factor = 0.5
-        recognition_reward = 0.
         recognition_factor = 50.  # TODO: magic number
+        points_to_visit = 0
         for obstacle in self.obstacles:
             points = obstacle.get_points_to_visit()
             if len(points) != 0:  # the obstacle has not been finished yet
+                points_to_visit += len(points)
                 distances.append(self.car.get_euclidean_distance(obstacle))
             else:
                 recog_distances.append(self.car.get_euclidean_distance(obstacle))
-                recognition_reward += 1  # TODO: magic number
-        sorted(distances)
+        recognition_reward = self.points_to_visit - points_to_visit
+        self.points_to_visit = points_to_visit
+        if recognition_reward != 0:
+            logging.info(f"new faces solved! {recognition_reward}")
 
         # stay close to the unexplored/unsolved obstacles
         distance_factor = -5e-2
         distance_cost = 0.
+        sorted(distances)
         for d in distances:
             distance_cost += d * distances_discount_factor
             distances_discount_factor **= 2
@@ -207,20 +215,27 @@ class ImageRecognitionEnv(gym.Env):
             if self.mock:
                 self.car.set(traj[-1].x, traj[-1].y, traj[-1].z)  # no need to set separately in mock
                 for o in self.obstacles:  # check if it has any chance of recognizing one obstacle
+                    if o.explored:
+                        continue
+                    reg_ids = []
                     for i, p in enumerate(o.get_points_to_visit()):
                         if ((p[0] - self.car.x) ** 2 + (p[1] - self.car.y) ** 2) ** 0.5 < 20. and \
                                 min((2 * math.pi) - abs(p[2] - self.car.z), abs(p[2] - self.car.z)) < 0.5:
                             # means tha car is close enough to recognize
                             logging.info("the car has arrived at a proper position")
-                            j = 0
-                            for s_id, s in enumerate(o.surfaces):
-                                # this is a really silly and unreliable way of finding the surface
-                                if s.sign != Sign.UNKNOWN:  # see if it contributes to the points to visit
-                                    continue
-                                if i == j:
-                                    o.recognize_face(s_id, s.gt)
-                                    break
-                                j += 1
+                            reg_ids.append(i)
+
+                    j = 0
+                    for s_id, s in enumerate(o.surfaces):
+                        # this is a really silly and unreliable way of finding the surface
+                        if s.sign != Sign.UNKNOWN:  # see if it contributes to the points to visit
+                            continue
+                        if j in reg_ids:
+                            o.recognize_face(s_id, s.gt)
+                            logging.info("done recognizing one surface")
+                            break
+                        j += 1
+
                 obs = self.get_current_obs()
             else:
                 obs = self._get_obs_from_car_pos(traj[-1])
@@ -304,14 +319,17 @@ class ImageRecognitionEnv(gym.Env):
         :return:
         """
         if self.mock:
+            logging.debug("env reset")
             # TODO: randomly place the car, so that it's not so easy to hit the wall at the begining
             self.set_car(x=random.uniform(30, self.width - 30), y=random.uniform(30, self.length - 30))
             self.obstacles = []
             for i in range(5):
                 while self.add_obstacle(x=random.uniform(30, self.width - 30),
-                                        y=random.uniform(30, self.length - 30)) == -1:
+                                        y=random.uniform(30, self.length - 30),
+                                        mock=True) == -1:
                     continue  # TODO: actually this may make the obstacles too close to each other
             self.steps = 0
+            self.points_to_visit = 4 * 5
         return self._get_obs_from_car_pos(self.car)
 
     def render(self, mode="human"):
