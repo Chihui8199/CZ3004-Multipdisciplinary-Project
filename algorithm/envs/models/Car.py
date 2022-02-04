@@ -12,10 +12,10 @@ class Car(Entity):
     Represents the robot car
     """
     # TODO: these bounds are just placeholders, the numbers/units are unclear
-    VELOCITY_LB = -10
-    VELOCITY_UP = 10
-    ANGLE_LB = - math.pi / 2
-    ANGLE_UB = math.pi / 2
+    VELOCITY_LB = -1
+    VELOCITY_UP = 1
+    ANGLE_LB = - math.pi / 4
+    ANGLE_UB = math.pi / 4
     TIME_LB = 0
     TIME_UP = 3
 
