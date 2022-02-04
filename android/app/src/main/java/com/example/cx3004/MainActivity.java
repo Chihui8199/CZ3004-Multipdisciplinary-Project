@@ -7,6 +7,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
 import androidx.appcompat.widget.PopupMenu;
 import androidx.fragment.app.Fragment;
 
@@ -38,14 +39,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void setPage(Fragment fragment, int title){
-        pageTitle.setText(title);
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.page_fragment, fragment)
-                .commit();
-    }
-
     public void showPopup(View v) {
         PopupMenu popup = new PopupMenu(this, v);
         popup.setOnMenuItemClickListener(
@@ -71,6 +64,14 @@ public class MainActivity extends AppCompatActivity {
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.nav_menu, popup.getMenu());
         popup.show();
+    }
+
+    public void setPage(Fragment fragment, int title) {
+        pageTitle.setText(title);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.page_fragment, fragment)
+                .commit();
     }
 
 

@@ -18,15 +18,6 @@
         android:theme="?attr/actionBarTheme"
         app:layout_constraintTop_toTopOf="parent">
 
-        <!--
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/bluetooth_switch"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="end"
-            android:layout_marginEnd="50sp"/>
-            -->
-
         <Button
             android:id="@+id/bluetooth_button"
             android:layout_width="wrap_content"
@@ -34,6 +25,13 @@
             android:layout_gravity="end"
             android:layout_marginEnd="@dimen/item_padding"
             android:text="Connect" />
+        <Button
+            android:id="@+id/chat_button"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="end"
+            android:layout_marginEnd="@dimen/item_padding"
+            android:text="Start Chat" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -46,7 +44,7 @@
         <LinearLayout
             android:id="@+id/paired_device_display"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
             android:layout_weight="1"
             android:orientation="vertical">
 
@@ -72,8 +70,8 @@
         <LinearLayout
             android:id="@+id/discovered_device_display"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:layout_weight="2"
             android:orientation="vertical">
 
             <TextView
@@ -85,11 +83,11 @@
                 android:textColor="@color/black" />
 
 
-            <!--            <androidx.recyclerview.widget.RecyclerView-->
             <ListView
                 android:id="@+id/lvNewDevices"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
                 android:paddingStart="@dimen/text_padding"
                 android:paddingEnd="@dimen/text_padding" />
 
@@ -99,8 +97,8 @@
         <LinearLayout
             android:id="@+id/message_display"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_height="0dp"
+            android:layout_weight="2"
             android:background="?attr/colorPrimary"
             android:orientation="vertical">
 
@@ -115,7 +113,6 @@
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="@dimen/header_size" />
 
-<!--            <androidx.recyclerview.widget.RecyclerView-->
             <EditText
                 android:id="@+id/message_list"
                 android:layout_width="match_parent"
@@ -129,9 +126,6 @@
                 android:hint="No messages yet~"
                 android:padding="@dimen/text_padding"
                 />
-
-<!--            </androidx.recyclerview.widget.RecyclerView>-->
-
 
             <LinearLayout
                 android:id="@+id/message_sender"
