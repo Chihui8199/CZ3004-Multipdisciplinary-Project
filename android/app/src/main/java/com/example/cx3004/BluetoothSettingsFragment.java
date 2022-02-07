@@ -3,8 +3,8 @@ package com.example.cx3004;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothHeadset;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -12,99 +12,82 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.RequiresApi;
-import androidx.fragment.app.Fragment;
-
+import android.os.Handler;
 import android.util.Log;
+import android.bluetooth.BluetoothAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.UUID;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link BluetoothSettingsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class BluetoothSettingsFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
     private static final String TAG = "BTCheck";
+    private static final UUID myUUID = UUID.fromString("9ac5e66c-882b-11ec-a8a3-0242ac120002");
 
-    BluetoothAdapter myBluetoothAdapter;
+    //Array List to hold bluetooth devices discovered
+    ArrayList<BluetoothDevice> myBTDevicesArrayList = new ArrayList<>();
+    DeviceAdapterList myFoundAdapterListItem;
+    //Array List to hold bluetooth devices paired
+    ArrayList<BluetoothDevice> myBTPairedDevicesArrayList = new ArrayList<>();
+    DeviceAdapterList myPairedDeviceAdapterListItem;
+
     static BluetoothDevice myBTDevice;
+    BluetoothDevice myBTConnectionDevice;
+    BluetoothAdapter myBluetoothAdapter;
+    Intent connectIntent;
+
     Button btnOnOff;
+    Button bluetoothConnect;
     ListView lvFoundDevices;
     ListView lvPairedDevices;
     ProgressDialog myProgressDialog;
-
-    //Array List to hold bluetooth devices discovered
-    public ArrayList<BluetoothDevice> myBTDevicesArrayList = new ArrayList<>();
-    public DeviceAdapterList myFoundAdapterListItem;
-    //Array List to hold bluetooth devices paired
-    public ArrayList<BluetoothDevice> myBTPairedDevicesArrayList = new ArrayList<>();
-    public DeviceAdapterList myPairedDeviceAdapterListItem;
-
-
-    public BluetoothSettingsFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment BluetoothSettingsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static BluetoothSettingsFragment newInstance(String param1, String param2) {
-        BluetoothSettingsFragment fragment = new BluetoothSettingsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-    }
+    //Button btnStartConnection;
+    ImageButton btnSend;
+    EditText message_list;
+    StringBuilder incomingMsg;
+    EditText sendMessage;
+    View view;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_bluetooth_settings, container, false);
+        view = inflater.inflate(R.layout.fragment_bluetooth_settings, container, false);
+        return view;
+    }
+
+
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+
         myBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        myProgressDialog = new ProgressDialog(getContext());
 
         // Getting Ui objects
-        btnOnOff = rootView.findViewById(R.id.bluetooth_button);
-        lvFoundDevices = rootView.findViewById(R.id.lvNewDevices);
-        lvPairedDevices = rootView.findViewById(R.id.lvPairedDevices);
+        btnOnOff = getActivity().findViewById(R.id.bluetooth_button);
+
+        lvFoundDevices = getActivity().findViewById(R.id.lvNewDevices);
+        lvPairedDevices = getActivity().findViewById(R.id.lvPairedDevices);
+        message_list = getActivity().findViewById(R.id.message_list);
+        sendMessage = getActivity().findViewById(R.id.sender_input_text);
+        btnSend = getActivity().findViewById(R.id.sendBtn);
+        incomingMsg = new StringBuilder();
+        myBTDevice = null;
+        // btnSend.setEnabled(false);
 
         //Register BroadcastReceiver for ACTION_FOUND (ENABLE/DISABLE BLUETOOTH)
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
@@ -121,7 +104,6 @@ public class BluetoothSettingsFragment extends Fragment {
         // Register broadcast when bond state changed (E.g. PAIRING)
         IntentFilter bondFilter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
         getActivity().registerReceiver(bondingBroadcastReceiver, bondFilter);
-
 
         btnOnOff.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -148,16 +130,12 @@ public class BluetoothSettingsFragment extends Fragment {
                         // Create bond if > JELLYBEAN
                         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
                             Log.d(TAG, "Trying to pair with: " + deviceName);
-
                             // Create bond with selected device
                             myBTDevicesArrayList.get(i).createBond();
 
                             // Assign selected device info to myBTDevice
                             myBTDevice = myBTDevicesArrayList.get(i);
-
-
                         }
-
                     }
                 }
         );
@@ -174,13 +152,20 @@ public class BluetoothSettingsFragment extends Fragment {
                         lvFoundDevices.setAdapter(myFoundAdapterListItem);
                         Log.d(TAG, "onItemClick: Paired Device = " + myBTPairedDevicesArrayList.get(i).getName());
                         Log.d(TAG, "onItemClick: DeviceAddress = " + myBTPairedDevicesArrayList.get(i).getAddress());
+                        if (myBTDevice == null) {
+                            Toast.makeText(getContext(), "Not Connected! Pairing Unsuccessful. Please Search/Select a Device.",
+                                    Toast.LENGTH_LONG).show();
+                        } else {
+                            //TODO send is only enabled onced paired need to check for connection status too
+                            //TODO grey out button when disabled
+                            btnSend.setEnabled(true);
+                        }
                     }
                 }
         );
-
-        return rootView;
     }
 
+    // Enable Bluetooth
     public void enableBT() {
         // Device does not have Bluetooth
         if (myBluetoothAdapter == null) {
@@ -197,6 +182,7 @@ public class BluetoothSettingsFragment extends Fragment {
         // Device's Bluetooth is enabled
         if (myBluetoothAdapter.isEnabled()) {
             Log.d(TAG, "enableDisableBT: enabling BT.");
+            // Turns on Discoverability
             discoverabilityON();
         }
 
@@ -213,7 +199,6 @@ public class BluetoothSettingsFragment extends Fragment {
     // Process of searching for unpaired devices
     private void startSearch() {
         Log.d(TAG, "btnDiscover: Looking for unpaired devices.");
-
         // Discover devices
         if (myBluetoothAdapter.isDiscovering()) {
             myBluetoothAdapter.cancelDiscovery();
@@ -227,7 +212,6 @@ public class BluetoothSettingsFragment extends Fragment {
 
         }
         if (!myBluetoothAdapter.isDiscovering()) {
-
             // Check Bluetooth Permission in Manifest
             checkBTPermission();
             myBluetoothAdapter.startDiscovery();
@@ -244,7 +228,6 @@ public class BluetoothSettingsFragment extends Fragment {
                 Log.d(TAG, "PAIRED DEVICES: " + device.getName() + "," + device.getAddress());
                 myBTPairedDevicesArrayList.add(device);
             }
-            //pairedDeviceText.setText("Paired Devices: ");
             myPairedDeviceAdapterListItem = new DeviceAdapterList(getContext(), R.layout.device_adapter_view, myBTPairedDevicesArrayList);
             lvPairedDevices.setAdapter(myPairedDeviceAdapterListItem);
 
@@ -310,19 +293,12 @@ public class BluetoothSettingsFragment extends Fragment {
             final String action = intent.getAction();
             if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
                 int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
-
                 switch (mode) {
                     // Device is on discoverable mode
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
                         Log.d(TAG, "OnReceiver: DISCOVERABILITY ENABLED");
                         // Discover devices
                         startSearch();
-
-//                        // Start BluetoothConnectionService to listen for connection
-//                        connectIntent = new Intent(getContext(), BluetoothComms.class);
-//                        connectIntent.putExtra("serviceType", "listen");
-//                        getActivity().startService(connectIntent);
-//
                         // Check Paired Devices list
                         checkPairedDevice();
                         break;
@@ -365,37 +341,30 @@ public class BluetoothSettingsFragment extends Fragment {
     // Create a BroadcastReceiver for ACTION_FOUND (Pairing Devices)
     private final BroadcastReceiver bondingBroadcastReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
+
             final String action = intent.getAction();
 
             if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
 
                 // Bonding device
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
                 // case 1: Device already bonded
                 if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-
                     Log.d(TAG, "BoundReceiver: Bond Bonded with: " + device.getName());
-
                     //Deprecated
                     myProgressDialog.dismiss();
-
                     Toast.makeText(getContext(), "Paired Successfully With: " + device.getName(),
                             Toast.LENGTH_LONG).show();
+                    // Assign global bluetooth device to the device that it has paired with
                     myBTDevice = device;
                     checkPairedDevice();
-
                     //listview
                     lvFoundDevices.setAdapter(myFoundAdapterListItem);
-
                 }
                 // case 2: Device is bonded with another device
                 if (device.getBondState() == BluetoothDevice.BOND_BONDING) {
                     Log.d(TAG, "BoundReceiver: Pairing With Another Device");
-
                     myProgressDialog = ProgressDialog.show(getContext(), "Pairing With Device", "Please Wait...", true);
-
-
                 }
                 // case 3:  Break bond
                 if (device.getBondState() == BluetoothDevice.BOND_NONE) {
@@ -418,4 +387,19 @@ public class BluetoothSettingsFragment extends Fragment {
             }
         }
     };
+
+    //     Unregister receivers
+    @Override
+    public void onDestroy() {
+        Log.d(TAG, "ConnectActivity: onDestroyed: destroyed");
+        super.onDestroy();
+        try {
+            getActivity().unregisterReceiver(enableBTBroadcastReceiver);
+            getActivity().unregisterReceiver(discoverStatusBroadcastReceiver);
+            getActivity().unregisterReceiver(discoveringDevicesBroadcastReceiver);
+            getActivity().unregisterReceiver(bondingBroadcastReceiver);
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+    }
 }
