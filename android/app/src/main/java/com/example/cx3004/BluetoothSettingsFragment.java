@@ -57,7 +57,6 @@ public class BluetoothSettingsFragment extends Fragment {
     ListView lvFoundDevices;
     ListView lvPairedDevices;
     ProgressDialog myProgressDialog;
-    //Button btnStartConnection;
     ImageButton btnSend;
     EditText message_list;
     StringBuilder incomingMsg;
@@ -87,7 +86,6 @@ public class BluetoothSettingsFragment extends Fragment {
         btnSend = getActivity().findViewById(R.id.sendBtn);
         incomingMsg = new StringBuilder();
         myBTDevice = null;
-        // btnSend.setEnabled(false);
 
         //Register BroadcastReceiver for ACTION_FOUND (ENABLE/DISABLE BLUETOOTH)
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
