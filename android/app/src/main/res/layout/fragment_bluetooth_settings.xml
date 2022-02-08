@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/frameLayout"
@@ -19,16 +18,6 @@
         android:theme="?attr/actionBarTheme"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/bluetooth_status"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:text="@string/bluetooth_off"
-            android:textSize="24sp"
-            android:textColor="@color/white"
-            android:layout_gravity="start"
-            android:layout_marginStart="100sp"/>
-
         <!--
         <androidx.appcompat.widget.SwitchCompat
             android:id="@+id/bluetooth_switch"
@@ -42,14 +31,11 @@
             android:id="@+id/bluetooth_button"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:text="Button"
             android:layout_gravity="end"
-            android:layout_marginEnd="@dimen/item_padding"/>
+            android:layout_marginEnd="@dimen/item_padding"
+            android:text="Connect" />
 
     </androidx.appcompat.widget.Toolbar>
-
-
-
 
     <LinearLayout
         android:id="@+id/device_display"
@@ -70,55 +56,87 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@string/header_paired_device"
-                android:textColor="@color/black"/>
+                android:textColor="@color/black" />
 
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/paired_device_list"
+            <!--            <androidx.recyclerview.widget.RecyclerView-->
+            <ListView
+                android:id="@+id/lvPairedDevices"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:paddingStart="@dimen/text_padding"
-                android:paddingEnd="@dimen/text_padding"/>
+                android:paddingEnd="@dimen/text_padding" />
 
         </LinearLayout>
 
-        <include layout="@layout/discovered_device_view"/>
+        <LinearLayout
+            android:id="@+id/discovered_device_display"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/discovered_device_header"
+                style="@style/sectionHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/header_discovered_device"
+                android:textColor="@color/black" />
+
+
+            <!--            <androidx.recyclerview.widget.RecyclerView-->
+            <ListView
+                android:id="@+id/lvNewDevices"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="@dimen/text_padding"
+                android:paddingEnd="@dimen/text_padding" />
+
+        </LinearLayout>
+
 
         <LinearLayout
             android:id="@+id/message_display"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:orientation="vertical"
-            android:background="?attr/colorPrimary">
+            android:background="?attr/colorPrimary"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/message_header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:paddingStart="@dimen/header_padding"
+                android:paddingTop="@dimen/header_padding"
+                android:paddingEnd="@dimen/header_padding"
                 android:text="@string/header_message"
                 android:textColor="?attr/colorOnPrimary"
-                android:textSize="@dimen/header_size"
-                android:paddingTop="@dimen/header_padding"
-                android:paddingStart="@dimen/header_padding"
-                android:paddingEnd="@dimen/header_padding"/>
+                android:textSize="@dimen/header_size" />
 
-            <androidx.recyclerview.widget.RecyclerView
+<!--            <androidx.recyclerview.widget.RecyclerView-->
+            <EditText
                 android:id="@+id/message_list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_weight="1"
                 android:layout_gravity="center"
-                android:background="@drawable/rounded_box"
                 android:layout_margin="@dimen/item_padding"
+                android:background="@drawable/rounded_box"
+                android:scrollbars="vertical"
+                android:inputType="textMultiLine"
+                android:hint="No messages yet~"
                 android:padding="@dimen/text_padding"
-                >
+                />
 
-            </androidx.recyclerview.widget.RecyclerView>
+<!--            </androidx.recyclerview.widget.RecyclerView>-->
+
 
             <LinearLayout
                 android:id="@+id/message_sender"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_margin="@dimen/item_padding"
                 android:minHeight="@dimen/button_size"
                 android:orientation="horizontal">
@@ -134,21 +152,25 @@
                         android:id="@+id/sender_input_text"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
+                        android:background="@drawable/rounded_box"
                         android:hint="@string/sender_hint"
-                        android:background="@drawable/rounded_box" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:inputType="textMultiLine"
+                        android:singleLine="true"
+                        />
 
+                </com.google.android.material.textfield.TextInputLayout>
                 <ImageButton
-                    android:id="@+id/imageButton"
+                    android:id="@+id/sendBtn"
                     android:layout_width="@dimen/button_size"
                     android:layout_height="@dimen/button_size"
                     android:layout_marginStart="@dimen/item_padding"
-                    android:minHeight="@dimen/button_size"
-                    android:minWidth="@dimen/button_size"
-                    android:src="@drawable/send_button"
-                    android:scaleType="fitCenter"
                     android:background="@null"
-                    android:contentDescription="@string/send_button_description"/>
+                    android:contentDescription="@string/send_button_description"
+                    android:minWidth="@dimen/button_size"
+                    android:minHeight="@dimen/button_size"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/send_button" />
+
             </LinearLayout>
 
         </LinearLayout>
