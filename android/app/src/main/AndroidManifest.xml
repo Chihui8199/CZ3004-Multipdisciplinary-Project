@@ -17,6 +17,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".BluetoothPairingPage"></activity>
     </application>
 
     <!--Requires bluetooth for app and ask for permission-->
