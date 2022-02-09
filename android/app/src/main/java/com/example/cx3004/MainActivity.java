@@ -110,17 +110,22 @@ public class MainActivity extends AppCompatActivity {
         gridMap.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
+                switch (dragEvent.getAction()){
+                    case DragEvent.ACTION_DROP:
+                        ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
+                        droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
+                        // get obstacle image face using popup
+                        showImageFacePopup(droppedObstacle);
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        if (!dragEvent.getResult()){
+                            droppedObstacle = (ObstacleView) dragEvent.getLocalState();
+                            droppedObstacle.reset();
+                        }
+                        break;
+                }
+
                 if (dragEvent.getAction() == DragEvent.ACTION_DROP) {
-                    // get obstacle view
-                    CharSequence id_data = dragEvent.getClipData().getItemAt(0).getText();
-                    int i = Integer.parseInt(id_data.toString()) - 1;
-                    ObstacleView droppedObstacle = obstacleViews[i];
-
-                    // move obstacle
-                    droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
-
-                    // get obstacle image face using popup
-                    showImageFacePopup(droppedObstacle);
 
                 }
                 return true;

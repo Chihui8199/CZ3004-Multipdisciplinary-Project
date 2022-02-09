@@ -32,6 +32,9 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     public String imageFace = "";
     public boolean setOnMap = false; // true when obstacle has been placed on map
 
+    private float initX;
+    private float initY;
+
     public ObstacleView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
 
@@ -52,16 +55,8 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View view) {
-                // pass ID into clipdata
-                ClipData.Item item = new ClipData.Item((CharSequence) Integer.toString(id));
-                ClipData dragData = new ClipData(
-                        (CharSequence) "id",
-                        new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN },
-                        item);
-
-
                 DragShadowBuilder dragShadowBuilder = new DragShadowBuilder(view);
-                view.startDragAndDrop(dragData, dragShadowBuilder, this, 0);
+                view.startDragAndDrop(null, dragShadowBuilder, ObstacleView.this, 0);
                 return true;
             }
         });
@@ -108,6 +103,12 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     public void move(float xCoord, float yCoord){
         // snaps obstacle to the grid
 
+        // store initial coordinates if obstacle has not been placed on map
+        if (!setOnMap){
+            initX = getX();
+            initY = getY();
+        }
+
         x = (int) Math.floor(xCoord / gridInterval);
 
         // the screen y coordinates start from the top,
@@ -119,6 +120,22 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         setY(screenY * gridInterval);
     }
 
+    public void reset(){
+        // reset attributes
+        x = -1;
+        y = -1;
+        imageFace = "";
+        setOnMap = false;
+
+        // reset position
+        setX(initX);
+        setY(initY);
+
+        // redraw
+        invalidate();
+    }
+
+    // called after layout
     public void setGridInterval(int gridInterval){
         this.gridInterval = gridInterval;
 
@@ -138,7 +155,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         setText("");
         String imageResourceID = String.format("obstacle_image_%d", imageID);
         int imageResourceIntID = getResources().getIdentifier(imageResourceID, "drawable", getContext().getPackageName());
-        setBackgroundResource(imageResourceIntID);
+        if (imageResourceIntID != 0) setBackgroundResource(imageResourceIntID);
     }
 
     public String getMessage(){
