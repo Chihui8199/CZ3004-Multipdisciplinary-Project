@@ -42,7 +42,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
             id = Integer.parseInt(getText().toString());
             setTextSize(getResources().getDimensionPixelSize(R.dimen.small_text_size));
             setTextColor(Color.WHITE);
-            setBackgroundColor(Color.BLACK);
+            setBackgroundResource(R.color.black);
             setGravity(Gravity.CENTER);
         } finally {
             a.recycle();
@@ -52,7 +52,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
             @Override
             public boolean onLongClick(View view) {
                 // pass ID into clipdata
-                ClipData.Item item = new ClipData.Item((CharSequence) Integer.toString(getId()));
+                ClipData.Item item = new ClipData.Item((CharSequence) Integer.toString(id));
                 ClipData dragData = new ClipData(
                         (CharSequence) "id",
                         new String[] { ClipDescription.MIMETYPE_TEXT_PLAIN },
@@ -131,6 +131,13 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     public void setImageFace(String imageFace) {
         this.imageFace = imageFace;
         invalidate(); // redraw obstacle with new image face border
+    }
+
+    public void setImage(int imageID){
+        setText("");
+        String imageResourceID = String.format("obstacle_image_%d", imageID);
+        int imageResourceIntID = getResources().getIdentifier(imageResourceID, "drawable", getContext().getPackageName());
+        setBackgroundResource(imageResourceIntID);
     }
 
     public String getMessage(){
