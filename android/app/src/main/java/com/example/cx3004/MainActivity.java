@@ -122,28 +122,6 @@ public class MainActivity extends AppCompatActivity {
                     // get obstacle image face using popup
                     showImageFacePopup(droppedObstacle);
 
-                    // set obstacle flag
-                    obstacleFlags[i] = true;
-
-                    // check if all obstacle flags have been set
-                    // if yes, send obstacle position message
-                    // TODO: messages are sent before popup is done, fix
-                    boolean allFlagsSet = true;
-                    for (boolean flag: obstacleFlags){
-                        if (!flag){
-                            allFlagsSet = false;
-                            break;
-                        }
-                    }
-                    if (allFlagsSet){
-                        //send obstacle position message
-                        for (ObstacleView obstacle: obstacleViews) {
-                            //printMessage(obstacle.getMessage());
-                            System.out.println(obstacle.getMessage());
-                        }
-                    }
-
-
                 }
                 return true;
             }
@@ -352,13 +330,28 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     obstacle.setImageFace(face);
-
-                    System.out.println(obstacle);
-
+                    obstacle.setOnMap = true;
                     popupWindow.dismiss();
                 }
             });
         }
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                // check if all obstacles have been placed on map
+                // if an obstacle has not been set, break out of function
+                for (ObstacleView obstacle: obstacleViews)
+                    if (!obstacle.setOnMap) return;
+
+                // if all obstacles have been set, send obstacle coordinate messages
+                for (ObstacleView obstacle: obstacleViews){
+                    remoteSendMsg(obstacle.getMessage());
+                }
+
+
+            }
+        });
 
     }
 }

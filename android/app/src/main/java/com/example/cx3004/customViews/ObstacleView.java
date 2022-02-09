@@ -30,6 +30,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     private int x;
     private int y;
     public String imageFace = "";
+    public boolean setOnMap = false; // true when obstacle has been placed on map
 
     public ObstacleView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
