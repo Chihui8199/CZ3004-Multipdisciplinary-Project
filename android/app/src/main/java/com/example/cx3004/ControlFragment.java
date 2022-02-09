@@ -24,7 +24,7 @@ public class ControlFragment extends Fragment {
     SharedPreferences sharedPreferences;
 
     // Control Button
-    ImageButton moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn;
+    ImageButton moveUpImageBtn, moveRightImageBtn, moveBackImageBtn, moveDownImageBtn;
 
     // Fragment Constructor
     public static ControlFragment newInstance(int index) {
@@ -58,22 +58,21 @@ public class ControlFragment extends Fragment {
 
 
         // variable initialization
-        moveForwardImageBtn = root.findViewById(R.id.forwardImageBtn);
-        turnRightImageBtn = root.findViewById(R.id.rightImageBtn);
-        moveBackImageBtn = root.findViewById(R.id.backImageBtn);
-        turnLeftImageBtn = root.findViewById(R.id.leftImageBtn);
+        moveUpImageBtn = root.findViewById(R.id.upImageBtn);
+        moveRightImageBtn = root.findViewById(R.id.rightImageBtn);
+        moveBackImageBtn = root.findViewById(R.id.downImageBtn);
+        moveDownImageBtn = root.findViewById(R.id.leftImageBtn);
 
-      //  robotStatusTextView = MainActivity.getRobotStatusTextView();
 
         // Button Listener
-        moveForwardImageBtn.setOnClickListener(new View.OnClickListener() {
+        moveUpImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
             }
         });
 
-        turnRightImageBtn.setOnClickListener(new View.OnClickListener() {
+        moveRightImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
@@ -87,7 +86,7 @@ public class ControlFragment extends Fragment {
             }
         });
 
-        turnLeftImageBtn.setOnClickListener(new View.OnClickListener() {
+        moveDownImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 

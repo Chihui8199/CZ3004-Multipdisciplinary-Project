@@ -162,12 +162,11 @@ public class BluetoothPairingPage extends AppCompatActivity {
                         registerReceiver(enableBTBroadcastReceiver, BTIntent);
 
                         IntentFilter discoverIntent = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-                        registerReceiver(enableBTBroadcastReceiver, discoverIntent);
+                        registerReceiver(discoverStatusBroadcastReceiver, discoverIntent);
                     }
                     if (mBluetoothAdapter.isEnabled()) {
                         Log.d(TAG, "enableDisableBT: disabling Bluetooth");
                         mBluetoothAdapter.disable();
-
                         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
                         registerReceiver(enableBTBroadcastReceiver, BTIntent);
                     }
@@ -292,7 +291,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
             String action = intent.getAction();
             if (action.equals(mBluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
                 final int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
-
                 switch (mode) {
                     case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
                         Log.d(TAG, "mBroadcastReceiver2: Discoverability Enabled.");

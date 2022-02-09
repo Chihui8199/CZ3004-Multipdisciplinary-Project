@@ -102,7 +102,8 @@ public class MainActivity extends AppCompatActivity {
                 R.id.obstacle5
         };
         obstacleViews = new ObstacleView[obstacleIDs.length];
-        for (int i=0; i<obstacleIDs.length; i++) obstacleViews[i] = findViewById(obstacleIDs[i]);
+        for (int i = 0; i < obstacleIDs.length; i++)
+            obstacleViews[i] = findViewById(obstacleIDs[i]);
 
 
         // set on drag listener for grid map
@@ -129,15 +130,15 @@ public class MainActivity extends AppCompatActivity {
                     // if yes, send obstacle position message
                     // TODO: messages are sent before popup is done, fix
                     boolean allFlagsSet = true;
-                    for (boolean flag: obstacleFlags){
-                        if (!flag){
+                    for (boolean flag : obstacleFlags) {
+                        if (!flag) {
                             allFlagsSet = false;
                             break;
                         }
                     }
-                    if (allFlagsSet){
+                    if (allFlagsSet) {
                         //send obstacle position message
-                        for (ObstacleView obstacle: obstacleViews) {
+                        for (ObstacleView obstacle : obstacleViews) {
                             //printMessage(obstacle.getMessage());
                             System.out.println(obstacle.getMessage());
                         }
@@ -162,7 +163,6 @@ public class MainActivity extends AppCompatActivity {
                 robotView.bringToFront();
             }
         });
-
 
 
     }
@@ -220,7 +220,7 @@ public class MainActivity extends AppCompatActivity {
             parseCommands(message);
             showLog("receivedMessage: message --- " + message);
             //TODO for testing only: for Glenda
-            MainActivity.remoteSendMsg("Message Received:"+ message);
+            MainActivity.remoteSendMsg("Message Received:" + message);
             sharedPreferences();
             String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
             editor.putString("message", receivedText);
@@ -229,8 +229,8 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void parseCommands(String receivedText){
-        Log.d(TAG,"Testing" + receivedText);
+    private void parseCommands(String receivedText) {
+        Log.d(TAG, "Testing" + receivedText);
         //TODO Better error catching
         try {
             if (receivedText.contains(",")) {
@@ -244,17 +244,17 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
                     // call method to update ROBOT, X, Y, direction
                     robotView.move(xCoord, yCoord, direction);
-                }else if (command.equals("TARGET")){
+                } else if (command.equals("TARGET")) {
                     int obstacleNo = Integer.parseInt(stringSplit[1]);
                     int targetID = Integer.parseInt(stringSplit[2]);
                     Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
                     // call method to update Obstacle Number, ID
-                    obstacleViews[obstacleNo-1].setImage(targetID);
-                }else{
+                    obstacleViews[obstacleNo - 1].setImage(targetID);
+                } else {
                     Log.d("NO COMMANDS ACTIVATED", "NIL");
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
