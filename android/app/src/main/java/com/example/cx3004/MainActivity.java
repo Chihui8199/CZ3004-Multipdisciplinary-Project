@@ -9,16 +9,25 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.DragEvent;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
+import com.example.cx3004.customViews.ObstacleView;
+import com.example.cx3004.customViews.SquareGridView;
 import com.google.android.material.tabs.TabLayout;
 
 import org.json.JSONException;
@@ -28,6 +37,14 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
+
+    int[] obstacleIDs = new int[]{
+            R.id.obstacle1,
+            R.id.obstacle2,
+            R.id.obstacle3,
+            R.id.obstacle4,
+            R.id.obstacle5
+    };
 
     // Declaration Variables
     private static SharedPreferences sharedPreferences;
@@ -83,6 +100,36 @@ public class MainActivity extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+        // set on drag listener for grid map
+        SquareGridView gridMap = (SquareGridView) findViewById(R.id.grid_map);
+        gridMap.setOnDragListener(new View.OnDragListener() {
+            @Override
+            public boolean onDrag(View view, DragEvent dragEvent) {
+                if (dragEvent.getAction() == DragEvent.ACTION_DROP){
+                    CharSequence id_data = dragEvent.getClipData().getItemAt(0).getText();
+                    int id = Integer.parseInt(id_data.toString());
+                    ObstacleView obstacle = (ObstacleView) findViewById(id);
+                    obstacle.move(dragEvent.getX(), dragEvent.getY());
+                    showImageFacePopup(obstacle);
+                }
+                return true;
+            }
+        });
+
+        // actual width and height of views is only measured after layout
+        // hence, resize obstacles in maptabfragment after layout is complete
+        // grid boxes and obstacles should be same size
+        View rootView = (View) findViewById(R.id.main_layout);
+        rootView.post(new Runnable() {
+              @Override
+              public void run() {
+                  for (int id: obstacleIDs){
+                      ObstacleView obstacle = (ObstacleView) findViewById(id);
+                      obstacle.setGridInterval(gridMap.gridInterval);
+                  }
+              }
+          });
     }
 
     public static void sharedPreferences() {
@@ -252,5 +299,39 @@ public class MainActivity extends AppCompatActivity {
 
         outState.putString(TAG, "onSaveInstanceState");
         showLog("Exiting onSaveInstanceState");
+    }
+
+    private void showImageFacePopup(ObstacleView obstacle){
+
+        final PopupWindow popupWindow = new PopupWindow(this);
+
+        // inflate layout
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.image_face_popup, null);
+
+        popupWindow.setContentView(view);
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // set buttons
+        int[] buttonIDs = new int[]{
+                R.id.up_button, R.id.down_button,
+                R.id.left_button, R.id.right_button
+        };
+        String[] faces = new String[]{"up", "down", "left", "right"};
+        for (int i=0; i<buttonIDs.length; i++){
+            View button = view.findViewById(buttonIDs[i]);
+            String face = faces[i];
+            button.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view) {
+                    obstacle.setImageFace(face);
+
+                    System.out.println(obstacle);
+
+                    popupWindow.dismiss();
+                }
+            });
+        }
+
     }
 }

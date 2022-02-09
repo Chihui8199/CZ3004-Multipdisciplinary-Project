@@ -56,9 +56,9 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="4dp"
-        android:foreground="@drawable/send_button"
-        android:foregroundGravity="center"
         android:scaleType="fitCenter"
+        android:background="@null"
+        android:src="@drawable/send_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextView"
         />
