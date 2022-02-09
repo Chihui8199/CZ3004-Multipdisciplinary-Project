@@ -14,8 +14,11 @@ import androidx.fragment.app.FragmentPagerAdapter;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
+    // fragments
+    RobotStateFragment robotStateFragment = new RobotStateFragment();
+
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_2, R.string.tab_text_4};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_2, R.string.tab_text_3, R.string.tab_text_4};
     private final Context mContext;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
@@ -31,6 +34,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 0:
                 return CommsFragment.newInstance(position+1);
             case 1:
+                return robotStateFragment;
+            case 2:
                 return ControlFragment.newInstance(position+1);
             default:
                 return PlaceholderFragment.newInstance(position + 1);
