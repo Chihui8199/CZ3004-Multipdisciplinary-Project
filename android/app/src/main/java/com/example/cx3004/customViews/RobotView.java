@@ -15,6 +15,9 @@ import com.example.cx3004.R;
 
 public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
     private int gridInterval;
+    public int x;
+    public int y;
+    public String direction;
 
     public RobotView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -59,17 +62,26 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
         switch (direction){
             case "left":
                 setRotation(-90);
+                this.direction = direction;
+                break;
             case "right":
                 setRotation(90);
+                this.direction = direction;
+                break;
             case "down":
                 setRotation(180);
+                this.direction = direction;
+                break;
             case "up":
-            default:
+                this.direction = direction;
                 break;
         }
 
         // set coordinates
         setX(x * gridInterval);
         setY((19-y) * gridInterval);
+        this.x = x;
+        this.y = y;
+
     }
 }
