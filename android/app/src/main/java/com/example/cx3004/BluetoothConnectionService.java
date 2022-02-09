@@ -19,7 +19,7 @@ import java.nio.charset.Charset;
 import java.util.UUID;
 
 public class BluetoothConnectionService {
-    BluetoothPairingPage mBluetoothPopup;
+    BluetoothPairingPage mBluetoothPairingPage;
     private static BluetoothConnectionService instance;
     private static final String TAG = "DebuggingTag";
 
@@ -269,7 +269,6 @@ public class BluetoothConnectionService {
 
     public static void write(byte[] out) {
         ConnectedThread tmp;
-
         Log.d(TAG, "write: Write is called.");
         mConnectedThread.write(out);
     }

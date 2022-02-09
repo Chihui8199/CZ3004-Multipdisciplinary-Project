@@ -9,18 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.media.Image;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewTreeObserver;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
@@ -32,9 +27,6 @@ import com.example.cx3004.customViews.ObstacleView;
 import com.example.cx3004.customViews.RobotView;
 import com.example.cx3004.customViews.SquareGridView;
 import com.google.android.material.tabs.TabLayout;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -56,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
     private static Context context;
-
     BluetoothConnectionService mBluetoothConnection;
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
@@ -161,60 +152,8 @@ public class MainActivity extends AppCompatActivity {
         editor = sharedPreferences.edit();
     }
 
-    // Send message to bluetooth
-    public static void printMessage(String message) {
-        showLog("Entering printMessage");
-        editor = sharedPreferences.edit();
-
-        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
-            byte[] bytes = message.getBytes(Charset.defaultCharset());
-            BluetoothConnectionService.write(bytes);
-        }
-        showLog(message);
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
-        editor.commit();
-        refreshMessageReceived();
-        showLog("Exiting printMessage");
-    }
-
-    public static void printMessage(String name, int x, int y) throws JSONException {
-        showLog("Entering printMessage");
-        sharedPreferences();
-
-        JSONObject jsonObject = new JSONObject();
-        String message;
-
-        switch (name) {
-//            case "starting":
-            case "waypoint":
-                jsonObject.put(name, name);
-                jsonObject.put("x", x);
-                jsonObject.put("y", y);
-                message = name + " (" + x + "," + y + ")";
-                break;
-            default:
-                message = "Unexpected default for printMessage: " + name;
-                break;
-        }
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
-        editor.commit();
-        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
-            byte[] bytes = message.getBytes(Charset.defaultCharset());
-            BluetoothConnectionService.write(bytes);
-        }
-        showLog("Exiting printMessage");
-    }
-
     public static void refreshMessageReceived() {
         CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
-    }
-
-    public static void receiveMessage(String message) {
-        showLog("Entering receiveMessage");
-        sharedPreferences();
-        editor.putString("message", sharedPreferences.getString("message", "") + "\n" + message);
-        editor.commit();
-        showLog("Exiting receiveMessage");
     }
 
     private static void showLog(String message) {
@@ -225,13 +164,13 @@ public class MainActivity extends AppCompatActivity {
         return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
     }
 
-    private BroadcastReceiver mBroadcastReceiver5 = new BroadcastReceiver() {
+    // Broadcast Receiver 5:  for Bluetooth Connection Status
+    private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             BluetoothDevice mDevice = intent.getParcelableExtra("Device");
             String status = intent.getStringExtra("Status");
             sharedPreferences();
-
             if (status.equals("connected")) {
                 try {
                     myDialog.dismiss();
@@ -246,11 +185,7 @@ public class MainActivity extends AppCompatActivity {
             } else if (status.equals("disconnected")) {
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
                 Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_LONG).show();
-
-
                 editor.putString("connStatus", "Disconnected");
-
-
                 myDialog.show();
             }
             editor.commit();
@@ -261,8 +196,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("receivedMessage");
+            // Read message to parse as commands
+            parseCommands(message);
             showLog("receivedMessage: message --- " + message);
-            // write specific commands here
             sharedPreferences();
             String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
             editor.putString("message", receivedText);
@@ -270,6 +206,34 @@ public class MainActivity extends AppCompatActivity {
             refreshMessageReceived();
         }
     };
+
+    private void parseCommands(String receivedText){
+        Log.d(TAG,"Testing" + receivedText);
+        //TODO Better error catching
+        try {
+            if (receivedText.contains(",")) {
+                String[] stringSplit = receivedText.split(",");
+                String command = stringSplit[0];
+                //TODO Perhaps allow check length
+                if (command.equals("ROBOT")) {
+                    int xCoord = Integer.parseInt(stringSplit[1]);
+                    int yCoord = Integer.parseInt(stringSplit[2]);
+                    String direction = stringSplit[3];
+                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
+                    // TODO call method to update ROBOT, X, Y, direction
+                }else if (command.equals("TARGET")){
+                    int obstacleNo = Integer.parseInt(stringSplit[1]);
+                    int targetID = Integer.parseInt(stringSplit[2]);
+                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
+                    // TODO call method to update Obstacle Number, ID
+                }else{
+                    Log.d("NO COMMANDS ACTIVATED", "NIL");
+                }
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -289,7 +253,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         try {
             LocalBroadcastManager.getInstance(this).unregisterReceiver(messageReceiver);
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver5);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(btConnectionReceiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -299,7 +263,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         try {
-            LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver5);
+            LocalBroadcastManager.getInstance(this).unregisterReceiver(btConnectionReceiver);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -310,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
         super.onResume();
         try {
             IntentFilter filter2 = new IntentFilter("ConnectionStatus");
-            LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver5, filter2);
+            LocalBroadcastManager.getInstance(this).registerReceiver(btConnectionReceiver, filter2);
         } catch (IllegalArgumentException e) {
             e.printStackTrace();
         }

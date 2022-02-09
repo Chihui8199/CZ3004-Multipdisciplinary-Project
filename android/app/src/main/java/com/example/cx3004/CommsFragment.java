@@ -92,7 +92,6 @@ public class CommsFragment extends Fragment {
                 showLog("Exiting sendTextBtn");
             }
         });
-
         return root;
     }
 
