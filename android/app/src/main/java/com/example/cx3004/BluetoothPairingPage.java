@@ -123,7 +123,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mBluetoothAdapter.cancelDiscovery();
                 discovDevicesListView.setAdapter(mFoundDeviceListAdapter);
-
                 String deviceName = mPairedBTDevices.get(i).getName();
                 String deviceAddress = mPairedBTDevices.get(i).getAddress();
                 Log.d(TAG, "onItemClick: A device is selected.");
@@ -345,7 +344,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 }
                 if (mDevice.getBondState() == BluetoothDevice.BOND_BONDING) {
                     Log.d(TAG, "BOND_BONDING.");
-                    myDialog = ProgressDialog.show(BluetoothPairingPage.this, "Pairing With Device", "Please Wait...", true);
                 }
                 if (mDevice.getBondState() == BluetoothDevice.BOND_NONE) {
                     Log.d(TAG, "BOND_NONE.");
@@ -368,6 +366,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
+
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
                 Toast.makeText(BluetoothPairingPage.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_LONG).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
@@ -385,7 +384,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 try {
                     myDialog.show();
                 } catch (Exception e) {
-                    Log.d(TAG, "BluetoothPairing: mBroadcastReceiver5 Dialog show failure");
+                    Log.d(TAG, "BluetoothPopUp: mBroadcastReceiver5 Dialog show failure");
                 }
                 retryConnection = true;
                 reconnectionHandler.postDelayed(reconnectionRunnable, 5000);
