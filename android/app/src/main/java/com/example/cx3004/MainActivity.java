@@ -155,44 +155,8 @@ public class MainActivity extends AppCompatActivity {
         showLog("Exiting printMessage");
     }
 
-    public static void printMessage(String name, int x, int y) throws JSONException {
-        showLog("Entering printMessage");
-        sharedPreferences();
-
-        JSONObject jsonObject = new JSONObject();
-        String message;
-
-        switch (name) {
-//            case "starting":
-            case "waypoint":
-                jsonObject.put(name, name);
-                jsonObject.put("x", x);
-                jsonObject.put("y", y);
-                message = name + " (" + x + "," + y + ")";
-                break;
-            default:
-                message = "Unexpected default for printMessage: " + name;
-                break;
-        }
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
-        editor.commit();
-        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
-            byte[] bytes = message.getBytes(Charset.defaultCharset());
-            BluetoothConnectionService.write(bytes);
-        }
-        showLog("Exiting printMessage");
-    }
-
     public static void refreshMessageReceived() {
         CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
-    }
-
-    public static void receiveMessage(String message) {
-        showLog("Entering receiveMessage");
-        sharedPreferences();
-        editor.putString("message", sharedPreferences.getString("message", "") + "\n" + message);
-        editor.commit();
-        showLog("Exiting receiveMessage");
     }
 
     private static void showLog(String message) {
