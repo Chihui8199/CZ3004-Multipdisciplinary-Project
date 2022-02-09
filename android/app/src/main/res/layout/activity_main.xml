@@ -52,13 +52,20 @@
             android:layout_width="match_parent"
             android:layout_height="507dp">
 
+            <com.example.cx3004.customViews.RobotView
+                android:id="@+id/robot"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"/>
+
             <com.example.cx3004.customViews.SquareGridView
                 android:id="@+id/grid_map"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent"
                 app:border_color="@color/dark_orange"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@id/obstacle1"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle1"
