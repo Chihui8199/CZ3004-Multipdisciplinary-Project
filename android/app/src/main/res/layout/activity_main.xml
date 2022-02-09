@@ -43,7 +43,7 @@
                 android:layout_marginLeft="425dp"
                 android:background="@drawable/rounded_orange_box"
                 android:scaleType="fitCenter"
-                android:src="@drawable/bluetooth_icon"  />
+                android:src="@drawable/bluetooth_icon" />
 
 
         </androidx.appcompat.widget.Toolbar>
@@ -57,15 +57,15 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 app:border_color="@color/dark_orange"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/obstacle1"/>
+                app:layout_constraintEnd_toStartOf="@id/obstacle1"
+                app:layout_constraintStart_toStartOf="parent" />
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/obstacle1_id"
                 android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle1_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle2"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/grid_map"
@@ -75,19 +75,19 @@
                 android:id="@+id/obstacle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/obstacle2_id"
                 android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle2_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle3"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
-                app:layout_constraintTop_toBottomOf="@id/obstacle1"/>
+                app:layout_constraintTop_toBottomOf="@id/obstacle1" />
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/obstacle3_id"
                 android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle3_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle4"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
@@ -97,8 +97,8 @@
                 android:id="@+id/obstacle4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/obstacle4_id"
                 android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle4_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle5"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
@@ -108,8 +108,8 @@
                 android:id="@+id/obstacle5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/obstacle5_id"
                 android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle5_id"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
@@ -121,14 +121,14 @@
             android:id="@+id/view_pager"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior" >
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
             <com.google.android.material.tabs.TabLayout
                 android:id="@+id/tabs"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
-                app:tabGravity="fill"/>
+                app:tabGravity="fill" />
         </androidx.viewpager.widget.ViewPager>
 
     </LinearLayout>
