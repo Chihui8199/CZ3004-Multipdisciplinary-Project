@@ -130,10 +130,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                         break;
                 }
-
-                if (dragEvent.getAction() == DragEvent.ACTION_DROP) {
-
-                }
                 return true;
             }
         });
