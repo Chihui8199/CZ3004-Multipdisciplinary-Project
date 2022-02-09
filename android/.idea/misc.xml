@@ -34,10 +34,14 @@
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/menu/nav_menu.xml" value="0.13588709677419356" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/border_white_background.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/circle.xml" value="0.24921875" />
         <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/menu_icon.xml" value="0.24921875" />
         <entry key="app/src/main/res/drawable/rounded_bordered_box.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/rounded_box.xml" value="0.24921875" />
         <entry key="app/src/main/res/drawable/rounded_corner.xml" value="0.1" />
         <entry key="app/src/main/res/drawable/send_button.xml" value="0.1" />
+        <entry key="app/src/main/res/drawable/send_icon.xml" value="0.24921875" />
         <entry key="app/src/main/res/layout/activity_bluetooth_settings.xml" value="0.2942708333333333" />
         <entry key="app/src/main/res/layout/activity_comms.xml" value="0.2942708333333333" />
         <entry key="app/src/main/res/layout/activity_image_recognition.xml" value="0.2942708333333333" />
