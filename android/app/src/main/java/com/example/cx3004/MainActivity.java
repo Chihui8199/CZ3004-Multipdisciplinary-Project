@@ -33,13 +33,7 @@ import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
-    int[] obstacleIDs = new int[]{
-            R.id.obstacle1,
-            R.id.obstacle2,
-            R.id.obstacle3,
-            R.id.obstacle4,
-            R.id.obstacle5
-    };
+    ObstacleView[] obstacleViews;
     // flags are set when the corresponding obstacle is placed on the grid
     boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
     RobotView robotView;
@@ -98,6 +92,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // instantiate robot view & obstacle views
+        robotView = (RobotView) findViewById(R.id.robot);
+        int[] obstacleIDs = new int[]{
+                R.id.obstacle1,
+                R.id.obstacle2,
+                R.id.obstacle3,
+                R.id.obstacle4,
+                R.id.obstacle5
+        };
+        obstacleViews = new ObstacleView[obstacleIDs.length];
+        for (int i=0; i<obstacleIDs.length; i++) obstacleViews[i] = findViewById(obstacleIDs[i]);
+
+
         // set on drag listener for grid map
         SquareGridView gridMap = (SquareGridView) findViewById(R.id.grid_map);
         gridMap.setOnDragListener(new View.OnDragListener() {
@@ -106,28 +113,41 @@ public class MainActivity extends AppCompatActivity {
                 if (dragEvent.getAction() == DragEvent.ACTION_DROP) {
                     // get obstacle view
                     CharSequence id_data = dragEvent.getClipData().getItemAt(0).getText();
-                    int id = Integer.parseInt(id_data.toString());
-                    ObstacleView obstacle = (ObstacleView) findViewById(id);
+                    int i = Integer.parseInt(id_data.toString()) - 1;
+                    ObstacleView droppedObstacle = obstacleViews[i];
 
                     // move obstacle
-                    obstacle.move(dragEvent.getX(), dragEvent.getY());
+                    droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
 
                     // get obstacle image face using popup
-                    showImageFacePopup(obstacle);
+                    showImageFacePopup(droppedObstacle);
 
                     // set obstacle flag
-                    obstacleFlags[obstacle.id-1] = true;
+                    obstacleFlags[i] = true;
 
                     // check if all obstacle flags have been set
+                    // if yes, send obstacle position message
+                    // TODO: messages are sent before popup is done, fix
+                    boolean allFlagsSet = true;
+                    for (boolean flag: obstacleFlags){
+                        if (!flag){
+                            allFlagsSet = false;
+                            break;
+                        }
+                    }
+                    if (allFlagsSet){
+                        //send obstacle position message
+                        for (ObstacleView obstacle: obstacleViews) {
+                            //printMessage(obstacle.getMessage());
+                            System.out.println(obstacle.getMessage());
+                        }
+                    }
 
 
                 }
                 return true;
             }
         });
-
-        // instantiate robot view
-        robotView = (RobotView) findViewById(R.id.robot);
 
         // actual width and height of views is only measured after layout
         // hence, resize obstacles and set robot after layout is complete
@@ -136,15 +156,15 @@ public class MainActivity extends AppCompatActivity {
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                for (int id : obstacleIDs) {
-                    ObstacleView obstacle = (ObstacleView) findViewById(id);
+                for (ObstacleView obstacle : obstacleViews)
                     obstacle.setGridInterval(gridMap.gridInterval);
-
-                }
                 robotView.setGridInterval(gridMap.gridInterval);
                 robotView.bringToFront();
             }
         });
+
+
+
     }
 
     public static void sharedPreferences() {
@@ -220,12 +240,14 @@ public class MainActivity extends AppCompatActivity {
                     int yCoord = Integer.parseInt(stringSplit[2]);
                     String direction = stringSplit[3];
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
-                    // TODO call method to update ROBOT, X, Y, direction
+                    // call method to update ROBOT, X, Y, direction
+                    robotView.move(xCoord, yCoord, direction);
                 }else if (command.equals("TARGET")){
                     int obstacleNo = Integer.parseInt(stringSplit[1]);
                     int targetID = Integer.parseInt(stringSplit[2]);
                     Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
-                    // TODO call method to update Obstacle Number, ID
+                    // call method to update Obstacle Number, ID
+                    obstacleViews[obstacleNo-1].setImage(targetID);
                 }else{
                     Log.d("NO COMMANDS ACTIVATED", "NIL");
                 }
