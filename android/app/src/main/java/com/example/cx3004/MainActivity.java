@@ -219,6 +219,8 @@ public class MainActivity extends AppCompatActivity {
             // Read message to parse as commands
             parseCommands(message);
             showLog("receivedMessage: message --- " + message);
+            //TODO for testing only: for Glenda
+            MainActivity.remoteSendMsg("Message Received:"+ message);
             sharedPreferences();
             String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
             editor.putString("message", receivedText);
@@ -255,6 +257,21 @@ public class MainActivity extends AppCompatActivity {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    // Send message to bluetooth remotely
+    public static void remoteSendMsg(String message) {
+        showLog("Entering printMessage");
+        editor = sharedPreferences.edit();
+        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
+            byte[] bytes = message.getBytes(Charset.defaultCharset());
+            BluetoothConnectionService.write(bytes);
+        }
+        showLog(message);
+        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.commit();
+        refreshMessageReceived();
+        showLog("Exiting printMessage");
     }
 
     @Override
