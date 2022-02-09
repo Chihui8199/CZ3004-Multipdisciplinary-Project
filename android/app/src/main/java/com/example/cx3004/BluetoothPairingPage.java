@@ -151,10 +151,10 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 } else {
                     if (!mBluetoothAdapter.isEnabled()) {
                         Log.d(TAG, "enableDisableBT: enabling Bluetooth");
-                        Log.d(TAG, "enableDisableBT: Making device discoverable for 600 seconds.");
+                        Log.d(TAG, "enableDisableBT: Making device discoverable for 900 seconds.");
 
                         Intent discoverableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 600);
+                        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 900);
                         startActivity(discoverableIntent);
 
                         compoundButton.setChecked(true);
@@ -368,7 +368,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
-
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
                 Toast.makeText(BluetoothPairingPage.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_LONG).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
