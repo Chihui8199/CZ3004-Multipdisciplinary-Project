@@ -29,6 +29,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
 import com.example.cx3004.customViews.ObstacleView;
+import com.example.cx3004.customViews.RobotView;
 import com.example.cx3004.customViews.SquareGridView;
 import com.google.android.material.tabs.TabLayout;
 
@@ -47,6 +48,9 @@ public class MainActivity extends AppCompatActivity {
             R.id.obstacle4,
             R.id.obstacle5
     };
+    // flags are set when the corresponding obstacle is placed on the grid
+    boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
+    RobotView robotView;
 
     // Declaration Variables
     private static SharedPreferences sharedPreferences;
@@ -109,18 +113,33 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
                 if (dragEvent.getAction() == DragEvent.ACTION_DROP) {
+                    // get obstacle view
                     CharSequence id_data = dragEvent.getClipData().getItemAt(0).getText();
                     int id = Integer.parseInt(id_data.toString());
                     ObstacleView obstacle = (ObstacleView) findViewById(id);
+
+                    // move obstacle
                     obstacle.move(dragEvent.getX(), dragEvent.getY());
+
+                    // get obstacle image face using popup
                     showImageFacePopup(obstacle);
+
+                    // set obstacle flag
+                    obstacleFlags[obstacle.id-1] = true;
+
+                    // check if all obstacle flags have been set
+
+
                 }
                 return true;
             }
         });
 
+        // instantiate robot view
+        robotView = (RobotView) findViewById(R.id.robot);
+
         // actual width and height of views is only measured after layout
-        // hence, resize obstacles in maptabfragment after layout is complete
+        // hence, resize obstacles and set robot after layout is complete
         // grid boxes and obstacles should be same size
         View rootView = (View) findViewById(R.id.main_layout);
         rootView.post(new Runnable() {
@@ -129,7 +148,10 @@ public class MainActivity extends AppCompatActivity {
                 for (int id : obstacleIDs) {
                     ObstacleView obstacle = (ObstacleView) findViewById(id);
                     obstacle.setGridInterval(gridMap.gridInterval);
+
                 }
+                robotView.setGridInterval(gridMap.gridInterval);
+                robotView.bringToFront();
             }
         });
     }

@@ -25,6 +25,7 @@ import com.example.cx3004.R;
 */
 public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
 
+    public int id;
     private int gridInterval;
     private int x;
     private int y;
@@ -38,6 +39,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
                 R.styleable.ObstacleView,
                 0, 0);
         try {
+            id = Integer.parseInt(getText().toString());
             setTextSize(getResources().getDimensionPixelSize(R.dimen.small_text_size));
             setTextColor(Color.WHITE);
             setBackgroundColor(Color.BLACK);
@@ -94,7 +96,8 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     public String toString() {
         // for debugging purposes
         return "ObstacleView{" +
-                "gridInterval=" + gridInterval +
+                "id=" + id +
+                ", gridInterval=" + gridInterval +
                 ", x=" + x +
                 ", y=" + y +
                 ", imageFace='" + imageFace + '\'' +
@@ -128,5 +131,9 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     public void setImageFace(String imageFace) {
         this.imageFace = imageFace;
         invalidate(); // redraw obstacle with new image face border
+    }
+
+    public String getMessage(){
+        return String.format("Obstacle %d (%d, %d, %s)", id, x, y, imageFace);
     }
 }
