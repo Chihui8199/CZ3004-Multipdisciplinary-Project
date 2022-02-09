@@ -121,18 +121,21 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     }
 
     public void reset(){
-        // reset attributes
-        x = -1;
-        y = -1;
-        imageFace = "";
-        setOnMap = false;
+        // only perform reset if obstacle was placed on the map
+        if (setOnMap) {
+            // reset attributes
+            x = -1;
+            y = -1;
+            imageFace = "";
+            setOnMap = false;
 
-        // reset position
-        setX(initX);
-        setY(initY);
+            // reset position
+            setX(initX);
+            setY(initY);
 
-        // redraw
-        invalidate();
+            // redraw
+            invalidate();
+        }
     }
 
     // called after layout
