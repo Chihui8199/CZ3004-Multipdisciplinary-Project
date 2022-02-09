@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import com.example.cx3004.R;
 
 public class SquareGridView extends View {
-    private int gridSize; // size (height/width) of the grid
+    public int gridSize; // size (height/width) of the grid
     private int dim; // number of boxes in the grid
     public int gridInterval; // size of grid boxes
     private Paint innerBorderPaint = new Paint();
@@ -45,6 +45,14 @@ public class SquareGridView extends View {
 
         gridInterval = (int) Math.min(getHeight(), getWidth()) / dim;
         gridSize = gridInterval * dim;
+
+        // resize grid view
+        ViewGroup.LayoutParams params = getLayoutParams();
+        params.height = gridSize;
+        params.width = gridSize;
+        setLayoutParams(params);
+        setX(0);
+        setY(0);
 
         // Draw grid outer border
         canvas.drawLines(new float[]{

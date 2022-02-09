@@ -15,11 +15,13 @@ import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
@@ -38,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
     boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
     RobotView robotView;
 
+    SectionsPagerAdapter sectionsPagerAdapter;
+
     // Declaration Variables
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
@@ -55,7 +59,7 @@ public class MainActivity extends AppCompatActivity {
         // Initialization
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
+        sectionsPagerAdapter = new SectionsPagerAdapter(this, getSupportFragmentManager());
         ViewPager viewPager = findViewById(R.id.view_pager);
         viewPager.setAdapter(sectionsPagerAdapter);
         viewPager.setOffscreenPageLimit(9999);
@@ -92,8 +96,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        // instantiate robot view & obstacle views
+        // instantiate views
+        // instantiate robot view
         robotView = (RobotView) findViewById(R.id.robot);
+        //instantiate obstacle view
         int[] obstacleIDs = new int[]{
                 R.id.obstacle1,
                 R.id.obstacle2,
@@ -111,39 +117,22 @@ public class MainActivity extends AppCompatActivity {
         gridMap.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
+                switch (dragEvent.getAction()){
+                    case DragEvent.ACTION_DROP:
+                        ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
+                        droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
+                        // get obstacle image face using popup
+                        showImageFacePopup(droppedObstacle);
+                        break;
+                    case DragEvent.ACTION_DRAG_ENDED:
+                        if (!dragEvent.getResult()){
+                            droppedObstacle = (ObstacleView) dragEvent.getLocalState();
+                            droppedObstacle.reset();
+                        }
+                        break;
+                }
+
                 if (dragEvent.getAction() == DragEvent.ACTION_DROP) {
-                    // get obstacle view
-                    CharSequence id_data = dragEvent.getClipData().getItemAt(0).getText();
-                    int i = Integer.parseInt(id_data.toString()) - 1;
-                    ObstacleView droppedObstacle = obstacleViews[i];
-
-                    // move obstacle
-                    droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
-
-                    // get obstacle image face using popup
-                    showImageFacePopup(droppedObstacle);
-
-                    // set obstacle flag
-                    obstacleFlags[i] = true;
-
-                    // check if all obstacle flags have been set
-                    // if yes, send obstacle position message
-                    // TODO: messages are sent before popup is done, fix
-                    boolean allFlagsSet = true;
-                    for (boolean flag : obstacleFlags) {
-                        if (!flag) {
-                            allFlagsSet = false;
-                            break;
-                        }
-                    }
-                    if (allFlagsSet) {
-                        //send obstacle position message
-                        for (ObstacleView obstacle : obstacleViews) {
-                            //printMessage(obstacle.getMessage());
-                            System.out.println(obstacle.getMessage());
-                        }
-                    }
-
 
                 }
                 return true;
@@ -163,8 +152,6 @@ public class MainActivity extends AppCompatActivity {
                 robotView.bringToFront();
             }
         });
-
-
     }
 
     public static void sharedPreferences() {
@@ -244,7 +231,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
                     // call method to update ROBOT, X, Y, direction
                     robotView.move(xCoord, yCoord, direction);
-                } else if (command.equals("TARGET")) {
+                    // call method to update robot state
+                    sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
+                }else if (command.equals("TARGET")){
                     int obstacleNo = Integer.parseInt(stringSplit[1]);
                     int targetID = Integer.parseInt(stringSplit[2]);
                     Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
@@ -352,13 +341,28 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     obstacle.setImageFace(face);
-
-                    System.out.println(obstacle);
-
+                    obstacle.setOnMap = true;
                     popupWindow.dismiss();
                 }
             });
         }
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                // check if all obstacles have been placed on map
+                // if an obstacle has not been set, break out of function
+                for (ObstacleView obstacle: obstacleViews)
+                    if (!obstacle.setOnMap) return;
+
+                // if all obstacles have been set, send obstacle coordinate messages
+                for (ObstacleView obstacle: obstacleViews){
+                    remoteSendMsg(obstacle.getMessage());
+                }
+
+
+            }
+        });
 
     }
 }
