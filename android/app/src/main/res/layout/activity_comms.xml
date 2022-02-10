@@ -39,7 +39,7 @@
         android:id="@+id/messageReceivedTitleTextView"
         android:layout_width="fill_parent"
         android:layout_height="30dp"
-        android:background="@drawable/border_black_background"
+        android:background="@drawable/border_primary_background"
         android:gravity="center"
         android:text="Message"
         android:textAlignment="center"

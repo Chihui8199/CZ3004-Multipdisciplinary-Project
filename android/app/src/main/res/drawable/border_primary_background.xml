@@ -9,7 +9,7 @@ android:shape="rectangle">
     <!-- View border color and width -->
     <stroke
         android:width="2dp"
-        android:color="@color/colorWhite" >
+        android:color="@color/black" >
     </stroke>
 
 </shape>
