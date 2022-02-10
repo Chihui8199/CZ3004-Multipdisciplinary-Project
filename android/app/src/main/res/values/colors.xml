@@ -6,9 +6,20 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
+    <color name="colorPrimary">#FFFFF7DF</color>
+    <color name="colorPrimaryDark">#FFFF8A00</color>
+    <color name="colorHeadingText">#FFFFF7DF</color>
+
+
     <color name="faint_orange">#FFFFF7DF</color>
     <color name="dark_orange">#FFFF8A00</color>
+    <color name="dark_orange_variant">#FFFF9736</color>
+    <color name="faint_orange_variant">#FAF7DF</color>
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="light_grey">#FFF1F1F1</color>
+
+    <color name="colorWhite">#FFFFFF</color>
+    <color name="colorRed">#FF0000</color>
+    <color name="colorBlack">#636363</color>
 </resources>

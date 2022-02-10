@@ -1,65 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
-    android:id="@+id/coordinatorLayout"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    tools:context=".MainActivity">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/nav_bar"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/page_title"
-            android:layout_width="wrap_content"
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/appBarLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/title_blank_page"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="@dimen/title_size" />
+            android:background = "@drawable/gradient_colour"
+            android:minHeight="?attr/actionBarSize"
+            android:orientation="horizontal"
+            android:theme="?attr/actionBarTheme">
 
+            <TextView
+                android:id="@+id/title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:minHeight="?actionBarSize"
+                android:padding="@dimen/appbar_padding"
+                android:text="@string/title_image_recognition"
+                android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                android:textColor="@color/colorHeadingText"
+                android:textSize="@dimen/title_size"
+                tools:layout_conversion_absoluteHeight="59dp"
+                tools:layout_conversion_absoluteWidth="229dp"
+                tools:layout_editor_absoluteX="0dp"
+                tools:layout_editor_absoluteY="0dp" />
 
-        <ImageButton
-            android:id="@+id/nav_button"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_gravity="end"
-            android:background="@null"
-            android:contentDescription="@string/nav_button_description"
-            android:scaleType="fitCenter"
-            app:srcCompat="@drawable/menu_icon"
-            android:onClick="showPopup"/>
-        <!--
-        <androidx.appcompat.widget.ActionMenuView
-            android:id="@+id/nav_button"
-            android:layout_width="@dimen/button_size"
-            android:layout_height="@dimen/button_size"
-            android:layout_gravity="end"
-            android:background="@drawable/menu_icon"
-            android:contentDescription="@string/nav_button_description"
-            android:scaleType="fitCenter">
+            <ImageButton
+                android:id="@+id/bluetoothButton"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                android:layout_marginLeft="250dp"
+                android:background="@null"
+                android:scaleType="fitCenter"
+                android:src="@drawable/bluetooth_icon"
+                />
+        </androidx.appcompat.widget.Toolbar>
 
-        </androidx.appcompat.widget.ActionMenuView>
-        -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="507dp">
 
-    </androidx.appcompat.widget.Toolbar>
+            <com.example.cx3004.customViews.RobotView
+                android:id="@+id/robot"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
 
+            <com.example.cx3004.customViews.SquareGridView
+                android:id="@+id/grid_map"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                app:border_color="@color/dark_orange"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/obstacle1"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/page_fragment"
-        android:name="com.example.cx3004.BluetoothSettingsFragment"
-        android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        app:layout_constraintTop_toBottomOf="@id/nav_bar"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle1_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/grid_map"
+                app:layout_constraintTop_toTopOf="parent" />
 
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle2_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle3"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/grid_map"
+                app:layout_constraintTop_toBottomOf="@id/obstacle1" />
 
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle3_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle4"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/grid_map"
+                app:layout_constraintTop_toBottomOf="@id/obstacle2" />
+
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle4"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle4_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle5"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/grid_map"
+                app:layout_constraintTop_toBottomOf="@id/obstacle3" />
+
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/item_padding"
+                android:text="@string/obstacle5_id"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/grid_map"
+                app:layout_constraintTop_toBottomOf="@id/obstacle4" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+            <com.google.android.material.tabs.TabLayout
+                android:id="@+id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/colorPrimary"
+                app:tabGravity="fill"
+                app:tabSelectedTextColor="@color/dark_orange" />
+        </androidx.viewpager.widget.ViewPager>
+
+    </LinearLayout>
 
 </LinearLayout>

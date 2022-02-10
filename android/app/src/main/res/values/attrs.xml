@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="SquareGridView">
+        <attr name="dim" format="integer" />
+        <attr name="inner_border_width" format="integer" />
+        <attr name="outer_border_width" format="integer" />
+        <attr name="border_color" format="color" />
+    </declare-styleable>
+
+    <declare-styleable name="ObstacleView">
+        <attr name="obstacle_id" format="string" />
+        <attr name="grid_interval" format="integer" />
+    </declare-styleable>
+</resources>

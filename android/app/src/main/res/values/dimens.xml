@@ -1,15 +1,15 @@
 <resources>
+    <dimen name="appbar_padding">10dp</dimen>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-
+    <dimen name="appbar_padding_top">8dp</dimen>
     <dimen name="button_size">49dp</dimen>
-
     <dimen name="title_size">30sp</dimen>
-    <dimen name="header_size">20sp</dimen>
-
+    <dimen name="header_size">16sp</dimen>
     <dimen name="header_padding">16dp</dimen>
     <dimen name="text_padding">16dp</dimen>
+    <dimen name="small_text_size">12sp</dimen>
     <dimen name="item_padding">24dp</dimen>
-
     <dimen name="radius">20dp</dimen>
-
 </resources>
