@@ -17,7 +17,7 @@
             android:id="@+id/appBarLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/colorPrimary"
+            android:background = "@drawable/gradient_colour"
             android:minHeight="?attr/actionBarSize"
             android:orientation="horizontal"
             android:theme="?attr/actionBarTheme">
@@ -29,10 +29,10 @@
                 android:gravity="center"
                 android:minHeight="?actionBarSize"
                 android:padding="@dimen/appbar_padding"
-                android:textColor="@color/colorHeadingText"
                 android:text="@string/title_image_recognition"
-                android:textSize="@dimen/title_size"
                 android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
+                android:textColor="@color/colorHeadingText"
+                android:textSize="@dimen/title_size"
                 tools:layout_conversion_absoluteHeight="59dp"
                 tools:layout_conversion_absoluteWidth="229dp"
                 tools:layout_editor_absoluteX="0dp"
@@ -45,7 +45,8 @@
                 android:layout_marginLeft="250dp"
                 android:background="@drawable/rounded_orange_box"
                 android:scaleType="fitCenter"
-                android:src="@drawable/bluetooth_icon" />
+                android:src="@drawable/bluetooth_icon"
+                />
         </androidx.appcompat.widget.Toolbar>
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -55,7 +56,7 @@
             <com.example.cx3004.customViews.RobotView
                 android:id="@+id/robot"
                 android:layout_width="wrap_content"
-                android:layout_height="match_parent"/>
+                android:layout_height="match_parent" />
 
             <com.example.cx3004.customViews.SquareGridView
                 android:id="@+id/grid_map"
