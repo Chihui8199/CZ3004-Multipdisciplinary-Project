@@ -148,99 +148,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public static void sharedPreferences() {
-        sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
-        editor = sharedPreferences.edit();
-    }
-
-    public static void refreshMessageReceived() {
-        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
-    }
-
     private static void showLog(String message) {
         Log.d(TAG, message);
     }
 
-    private static SharedPreferences getSharedPreferences(Context context) {
-        return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
-    }
-
-    // Broadcast Receiver 5:  for Bluetooth Connection Status
-    private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            BluetoothDevice mDevice = intent.getParcelableExtra("Device");
-            String status = intent.getStringExtra("Status");
-            sharedPreferences();
-            if (status.equals("connected")) {
-                try {
-                    myDialog.dismiss();
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
-
-                Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_LONG).show();
-                editor.putString("connStatus", "Connected to " + mDevice.getName());
-
-            } else if (status.equals("disconnected")) {
-                Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_LONG).show();
-                editor.putString("connStatus", "Disconnected");
-                myDialog.show();
-            }
-            editor.commit();
-        }
-    };
-
-    BroadcastReceiver messageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("receivedMessage");
-            // Read message to parse as commands
-            parseCommands(message);
-            showLog("receivedMessage: message --- " + message);
-            //TODO for testing only: for Glenda
-            MainActivity.remoteSendMsg("Message Received:" + message);
-            sharedPreferences();
-            String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
-            editor.putString("message", receivedText);
-            editor.commit();
-            refreshMessageReceived();
-        }
-    };
-
-    private void parseCommands(String receivedText) {
-        Log.d(TAG, "Testing" + receivedText);
-        //TODO Better error catching
-        try {
-            if (receivedText.contains(",")) {
-                String[] stringSplit = receivedText.split(",");
-                String command = stringSplit[0];
-                //TODO Perhaps allow check length
-                if (command.equals("ROBOT")) {
-                    int xCoord = Integer.parseInt(stringSplit[1]);
-                    int yCoord = Integer.parseInt(stringSplit[2]);
-                    String direction = stringSplit[3];
-                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
-                    // call method to update ROBOT, X, Y, direction
-                    // moves robot and sets fragment to correct axis
-                    moveRobot(xCoord, yCoord, direction);
-                } else if (command.equals("TARGET")) {
-                    int obstacleNo = Integer.parseInt(stringSplit[1]);
-                    int targetID = Integer.parseInt(stringSplit[2]);
-                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
-                    // call method to update Obstacle Number, ID
-                    obstacleViews[obstacleNo - 1].setImage(targetID);
-                } else {
-                    Log.d("NO COMMANDS ACTIVATED", "NIL");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
+    // Map stuff
     public static int getXCoord() {
         return robotView.getXCoord();
     }
@@ -257,22 +169,6 @@ public class MainActivity extends AppCompatActivity {
 
     private static void refreshRobotState(int xCoord, int yCoord, String direction) {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
-    }
-
-
-    // Send message to bluetooth remotely
-    public static void remoteSendMsg(String message) {
-        showLog("Entering printMessage");
-        editor = sharedPreferences.edit();
-        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
-            byte[] bytes = message.getBytes(Charset.defaultCharset());
-            BluetoothConnectionService.write(bytes);
-        }
-        showLog(message);
-        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
-        editor.commit();
-        refreshMessageReceived();
-        showLog("Exiting printMessage");
     }
 
     private void showImageFacePopup(ObstacleView obstacle) {
@@ -323,6 +219,108 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    //Bluetooth Stuff
+    public static void sharedPreferences() {
+        sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
+        editor = sharedPreferences.edit();
+    }
+
+    public static void refreshMessageReceived() {
+        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+    }
+
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
+    }
+
+    // Broadcast Receiver 5:  for Bluetooth Connection Status
+    private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            BluetoothDevice mDevice = intent.getParcelableExtra("Device");
+            String status = intent.getStringExtra("Status");
+            sharedPreferences();
+            if (status.equals("connected")) {
+                try {
+                    myDialog.dismiss();
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+                Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
+                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_LONG).show();
+                editor.putString("connStatus", "Connected to " + mDevice.getName());
+
+            } else if (status.equals("disconnected")) {
+                Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
+                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_LONG).show();
+                editor.putString("connStatus", "Disconnected");
+                myDialog.show();
+            }
+            editor.commit();
+        }
+    };
+
+    BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("receivedMessage");
+            // Read message to parse as commands
+            parseCommands(message);
+            showLog("receivedMessage: message --- " + message);
+            sharedPreferences();
+            String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
+            editor.putString("message", receivedText);
+            editor.commit();
+            refreshMessageReceived();
+        }
+    };
+
+    private void parseCommands(String receivedText) {
+        Log.d(TAG, "Testing" + receivedText);
+        //TODO Better error catching
+        try {
+            if (receivedText.contains(",")) {
+                String[] stringSplit = receivedText.split(",");
+                String command = stringSplit[0];
+                //TODO Perhaps allow check length
+                if (command.equals("ROBOT")) {
+                    int xCoord = Integer.parseInt(stringSplit[1]);
+                    int yCoord = Integer.parseInt(stringSplit[2]);
+                    String direction = stringSplit[3];
+                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
+                    // call method to update ROBOT, X, Y, direction
+                    // moves robot and sets fragment to correct axis
+                    moveRobot(xCoord, yCoord, direction);
+                } else if (command.equals("TARGET")) {
+                    int obstacleNo = Integer.parseInt(stringSplit[1]);
+                    int targetID = Integer.parseInt(stringSplit[2]);
+                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
+                    // call method to update Obstacle Number, ID
+                    obstacleViews[obstacleNo - 1].setImage(targetID);
+                } else {
+                    Log.d("NO COMMANDS ACTIVATED", "NIL");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Send message to bluetooth remotely
+    public static void remoteSendMsg(String message) {
+        showLog("Entering printMessage");
+        editor = sharedPreferences.edit();
+        if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
+            byte[] bytes = message.getBytes(Charset.defaultCharset());
+            BluetoothConnectionService.write(bytes);
+        }
+        showLog(message);
+        editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
+        editor.commit();
+        refreshMessageReceived();
+        showLog("Exiting printMessage");
     }
 
     @Override

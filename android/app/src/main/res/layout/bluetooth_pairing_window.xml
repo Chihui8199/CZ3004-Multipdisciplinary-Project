@@ -19,10 +19,11 @@
 
         <ImageButton
             android:id="@+id/backBtn"
-            style="@style/button"
+            android:background="@null"
             android:layout_width="80dp"
-            android:layout_height="27dp"
-            android:src="@drawable/arrow_left"
+            android:layout_height="50dp"
+            android:scaleType="fitCenter"
+            android:src="@drawable/arrow_back"
             tools:layout_editor_absoluteX="16dp"
             tools:layout_editor_absoluteY="16dp" />
 
@@ -52,8 +53,8 @@
             android:layout_marginEnd="0dp"
             android:splitTrack="false"
             android:text="@string/Toggle_Switch"
-            android:thumbTint="@color/dark_orange"
-            android:trackTint="@color/dark_orange_variant" />
+            android:thumbTint="@color/faint_orange"
+            android:trackTint="@color/faint_orange_variant" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
