@@ -15,6 +15,7 @@ import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -163,6 +164,8 @@ public class MainActivity extends AppCompatActivity {
 
     public static void moveRobot(int xCoord, int yCoord, String direction) {
         Log.d(TAG, "onClick: " + xCoord + yCoord + direction);
+        // if coordinates are out of bounds, break out of function and not move the robot
+        if (!robotView.checkBoundary(xCoord, yCoord)) return;
         robotView.move(xCoord, yCoord, direction);
         refreshRobotState(xCoord, yCoord, direction);
     }
