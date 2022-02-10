@@ -8,6 +8,9 @@
     <string name="tab_text_3">Robot State</string>
     <string name="tab_text_4">Control</string>
 
+    <!--  Bluetooth  -->
+    <string name="Toggle_Switch">OFF</string>
+
     <!--  Obstacle IDs  -->
     <string name="obstacle1_id">1</string>
     <string name="obstacle2_id">2</string>
@@ -17,7 +20,7 @@
 
     <!-- Titles & headers -->
     <string name="title_blank_page">Blank Page</string>
-    <string name="title_bluetooth_settings">Bluetooth Settings</string>
+    <string name="title_bluetooth_pairing">Bluetooth Pairing</string>
     <string name="title_image_recognition">Image Recognition</string>
     <string name="title_fastest_car_task">Fastest Car Task</string>
     <string name="header_paired_device">Paired Devices</string>
