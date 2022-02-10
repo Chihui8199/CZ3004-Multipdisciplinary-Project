@@ -22,6 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messageReceivedTextView" />
 
+
     <ImageButton
         android:id="@+id/messageButton"
         android:layout_width="@dimen/button_size"
@@ -42,11 +43,11 @@
         android:background="@drawable/rounded_corner"
         android:gravity="bottom"
         android:scrollbars="vertical"
-        android:textSize="12sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="-3dp" />
+        tools:layout_editor_absoluteY="-5dp" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

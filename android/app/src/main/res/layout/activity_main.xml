@@ -135,8 +135,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="?attr/colorPrimary"
-                app:tabSelectedTextColor="@color/dark_orange"
-                app:tabGravity="fill" />
+                app:tabGravity="fill"
+                app:tabSelectedTextColor="@color/dark_orange" />
         </androidx.viewpager.widget.ViewPager>
 
     </LinearLayout>

@@ -1,16 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <style name="headerText" parent="android:Widget.Holo.Light.TextView">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textSize">@dimen/header_size</item> <!-- originally 16sp -->
+        <item name="android:textStyle">bold</item>
+        <item name="android:background">@drawable/border_primary_background</item>
+    </style>
+
     <style name="textDisplay" parent="android:Widget.Holo.Light.TextView">
-        <item name="android:textColor">@color/dark_orange</item>
+        <item name="android:textColor">?attr/colorOnPrimary</item>
         <item name="android:background">@drawable/rounded_orange_box</item>
         <item name="android:padding">@dimen/text_padding</item>
         <item name="android:layout_margin">@dimen/item_padding</item>
     </style>
 
-    <style name="btnColour" parent="android:Widget.Holo.Light.Button">
+    <style name="button" parent="android:Widget.Holo.Light.Button">
         <item name="android:textColor">@color/dark_orange</item>
-        <item name="android:background">@drawable/rounded_orange_box</item>
-        <item name="android:padding">@dimen/text_padding</item>
-        <item name="android:layout_margin">@dimen/item_padding</item>
+        <item name="android:background">@color/faint_orange</item>
     </style>
 </resources>
