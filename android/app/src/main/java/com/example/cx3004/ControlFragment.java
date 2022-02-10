@@ -4,6 +4,7 @@ package com.example.cx3004;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +23,12 @@ public class ControlFragment extends Fragment {
     // Declaration Variable
     // Shared Preferences
     SharedPreferences sharedPreferences;
+    SectionsPagerAdapter sectionsPagerAdapter;
 
     // Control Button
-    ImageButton moveUpImageBtn, moveRightImageBtn, moveBackImageBtn, moveDownImageBtn;
+    ImageButton moveUpImageBtn, moveRightImageBtn, moveLeftImageBtn, moveDownImageBtn;
+    int xCoord;
+    int yCoord;
 
     // Fragment Constructor
     public static ControlFragment newInstance(int index) {
@@ -60,35 +64,44 @@ public class ControlFragment extends Fragment {
         // variable initialization
         moveUpImageBtn = root.findViewById(R.id.upImageBtn);
         moveRightImageBtn = root.findViewById(R.id.rightImageBtn);
-        moveBackImageBtn = root.findViewById(R.id.downImageBtn);
-        moveDownImageBtn = root.findViewById(R.id.leftImageBtn);
+        moveLeftImageBtn = root.findViewById(R.id.leftImageBtn);
+        moveDownImageBtn = root.findViewById(R.id.downImageBtn);
 
 
         // Button Listener
         moveUpImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                xCoord = ((MainActivity) getActivity()).getXCoord();
+                yCoord = ((MainActivity) getActivity()).getYCoord();
+                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord+1, "up");
             }
         });
 
         moveRightImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                xCoord = ((MainActivity) getActivity()).getXCoord();
+                yCoord = ((MainActivity) getActivity()).getYCoord();
+                ((MainActivity) getActivity()).moveRobot(xCoord+1, yCoord, "right");
             }
         });
 
-        moveBackImageBtn.setOnClickListener(new View.OnClickListener() {
+        moveLeftImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+                xCoord = ((MainActivity) getActivity()).getXCoord();
+                yCoord = ((MainActivity) getActivity()).getYCoord();
+                ((MainActivity) getActivity()).moveRobot(xCoord-1, yCoord, "left");
             }
         });
 
         moveDownImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                xCoord = ((MainActivity) getActivity()).getXCoord();
+                yCoord = ((MainActivity) getActivity()).getYCoord();
+                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord-1, "down");
 
             }
         });

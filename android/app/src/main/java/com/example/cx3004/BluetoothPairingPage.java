@@ -63,7 +63,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 if (BluetoothConnectionService.BluetoothConnectionStatus == false) {
                     startBTConnection(mBTDevice, myUUID);
                     Toast.makeText(BluetoothPairingPage.this, "Reconnection Success", Toast.LENGTH_SHORT).show();
-
                 }
                 reconnectionHandler.removeCallbacks(reconnectionRunnable);
                 retryConnection = false;

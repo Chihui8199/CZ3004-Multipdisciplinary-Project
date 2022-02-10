@@ -6,8 +6,8 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
 
-    <color name="colorPrimary">#FFFF8A00</color>
-    <color name="colorPrimaryDark">#FFFFF7DF</color>
+    <color name="colorPrimary">#FFFFF7DF</color>
+    <color name="colorPrimaryDark">#FFFF8A00</color>
     <color name="transparent">#0000ffff</color>
 
     <color name="faint_orange">#FFFFF7DF</color>

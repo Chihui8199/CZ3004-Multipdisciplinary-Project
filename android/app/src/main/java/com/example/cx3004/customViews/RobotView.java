@@ -1,9 +1,7 @@
 package com.example.cx3004.customViews;
 
 import android.content.Context;
-import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
@@ -13,7 +11,7 @@ import androidx.annotation.Nullable;
 
 import com.example.cx3004.R;
 
-public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
+public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
     private int gridInterval;
     public int x;
     public int y;
@@ -42,13 +40,13 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
         triangleArrow.draw(canvas);
     }
 
-    public void setGridInterval(int gridInterval){
+    public void setGridInterval(int gridInterval) {
         this.gridInterval = gridInterval;
 
         // resize view
         ViewGroup.LayoutParams params = getLayoutParams();
-        params.height = 4*gridInterval;
-        params.width = 4*gridInterval;
+        params.height = 4 * gridInterval;
+        params.width = 4 * gridInterval;
         setLayoutParams(params);
 
         // set robot at 0, 0
@@ -57,9 +55,9 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
         move(0, 3, "up");
     }
 
-    public void move(int x, int y, String direction){
+    public void move(int x, int y, String direction) {
         // set direction
-        switch (direction){
+        switch (direction) {
             case "left":
                 setRotation(-90);
                 this.direction = direction;
@@ -79,9 +77,16 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
 
         // set coordinates
         setX(x * gridInterval);
-        setY((19-y) * gridInterval);
+        setY((19 - y) * gridInterval);
         this.x = x;
         this.y = y;
+    }
 
+    public int getXCoord() {
+        return x;
+    }
+
+    public int getYCoord() {
+        return y;
     }
 }

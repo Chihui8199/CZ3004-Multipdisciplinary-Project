@@ -5,57 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/yAxisTextView"
-        android:layout_width="45dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="32dp"
-        android:text="0"
-        android:textAlignment="center"
-        android:textColor="@color/colorRed"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/yLabelTextView"
-        app:layout_constraintTop_toBottomOf="@+id/directionAxisTextView" />
-
-    <TextView
-        android:id="@+id/yLabelTextView"
-        android:layout_width="30dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_horizontal"
-        android:text="Y:"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/xAxisTextView"
-        app:layout_constraintTop_toBottomOf="@+id/directionAxisTextView" />
-
-    <TextView
-        android:id="@+id/xAxisTextView"
-        android:layout_width="45dp"
-        android:layout_height="40dp"
-        android:layout_marginTop="32dp"
-        android:text="0"
-        android:textAlignment="center"
-        android:textColor="@color/colorRed"
-        android:textSize="18sp"
-        app:layout_constraintStart_toEndOf="@+id/xLabelTextView"
-        app:layout_constraintTop_toBottomOf="@+id/directionLabelTextView" />
-
-    <TextView
-        android:id="@+id/xLabelTextView"
-        android:layout_width="30dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="32dp"
-        android:gravity="center_horizontal"
-        android:text="X:"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintStart_toEndOf="@+id/mapView"
-        app:layout_constraintTop_toBottomOf="@+id/directionLabelTextView" />
-
     <ImageButton
         android:id="@+id/downImageBtn"
         android:layout_width="wrap_content"

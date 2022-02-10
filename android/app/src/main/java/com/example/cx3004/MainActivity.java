@@ -15,13 +15,11 @@ import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import androidx.viewpager.widget.ViewPager;
 
@@ -38,9 +36,9 @@ public class MainActivity extends AppCompatActivity {
     ObstacleView[] obstacleViews;
     // flags are set when the corresponding obstacle is placed on the grid
     boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
-    RobotView robotView;
+    static RobotView robotView;
 
-    SectionsPagerAdapter sectionsPagerAdapter;
+    static SectionsPagerAdapter sectionsPagerAdapter;
 
     // Declaration Variables
     private static SharedPreferences sharedPreferences;
@@ -117,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         gridMap.setOnDragListener(new View.OnDragListener() {
             @Override
             public boolean onDrag(View view, DragEvent dragEvent) {
-                switch (dragEvent.getAction()){
+                switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DROP:
                         ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
                         droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
@@ -125,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
                         showImageFacePopup(droppedObstacle);
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
-                        if (!dragEvent.getResult()){
+                        if (!dragEvent.getResult()) {
                             droppedObstacle = (ObstacleView) dragEvent.getLocalState();
                             droppedObstacle.reset();
                         }
@@ -230,10 +228,9 @@ public class MainActivity extends AppCompatActivity {
                     String direction = stringSplit[3];
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
                     // call method to update ROBOT, X, Y, direction
-                    robotView.move(xCoord, yCoord, direction);
-                    // call method to update robot state
-                    sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
-                }else if (command.equals("TARGET")){
+                    // moves robot and sets fragment to correct axis
+                    moveRobot(xCoord, yCoord, direction);
+                } else if (command.equals("TARGET")) {
                     int obstacleNo = Integer.parseInt(stringSplit[1]);
                     int targetID = Integer.parseInt(stringSplit[2]);
                     Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
@@ -248,6 +245,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public static int getXCoord() {
+        return robotView.getXCoord();
+    }
+
+    public static int getYCoord() {
+        return robotView.getYCoord();
+    }
+
+    public static void moveRobot(int xCoord, int yCoord, String direction) {
+        Log.d(TAG, "onClick: " + xCoord + yCoord + direction);
+        robotView.move(xCoord, yCoord, direction);
+        refreshRobotState(xCoord, yCoord, direction);
+    }
+
+    private static void refreshRobotState(int xCoord, int yCoord, String direction) {
+        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
+    }
+
+
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
         showLog("Entering printMessage");
@@ -261,6 +277,56 @@ public class MainActivity extends AppCompatActivity {
         editor.commit();
         refreshMessageReceived();
         showLog("Exiting printMessage");
+    }
+
+    private void showImageFacePopup(ObstacleView obstacle) {
+
+        final PopupWindow popupWindow = new PopupWindow(this);
+
+        // inflate layout
+        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View view = inflater.inflate(R.layout.image_face_popup, null);
+
+        popupWindow.setContentView(view);
+        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
+
+        // set buttons
+        int[] buttonIDs = new int[]{
+                R.id.up_button, R.id.down_button,
+                R.id.left_button, R.id.right_button
+        };
+        String[] faces = new String[]{"up", "down", "left", "right"};
+        for (int i = 0; i < buttonIDs.length; i++) {
+            View button = view.findViewById(buttonIDs[i]);
+            String face = faces[i];
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    obstacle.setImageFace(face);
+                    obstacle.setOnMap = true;
+                    popupWindow.dismiss();
+                }
+            });
+        }
+
+        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
+            @Override
+            public void onDismiss() {
+                // check if all obstacles have been placed on map
+                // if an obstacle has not been set, break out of function
+                for (ObstacleView obstacle : obstacleViews)
+                    if (!obstacle.setOnMap) return;
+
+                // if all obstacles have been set, send obstacle coordinate messages
+                for (ObstacleView obstacle : obstacleViews) {
+                    remoteSendMsg(obstacle.getMessage());
+                }
+
+
+            }
+        });
+
+
     }
 
     @Override
@@ -315,54 +381,5 @@ public class MainActivity extends AppCompatActivity {
 
         outState.putString(TAG, "onSaveInstanceState");
         showLog("Exiting onSaveInstanceState");
-    }
-
-    private void showImageFacePopup(ObstacleView obstacle) {
-
-        final PopupWindow popupWindow = new PopupWindow(this);
-
-        // inflate layout
-        LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        View view = inflater.inflate(R.layout.image_face_popup, null);
-
-        popupWindow.setContentView(view);
-        popupWindow.showAtLocation(view, Gravity.CENTER, 0, 0);
-
-        // set buttons
-        int[] buttonIDs = new int[]{
-                R.id.up_button, R.id.down_button,
-                R.id.left_button, R.id.right_button
-        };
-        String[] faces = new String[]{"up", "down", "left", "right"};
-        for (int i = 0; i < buttonIDs.length; i++) {
-            View button = view.findViewById(buttonIDs[i]);
-            String face = faces[i];
-            button.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    obstacle.setImageFace(face);
-                    obstacle.setOnMap = true;
-                    popupWindow.dismiss();
-                }
-            });
-        }
-
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                // check if all obstacles have been placed on map
-                // if an obstacle has not been set, break out of function
-                for (ObstacleView obstacle: obstacleViews)
-                    if (!obstacle.setOnMap) return;
-
-                // if all obstacles have been set, send obstacle coordinate messages
-                for (ObstacleView obstacle: obstacleViews){
-                    remoteSendMsg(obstacle.getMessage());
-                }
-
-
-            }
-        });
-
     }
 }
