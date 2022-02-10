@@ -58,6 +58,9 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
     }
 
     public void move(int x, int y, String direction){
+        // if coordinates are out of bounds, break out of function and not move the robot
+        if (!checkBoundary(x, y)) return;
+
         // set direction
         switch (direction){
             case "left":
@@ -83,5 +86,9 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
         this.x = x;
         this.y = y;
 
+    }
+
+    private boolean checkBoundary(int x, int y){
+        return (0<= x & x <= 16) & (3 <= y & y <= 19);
     }
 }
