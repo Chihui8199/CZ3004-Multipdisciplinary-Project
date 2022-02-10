@@ -7,20 +7,21 @@
 
     <ImageButton
         android:id="@+id/upImageBtn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginTop="20dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="50dp"
         android:background="@drawable/rounded_orange_box"
+        app:layout_constraintBottom_toTopOf="@+id/downImageBtn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/arrow_up" />
 
     <ImageButton
         android:id="@+id/leftImageBtn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="50dp"
         android:background="@drawable/rounded_orange_box"
         app:layout_constraintBottom_toTopOf="@id/downImageBtn"
         app:layout_constraintEnd_toStartOf="@id/rightImageBtn"
@@ -31,8 +32,9 @@
 
     <ImageButton
         android:id="@+id/rightImageBtn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginStart="50dp"
         android:background="@drawable/rounded_orange_box"
         app:layout_constraintBottom_toTopOf="@id/downImageBtn"
         app:layout_constraintEnd_toEndOf="parent"
@@ -43,21 +45,14 @@
 
     <ImageButton
         android:id="@+id/downImageBtn"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_marginBottom="100dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="50dp"
         android:background="@drawable/rounded_orange_box"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.499"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/upImageBtn"
         app:srcCompat="@drawable/arrow_down" />
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_begin="20dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
