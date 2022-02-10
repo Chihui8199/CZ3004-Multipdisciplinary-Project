@@ -76,6 +76,7 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView  {
                 this.direction = direction;
                 break;
             case "up":
+                setRotation(0);
                 this.direction = direction;
                 break;
         }
