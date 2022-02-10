@@ -43,7 +43,7 @@
                 android:layout_width="@dimen/button_size"
                 android:layout_height="@dimen/button_size"
                 android:layout_marginLeft="250dp"
-                android:background="@drawable/rounded_orange_box"
+                android:background="@null"
                 android:scaleType="fitCenter"
                 android:src="@drawable/bluetooth_icon"
                 />
