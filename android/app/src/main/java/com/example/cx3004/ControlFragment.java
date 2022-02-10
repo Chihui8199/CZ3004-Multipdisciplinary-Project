@@ -1,10 +1,6 @@
 package com.example.cx3004;
 
-
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,11 +17,6 @@ public class ControlFragment extends Fragment {
     private PageViewModel pageViewModel;
 
     // Declaration Variable
-    // Shared Preferences
-    SharedPreferences sharedPreferences;
-    SectionsPagerAdapter sectionsPagerAdapter;
-
-    // Control Button
     ImageButton moveUpImageBtn, moveRightImageBtn, moveLeftImageBtn, moveDownImageBtn;
     int xCoord;
     int yCoord;
@@ -57,10 +48,6 @@ public class ControlFragment extends Fragment {
         // inflate
         View root = inflater.inflate(R.layout.fragment_controls, container, false);
 
-        // get shared preferences
-        sharedPreferences = getActivity().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
-
-
         // variable initialization
         moveUpImageBtn = root.findViewById(R.id.upImageBtn);
         moveRightImageBtn = root.findViewById(R.id.rightImageBtn);
@@ -69,12 +56,13 @@ public class ControlFragment extends Fragment {
 
 
         // Button Listener
+        //TODO Need to check if it's ok to create static var like this
         moveUpImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord+1, "up");
+                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord + 1, "up");
             }
         });
 
@@ -83,7 +71,7 @@ public class ControlFragment extends Fragment {
             public void onClick(View view) {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord+1, yCoord, "right");
+                ((MainActivity) getActivity()).moveRobot(xCoord + 1, yCoord, "right");
             }
         });
 
@@ -92,7 +80,7 @@ public class ControlFragment extends Fragment {
             public void onClick(View view) {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord-1, yCoord, "left");
+                ((MainActivity) getActivity()).moveRobot(xCoord - 1, yCoord, "left");
             }
         });
 
@@ -101,7 +89,7 @@ public class ControlFragment extends Fragment {
             public void onClick(View view) {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord-1, "down");
+                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord - 1, "down");
 
             }
         });
