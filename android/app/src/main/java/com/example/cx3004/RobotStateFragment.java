@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -50,5 +51,8 @@ public class RobotStateFragment extends Fragment {
         xTextView.setText(String.format("X: %d", x));
         yTextView.setText(String.format("Y: %d", y));
         directionTextView.setText(String.format("Direction: %s", direction.toUpperCase()));
+        Log.d("ROBOT STATE",
+                String.format("Robot state has been set to: x=%d, y=%d, direction=%s",
+                        x, y, direction.toUpperCase()));
     }
 }

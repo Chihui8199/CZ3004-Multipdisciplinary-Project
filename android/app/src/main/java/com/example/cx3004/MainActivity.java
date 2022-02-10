@@ -119,14 +119,28 @@ public class MainActivity extends AppCompatActivity {
                 switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DROP:
                         ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
+                        Log.d("OBSTACLE",
+                                String.format("Obstacle %d was dropped on the map.",
+                                        droppedObstacle.getObstacleId()));
                         droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
+                        Log.d("OBSTACLE",
+                                String.format("Obstacle %d was moved to (%d, %d) on the map.",
+                                        droppedObstacle.getObstacleId(),
+                                        droppedObstacle.getGridX(),
+                                        droppedObstacle.getGridY()));
                         // get obstacle image face using popup
                         showImageFacePopup(droppedObstacle);
                         break;
                     case DragEvent.ACTION_DRAG_ENDED:
                         if (!dragEvent.getResult()) {
                             droppedObstacle = (ObstacleView) dragEvent.getLocalState();
+                            Log.d("OBSTACLE",
+                                    String.format("Obstacle %d was dropped outside of the map.",
+                                            droppedObstacle.getObstacleId()));
                             droppedObstacle.reset();
+                            Log.d("OBSTACLE",
+                                    String.format("Obstacle %d was reset.",
+                                            droppedObstacle.getObstacleId()));
                         }
                         break;
                 }
@@ -141,10 +155,17 @@ public class MainActivity extends AppCompatActivity {
         rootView.post(new Runnable() {
             @Override
             public void run() {
-                for (ObstacleView obstacle : obstacleViews)
+                for (ObstacleView obstacle : obstacleViews) {
                     obstacle.setGridInterval(gridMap.gridInterval);
+                    Log.d("OBSTACLE",
+                            String.format("Obstacle %d has been resized to match grid boxes.",
+                                    obstacle.getObstacleId()));
+                }
                 robotView.setGridInterval(gridMap.gridInterval);
                 robotView.bringToFront();
+                Log.d("ROBOT",
+                        "Robot has been resized to match grid boxes " +
+                                "and positioned at bottom-left corner of map.");
             }
         });
     }
@@ -167,6 +188,9 @@ public class MainActivity extends AppCompatActivity {
         // if coordinates are out of bounds, break out of function and not move the robot
         if (!robotView.checkBoundary(xCoord, yCoord)) return;
         robotView.move(xCoord, yCoord, direction);
+        Log.d("ROBOT",
+                String.format("Robot has been moved to (%d, %d) on the map and is facing %s.",
+                        xCoord, yCoord, direction));
         refreshRobotState(xCoord, yCoord, direction);
     }
 
@@ -198,6 +222,9 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     obstacle.setImageFace(face);
+                    Log.d("OBSTACLE",
+                            String.format("Image face for obstacle %d has been set to '%s'.",
+                                    obstacle.getObstacleId(), face));
                     obstacle.setOnMap = true;
                     popupWindow.dismiss();
                 }
@@ -211,10 +238,14 @@ public class MainActivity extends AppCompatActivity {
                 // if an obstacle has not been set, break out of function
                 for (ObstacleView obstacle : obstacleViews)
                     if (!obstacle.setOnMap) return;
+                Log.d("OBSTACLE", "All obstacles have been placed on map.");
 
                 // if all obstacles have been set, send obstacle coordinate messages
                 for (ObstacleView obstacle : obstacleViews) {
                     remoteSendMsg(obstacle.getMessage());
+                    Log.d("SEND MESSAGE",
+                            String.format("Obstacle message has been sent for obstacle %d",
+                                    obstacle.getObstacleId()));
                 }
 
 
@@ -302,6 +333,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
                     // call method to update Obstacle Number, ID
                     obstacleViews[obstacleNo - 1].setImage(targetID);
+                    Log.d("OBSTACLE",
+                            String.format("Obstacle %d's image has been set to image ID %d.",
+                                    obstacleNo, targetID));
                 } else {
                     Log.d("NO COMMANDS ACTIVATED", "NIL");
                 }

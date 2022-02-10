@@ -25,7 +25,7 @@ import com.example.cx3004.R;
 */
 public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
 
-    public int id;
+    private int id;
     private int gridInterval;
     private int x;
     private int y;
@@ -163,5 +163,17 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
 
     public String getMessage(){
         return String.format("Obstacle %d (%d, %d, %s)", id, x, y, imageFace);
+    }
+
+    public int getObstacleId(){
+        return id;
+    }
+
+    public int getGridX(){
+        return x;
+    }
+
+    public int getGridY(){
+        return y;
     }
 }
