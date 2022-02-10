@@ -8,7 +8,8 @@
 
     <color name="colorPrimary">#FFFFF7DF</color>
     <color name="colorPrimaryDark">#FFFF8A00</color>
-    <color name="transparent">#0000ffff</color>
+    <color name="colorHeadingText">#FFFF8A00</color>
+
 
     <color name="faint_orange">#FFFFF7DF</color>
     <color name="dark_orange">#FFFF8A00</color>
