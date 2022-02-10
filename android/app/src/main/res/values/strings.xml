@@ -2,9 +2,25 @@
     <string name="test_string">Testing</string>
     <string name="app_name">CX3004</string>
 
+
+    <string name="tab_text_1">Bluetooth</string>
+    <string name="tab_text_2">Comms</string>
+    <string name="tab_text_3">Robot State</string>
+    <string name="tab_text_4">Control</string>
+
+    <!--  Bluetooth  -->
+    <string name="Toggle_Switch">OFF</string>
+
+    <!--  Obstacle IDs  -->
+    <string name="obstacle1_id">1</string>
+    <string name="obstacle2_id">2</string>
+    <string name="obstacle3_id">3</string>
+    <string name="obstacle4_id">4</string>
+    <string name="obstacle5_id">5</string>
+
     <!-- Titles & headers -->
     <string name="title_blank_page">Blank Page</string>
-    <string name="title_bluetooth_settings">Bluetooth Settings</string>
+    <string name="title_bluetooth_pairing">Bluetooth Pairing</string>
     <string name="title_image_recognition">Image Recognition</string>
     <string name="title_fastest_car_task">Fastest Car Task</string>
     <string name="header_paired_device">Paired Devices</string>
@@ -15,6 +31,9 @@
     <string name="bluetooth_on">On</string>
     <string name="bluetooth_off">Off</string>
     <string name="sender_hint">Message to send...</string>
+    <string name="robot_x_state">X: 0</string>
+    <string name="robot_y_state">Y: 3</string>
+    <string name="robot_direction_state">Direction: UP</string>
 
     <!-- Context descriptions -->
     <string name="nav_button_description">Navigation</string>
