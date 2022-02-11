@@ -320,9 +320,17 @@ public class MainActivity extends AppCompatActivity {
                 String command = stringSplit[0];
                 //TODO Perhaps allow check length
                 if (command.equals("ROBOT")) {
-                    int xCoord = Integer.parseInt(stringSplit[1]);
-                    int yCoord = Integer.parseInt(stringSplit[2]);
-                    String direction = stringSplit[3];
+                    double xCoord = Double.parseDouble(stringSplit[1]);
+                    double yCoord = Double.parseDouble(stringSplit[2]);
+                    // process direction
+                    // angle is sent in radians, convert to degrees
+                    double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
+                    String direction = "up";
+                    if ((0<=angle & angle<=45) | (315<angle & angle<360)) direction = "left";
+                    else if (45<angle & angle<=135) direction = "up";
+                    else if (135<angle & angle<=255) direction = "right";
+                    else if (255<angle & angle<=315) direction = "down";
+                    else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
                     // call method to update ROBOT, X, Y, direction
                     // moves robot and sets fragment to correct axis
