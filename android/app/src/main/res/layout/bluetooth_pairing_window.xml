@@ -54,7 +54,7 @@
             android:splitTrack="false"
             android:text="@string/Toggle_Switch"
             android:thumbTint="@color/faint_orange"
-            android:trackTint="@color/faint_orange_variant" />
+            android:trackTint="@color/switch_track" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
