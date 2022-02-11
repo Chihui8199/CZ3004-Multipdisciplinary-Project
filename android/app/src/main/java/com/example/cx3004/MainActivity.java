@@ -175,26 +175,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Map stuff
-    public static int getXCoord() {
+    public static double getXCoord() {
         return robotView.getXCoord();
     }
 
-    public static int getYCoord() {
+    public static double getYCoord() {
         return robotView.getYCoord();
     }
 
-    public static void moveRobot(int xCoord, int yCoord, String direction) {
+    public static void moveRobot(double xCoord, double yCoord, String direction) {
         Log.d(TAG, "onClick: " + xCoord + yCoord + direction);
         // if coordinates are out of bounds, break out of function and not move the robot
         if (!robotView.checkBoundary(xCoord, yCoord)) return;
         robotView.move(xCoord, yCoord, direction);
         Log.d("ROBOT",
-                String.format("Robot has been moved to (%d, %d) on the map and is facing %s.",
+                String.format("Robot has been moved to (%f, %f) on the map and is facing %s.",
                         xCoord, yCoord, direction));
         refreshRobotState(xCoord, yCoord, direction);
     }
 
-    private static void refreshRobotState(int xCoord, int yCoord, String direction) {
+    private static void refreshRobotState(double xCoord, double yCoord, String direction) {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
     }
 
@@ -336,6 +336,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("OBSTACLE",
                             String.format("Obstacle %d's image has been set to image ID %d.",
                                     obstacleNo, targetID));
+                } else if (command.equals("TIMING")){
+                    String timing = stringSplit[1];
+                    sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
                 } else {
                     Log.d("NO COMMANDS ACTIVATED", "NIL");
                 }

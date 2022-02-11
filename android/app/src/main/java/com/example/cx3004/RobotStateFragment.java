@@ -13,6 +13,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 /**
  * A simple {@link Fragment} subclass.
  * Use the {@link RobotStateFragment#newInstance} factory method to
@@ -47,12 +49,20 @@ public class RobotStateFragment extends Fragment {
         directionTextView = (TextView) getView().findViewById(R.id.robot_direction_state);
     }
 
-    public void setRobotState(int x, int y, String direction){
-        xTextView.setText(String.format("X: %d", x));
-        yTextView.setText(String.format("Y: %d", y));
-        directionTextView.setText(String.format("Direction: %s", direction.toUpperCase()));
+    public void setRobotState(double x, double y, String direction){
+        // remove trailing zeros from coords
+        DecimalFormat coordFormat = new DecimalFormat("0.#");
+        String xStr = String.format("X: %s", coordFormat.format(x));
+        String yStr = String.format("Y: %s", coordFormat.format(y));
+        String directionStr = String.format("Direction: %s", direction.toUpperCase());
+
+        // set text in text views
+        xTextView.setText(xStr);
+        yTextView.setText(yStr);
+        directionTextView.setText(directionStr);
+
         Log.d("ROBOT STATE",
-                String.format("Robot state has been set to: x=%d, y=%d, direction=%s",
-                        x, y, direction.toUpperCase()));
+                String.format("Robot state has been set to: %s, %s, %s",
+                        xStr, yStr, directionStr));
     }
 }

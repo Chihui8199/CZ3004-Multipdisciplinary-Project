@@ -18,8 +18,8 @@ public class ControlFragment extends Fragment {
 
     // Declaration Variable
     ImageButton moveUpImageBtn, moveRightImageBtn, moveLeftImageBtn, moveDownImageBtn;
-    int xCoord;
-    int yCoord;
+    double xCoord;
+    double yCoord;
 
     // Fragment Constructor
     public static ControlFragment newInstance(int index) {
@@ -63,6 +63,8 @@ public class ControlFragment extends Fragment {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
                 ((MainActivity) getActivity()).moveRobot(xCoord, yCoord + 1, "up");
+                //MainActivity activity = getActivity();
+
             }
         });
 

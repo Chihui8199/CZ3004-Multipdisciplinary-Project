@@ -32,8 +32,8 @@
     <string name="bluetooth_on">On</string>
     <string name="bluetooth_off">Off</string>
     <string name="sender_hint">Message to send...</string>
-    <string name="robot_x_state">X: 0</string>
-    <string name="robot_y_state">Y: 3</string>
+    <string name="robot_x_state">X: 1.5</string>
+    <string name="robot_y_state">Y: 1.5</string>
     <string name="robot_direction_state">Direction: UP</string>
 
     <!-- Context descriptions -->
