@@ -2,10 +2,8 @@ import math
 
 import cv2
 
-from envs.models import Entity
 
-
-def collide_with(a: Entity, b: Entity) -> bool:
+def collide_with(a, b) -> bool:
     """
     detect if two entities collide with each other
     reference:

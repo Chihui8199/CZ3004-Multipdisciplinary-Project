@@ -41,6 +41,7 @@ class ImageRecognitionEnv(gym.Env):
         self.car = None
         self.sensor_data = deque([], maxlen=1000)  # the point is, not need to keep too much old data
         self._add_walls()
+        self.path = None
 
         if self.rl_mode:
             self.action_space = gym.spaces.Box(low=np.array([-1.] * 3),  # TODO: norm not implemented yet
@@ -371,8 +372,13 @@ class ImageRecognitionEnv(gym.Env):
                     points_y.append(point[1])
             obstacles.set_data(obstacles_x, obstacles_y)
             nodes.set_data(points_x, points_y)
+            # import matplotlib as mpl
+            # t = mpl.markers.MarkerStyle(marker='p')
+            # t._transform = t.get_transform().rotate_deg(angle)
             car.set_data([self.car.x], [self.car.y])
-            info.set_text("x: {:.2f} y: {:.2f}".format(self.car.x, self.car.y))
+            if self.path:
+                path.set_data([i[0] for i in self.path], [i[1] for i in self.path])
+            info.set_text("x: {:.2f} y: {:.2f} angle: {:.1f}".format(self.car.x, self.car.y, self.car.z),)
 
             return info, obstacles, nodes, car,
 
@@ -383,9 +389,11 @@ class ImageRecognitionEnv(gym.Env):
         ax.set_ylim(0, 200)
 
         info = ax.text(5, 5, "")
-        obstacles, = ax.plot([], [], marker="s", ls="")
+        path, = ax.plot([], [])
+        obstacles, = ax.plot([], [], marker="s", ls="", markersize=18)
         nodes, = ax.plot([], [], marker="o", ls="")
-        car, = ax.plot([], [], marker="^", ls="")
+        car_dir = ax.plot([], [], marker="o", ls="")
+        car, = ax.plot([], [], marker="p", ls="", markersize=35)
 
         anim = FuncAnimation(fig, _update, interval=100, blit=True)
         fig.tight_layout()
