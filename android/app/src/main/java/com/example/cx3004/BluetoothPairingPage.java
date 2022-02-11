@@ -82,9 +82,11 @@ public class BluetoothPairingPage extends AppCompatActivity {
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
         Switch bluetoothSwitch = (Switch) findViewById(R.id.bluetoothSwitch);
-        if (mBluetoothAdapter.isEnabled()) {
-            bluetoothSwitch.setChecked(true);
-            bluetoothSwitch.setText("ON");
+        if (mBluetoothAdapter != null){
+            if (mBluetoothAdapter.isEnabled()) {
+                bluetoothSwitch.setChecked(true);
+                bluetoothSwitch.setText("ON");
+            }
         }
         discovDevicesListView = (ListView) findViewById(R.id.discovDevicesListView);
         pairedDevicesListView = (ListView) findViewById(R.id.pairedDevicesListView);
