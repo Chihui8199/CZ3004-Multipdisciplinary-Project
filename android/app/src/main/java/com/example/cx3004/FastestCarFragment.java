@@ -73,4 +73,9 @@ public class FastestCarFragment extends Fragment {
         return root;
     }
 
+    public void setTiming(String timing){
+        TextView timingText = (TextView) getView().findViewById(R.id.timing);
+        timingText.setText(String.format("Timing: %s", timing));
+    }
+
 }

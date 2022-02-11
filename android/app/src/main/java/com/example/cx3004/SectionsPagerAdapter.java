@@ -16,6 +16,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     // fragments
     RobotStateFragment robotStateFragment = new RobotStateFragment();
+    FastestCarFragment fastestCarFragment = new FastestCarFragment();
 
     @StringRes
     private static final int[] TAB_TITLES = new int[]{R.string.tab_text_2, R.string.tab_text_3, R.string.tab_text_4, R.string.tab_text_5};
@@ -38,7 +39,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
             case 2:
                 return ControlFragment.newInstance(position+1);
             case 3:
-                return FastestCarFragment.newInstance(position+1);
+                return fastestCarFragment;
             default:
                 return PlaceholderFragment.newInstance(position + 1);
         }
