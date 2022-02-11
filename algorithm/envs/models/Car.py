@@ -51,8 +51,8 @@ class Car(Entity):
             for i in range(samples):
                 time = i * sample_rate
                 traj = Entity(
-                    x=self.x + v * time * math.cos(math.pi/2+self.z),
-                    y=self.y + v * time * math.sin(math.pi/2+self.z),
+                    x=self.x + v * time * math.cos(self.z),
+                    y=self.y + v * time * math.sin(self.z),
                     z=self.z,
                     length=self.length,
                     width=self.width
@@ -61,16 +61,17 @@ class Car(Entity):
                     traj.add_noise()
                 traj_list.append(traj)
         else:
-            radius = self.length / (2 * math.sin(angle))
+            radius = self.length / math.tan(angle)
 
             for i in range(samples):
                 time = i * sample_rate
-                x = self.x - radius * math.cos(self.z) + radius * math.cos(v * time / radius + self.z)
-                y = self.y - radius * math.sin(self.z) + radius * math.sin(v * time / radius + self.z)
+                x = self.x - radius * math.cos(self.z) + radius * math.cos(v * time * math.sin(angle) / self.length + self.z)
+                y = self.y - radius * math.sin(self.z) + radius * math.sin(v * time * math.sin(angle) / self.length + self.z)
+                # print(x, y, v * time / radius + self.z)
                 traj = Entity(
                     x=x,
                     y=y,
-                    z=v * time / radius + self.z,
+                    z=v * time * math.sin(angle) / self.length + self.z,
                     length=self.length,
                     width=self.width
                 )
