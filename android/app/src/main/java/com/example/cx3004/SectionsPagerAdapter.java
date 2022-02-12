@@ -18,7 +18,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
     RobotStateFragment robotStateFragment = new RobotStateFragment();
 
     @StringRes
-    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_2, R.string.tab_text_3, R.string.tab_text_4};
+    private static final int[] TAB_TITLES = new int[]{R.string.tab_text_2, R.string.tab_text_3, R.string.tab_text_4, R.string.tab_text_5};
     private final Context mContext;
 
     public SectionsPagerAdapter(Context context, FragmentManager fm) {
@@ -37,6 +37,8 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
                 return robotStateFragment;
             case 2:
                 return ControlFragment.newInstance(position+1);
+            case 3:
+                return FastestCarFragment.newInstance(position+1);
             default:
                 return PlaceholderFragment.newInstance(position + 1);
         }
@@ -50,7 +52,7 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        // Show 3 total pages.
-        return 3;
+        // Show 4 total pages.
+        return 4;
     }
 }

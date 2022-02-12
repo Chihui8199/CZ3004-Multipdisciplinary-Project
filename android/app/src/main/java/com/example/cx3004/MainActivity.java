@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     ObstacleView[] obstacleViews;
     // flags are set when the corresponding obstacle is placed on the grid
     boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
-    static RobotView robotView;
+    public static RobotView robotView;
 
     static SectionsPagerAdapter sectionsPagerAdapter;
 
