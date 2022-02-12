@@ -347,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
-        showLog("Entering printMessage");
+        showLog("Entering printMessage: " + message);
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());

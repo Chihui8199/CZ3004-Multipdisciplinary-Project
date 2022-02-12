@@ -63,6 +63,8 @@ public class ControlFragment extends Fragment {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
                 ((MainActivity) getActivity()).moveRobot(xCoord, yCoord + 1, "up");
+                // TODO Check with RPI what command to send
+                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, UP, 1");
             }
         });
 
@@ -72,6 +74,7 @@ public class ControlFragment extends Fragment {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
                 ((MainActivity) getActivity()).moveRobot(xCoord + 1, yCoord, "right");
+                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, RIGHT, 1");
             }
         });
 
@@ -81,6 +84,7 @@ public class ControlFragment extends Fragment {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
                 ((MainActivity) getActivity()).moveRobot(xCoord - 1, yCoord, "left");
+                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, LEFT, 1");
             }
         });
 
@@ -90,7 +94,7 @@ public class ControlFragment extends Fragment {
                 xCoord = ((MainActivity) getActivity()).getXCoord();
                 yCoord = ((MainActivity) getActivity()).getYCoord();
                 ((MainActivity) getActivity()).moveRobot(xCoord, yCoord - 1, "down");
-
+                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, DOWN, 1");
             }
         });
 
