@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     BluetoothConnectionService mBluetoothConnection;
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
-    ProgressDialog myDialog;
 
     private static final String TAG = "Main Activity";
 
@@ -82,16 +81,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent popup = new Intent(MainActivity.this, BluetoothPairingPage.class);
                 startActivity(popup);
-            }
-        });
-
-        myDialog = new ProgressDialog(MainActivity.this);
-        myDialog.setMessage("Waiting for other device to reconnect...");
-        myDialog.setCancelable(false);
-        myDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
             }
         });
 
@@ -277,20 +266,14 @@ public class MainActivity extends AppCompatActivity {
             String status = intent.getStringExtra("Status");
             sharedPreferences();
             if (status.equals("connected")) {
-                try {
-                    myDialog.dismiss();
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_SHORT).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
 
             } else if (status.equals("disconnected")) {
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_SHORT).show();
                 editor.putString("connStatus", "Disconnected");
-                myDialog.show();
             }
             editor.commit();
         }
