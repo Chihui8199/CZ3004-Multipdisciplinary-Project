@@ -55,7 +55,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
     private static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     public static BluetoothDevice mSelectedBTDevice;
 
-    boolean attemptingReconnection = false;
     Handler reconnectionHandler = new Handler();
     Runnable clientReconnectionRunnable = new Runnable() {
         @Override
@@ -139,7 +138,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
 
         pairedDevicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            // when discovered device is selected: start bluetooth connection service (this automatically opens server socket)
+            // when discovered device is selected: start an accept thread
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 mBluetoothAdapter.cancelDiscovery(); // discovery takes alot of resources, cancel before attempting connection
                 String deviceName = mPairedBTDevices.get(i).getName();
@@ -245,13 +244,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
         clientReconnectionDialog.setMessage("Waiting for other device to reconnect...");
         clientReconnectionDialog.setCancelable(true);
         clientReconnectionDialog.setCanceledOnTouchOutside(true);
-        clientReconnectionDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                mBluetoothConnection.stop();
-                //dialog.dismiss();
-            }
-        });
         clientReconnectionDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
@@ -326,12 +318,10 @@ public class BluetoothPairingPage extends AppCompatActivity {
             String action = intent.getAction();
             if (action.equals(mBluetoothAdapter.ACTION_STATE_CHANGED)) {
                 final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
-
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
                         Log.d(TAG, "mBroadcastReceiver1: STATE OFF");
                         Toast.makeText(BluetoothPairingPage.this, "Bluetooth disabled.", Toast.LENGTH_SHORT).show();
-
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(TAG, "mBroadcastReceiver1: STATE TURNING OFF");
@@ -457,10 +447,12 @@ public class BluetoothPairingPage extends AppCompatActivity {
                     // start server thread
                     Log.d(TAG, "Reconnection: Starting server thread.");
                     mBluetoothConnection.startAcceptThread();
+
                     // start client thread
                     // while the device remains disconnected, check every 5 seconds if connection was successful.
                     // if no, start a new client thread.
-                    clientReconnectionRunnable.run();
+                    //(code is commented out for amd. amd reconnection must be initiated from the amd itself, only server thread should be running)
+                    //clientReconnectionRunnable.run();
                 }
 
             }
@@ -468,11 +460,13 @@ public class BluetoothPairingPage extends AppCompatActivity {
         }
     };
 
+    // start connection through client thread
     public void startConnection() {
-        clientConnectionDialog.show();
-        startBTConnection(mSelectedBTDevice, myUUID);
+        clientConnectionDialog.show(); // show connection dialog
+        startBTConnection(mSelectedBTDevice, myUUID); // start client thread
     }
 
+    // start client thread
     public void startBTConnection(BluetoothDevice device, UUID uuid) {
         Log.d(TAG, "startBTConnection: Initializing RFCOM Bluetooth Connection");
         mBluetoothConnection.startClientThread(device, uuid);
@@ -505,14 +499,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
         Log.d(TAG, "onPause: called");
         active = false;
         super.onPause();
-//        try {
-//            unregisterReceiver(enableBTBroadcastReceiver);
-//            unregisterReceiver(discoveryBroadcastReceiver);
-//            unregisterReceiver(bondingBroadcastReceiver);
-//            LocalBroadcastManager.getInstance(this).unregisterReceiver(btConnectionReceiver);
-//        } catch (IllegalArgumentException e) {
-//            e.printStackTrace();
-//        }
     }
 
     @Override
