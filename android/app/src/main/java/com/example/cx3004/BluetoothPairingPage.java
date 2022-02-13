@@ -233,8 +233,15 @@ public class BluetoothPairingPage extends AppCompatActivity {
             }
         });
 
+        // set connection dialog
+        clientConnectionDialog = new ProgressDialog(BluetoothPairingPage.this);
+        clientConnectionDialog.setTitle("Connecting Bluetooth");
+        clientConnectionDialog.setMessage("Please Wait...");
+        clientConnectionDialog.setIndeterminate(true);
+
         // set reconnection dialog
         clientReconnectionDialog = new ProgressDialog(BluetoothPairingPage.this);
+        clientReconnectionDialog.setTitle("Reconnecting");
         clientReconnectionDialog.setMessage("Waiting for other device to reconnect...");
         clientReconnectionDialog.setCancelable(true);
         clientReconnectionDialog.setCanceledOnTouchOutside(true);
@@ -459,7 +466,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
     };
 
     public void startConnection() {
-        clientConnectionDialog = ProgressDialog.show(this, "Connecting Bluetooth", "Please Wait...", true);
+        clientConnectionDialog.show();
         startBTConnection(mSelectedBTDevice, myUUID);
     }
 
