@@ -66,7 +66,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
                 Log.d(TAG, "Reconnection: Device is still disconnected, starting client thread.");
                 startBTConnection(mSelectedBTDevice, myUUID);
                 // in 5 seconds, run this runnable again
-                reconnectionHandler.postDelayed(clientReconnectionRunnable, 10000);
+                reconnectionHandler.postDelayed(clientReconnectionRunnable, 5000);
             } else Log.d(TAG, "Reconnection: Reconnection successful, stopping reconnection runnable loop.");
         }
     };
@@ -255,6 +255,9 @@ public class BluetoothPairingPage extends AppCompatActivity {
         clientReconnectionDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
             @Override
             public void onCancel(DialogInterface dialogInterface) {
+                // stop client reconnection loop
+                reconnectionHandler.removeCallbacks(clientReconnectionRunnable);
+                // stop all threads in bluetooth connection service
                 mBluetoothConnection.stop();
             }
         });
