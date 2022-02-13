@@ -105,34 +105,34 @@ public class BluetoothConnectionService {
 
     private class ConnectThread extends Thread {
         private BluetoothSocket mSocket;
-        private Queue<ParcelUuid> deviceParcelUUIDs;
 
         public ConnectThread(BluetoothDevice device, UUID u) {
             Log.d(TAG, "ConnectThread: started.");
             mDevice = device;
             deviceUUID = u;
-
-            deviceParcelUUIDs = new LinkedList<>(Arrays.asList(device.getUuids()));
         }
 
         public void run() {
             Log.d(TAG, "ConnectThread: Starting run().");
 
-            runDeviceUuidMode();
-            //runMyUuidMode();
+            // create client socket
+            BluetoothSocket tmp = null;
+            Log.d(TAG, "RUN: mConnectThread");
+            try {
+                Log.d(TAG, "ConnectThread: Trying to create InsecureRfcommSocket using UUID: " + deviceUUID);
+                tmp = mDevice.createRfcommSocketToServiceRecord(deviceUUID);
+            } catch (IOException e) {
+                Log.e(TAG, "ConnectThread: Could not create InsecureRfcommSocket " + e.getMessage());
+            }
+            mSocket = tmp;
 
-            Log.d(TAG, "ConnectThread: Exiting run().");
-        }
-
-        public void runMyUuidMode(){
-            Log.d(TAG, "ConnectThread: Starting runMyUuidMode().");
-
-
-            attemptConnection(deviceUUID);
-
-
-            // no uuids left to try in queue, connection to device failed
-            if (!BluetoothConnectionStatus){
+            // attempt connection using client socket
+            try {
+                mSocket.connect();
+                Log.d(TAG, "RUN: ConnectThread connected.");
+                connected(mSocket, mDevice);
+            } catch (IOException e) {
+                // connection to device failed, show toast on ui thread
                 try {
                     BluetoothPairingPage mBluetoothPopUpActivity = (BluetoothPairingPage) mContext;
                     mBluetoothPopUpActivity.runOnUiThread(new Runnable() {
@@ -148,57 +148,13 @@ public class BluetoothConnectionService {
                 } catch (Exception z) {
                     z.printStackTrace();
                 }
-            }
-            Log.d(TAG, "ConnectThread: Exiting runMyUuidMode().");
-        }
 
-        public void runDeviceUuidMode(){
-            Log.d(TAG, "ConnectThread: Starting runDeviceUuidMode().");
-
-            while (!deviceParcelUUIDs.isEmpty()){
-                UUID uuid = deviceParcelUUIDs.remove().getUuid();
-                if (attemptConnection(uuid)) break;
-            }
-
-            // no uuids left to try in queue, connection to device failed
-            if (!BluetoothConnectionStatus){
-                try {
-                    BluetoothPairingPage mBluetoothPopUpActivity = (BluetoothPairingPage) mContext;
-                    mBluetoothPopUpActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(mContext, "Failed to connect to the Device.", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (Exception z) {
-                    z.printStackTrace();
-                }
-            }
-            Log.d(TAG, "ConnectThread: Exiting runDeviceUuidMode().");
-        }
-
-        public boolean attemptConnection(UUID uuid){
-            BluetoothSocket tmp = null;
-            Log.d(TAG, "RUN: mConnectThread");
-
-            try {
-                Log.d(TAG, "ConnectThread: Trying to create InsecureRfcommSocket using UUID: " + uuid);
-                tmp = mDevice.createRfcommSocketToServiceRecord(uuid);
-            } catch (IOException e) {
-                Log.e(TAG, "ConnectThread: Could not create InsecureRfcommSocket " + e.getMessage());
-            }
-            mSocket = tmp;
-
-            try {
-                mSocket.connect();
-                Log.d(TAG, "RUN: ConnectThread connected.");
-                connected(mSocket, mDevice);
-                return true;
-            } catch (IOException e) {
+                // close connect thread
                 cancel();
-                Log.d(TAG, "ConnectThread: could not connect to UUID " + uuid);
+                Log.d(TAG, "ConnectThread: could not connect to UUID " + deviceUUID);
             }
-            return false;
+
+            Log.d(TAG, "ConnectThread: Exiting run().");
         }
 
         public void cancel() {
@@ -206,12 +162,9 @@ public class BluetoothConnectionService {
             Log.d(TAG, "cancel: Closing Client Socket");
             try {
                 mSocket.close();
-                mSocket = null;
                 Log.d(TAG, "ConnectThread: Socket closed.");
             } catch (IOException e) {
                 Log.e(TAG, "cancel: Failed to close ConnectThread mSocket " + e.getMessage());
-            } catch (NullPointerException e) {
-                Log.e(TAG, "ConnectThread: No socket to close: " + e.getMessage());
             }
 
             // set connect thread to null
@@ -222,10 +175,6 @@ public class BluetoothConnectionService {
     public synchronized void startAcceptThread() {
         Log.d(TAG, "START AcceptThread");
 
-//        if (mConnectThread != null) {
-//            mConnectThread.cancel();
-//            mConnectThread = null;
-//        }
         if (mInsecureAcceptThread == null) {
             mInsecureAcceptThread = new AcceptThread();
             mInsecureAcceptThread.start();
@@ -288,8 +237,6 @@ public class BluetoothConnectionService {
                     Log.e(TAG, "ConnectedThread: Error reading input stream. " + e.getMessage());
                     cancel(); // close socket
 
-                    //if (mConnectThread != null) mConnectThread.run();
-
                     break;
                 }
             }
@@ -322,10 +269,13 @@ public class BluetoothConnectionService {
             try {
                 mSocket.close();
                 Log.d(TAG, "ConnectedThread: Socket closed.");
+
+                // broadcast that connection status is disconnected.
                 connectionStatus = new Intent("ConnectionStatus");
                 connectionStatus.putExtra("Status", "disconnected");
                 connectionStatus.putExtra("Device", mDevice);
                 LocalBroadcastManager.getInstance(mContext).sendBroadcast(connectionStatus);
+
                 BluetoothConnectionStatus = false;
             } catch (IOException e) {
                 Log.e(TAG, "ConnectedThread: Failed to close mSocket: " + e.getMessage());
