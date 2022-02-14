@@ -159,10 +159,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private static void showLog(String message) {
-        Log.d(TAG, message);
-    }
-
     // Map stuff
     public static double getXCoord() {
         return robotView.getXCoord();
@@ -245,18 +241,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Bluetooth Stuff
-    public static void sharedPreferences() {
-        sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
-        editor = sharedPreferences.edit();
-    }
-
-    public static void refreshMessageReceived() {
-        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
-    }
-
-    private static SharedPreferences getSharedPreferences(Context context) {
-        return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
-    }
 
     // Broadcast Receiver 5:  for Bluetooth Connection Status
     private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
@@ -285,7 +269,7 @@ public class MainActivity extends AppCompatActivity {
             String message = intent.getStringExtra("receivedMessage");
             // Read message to parse as commands
             parseCommands(message);
-            showLog("receivedMessage: message --- " + message);
+            Log.d(TAG, String.format("receivedMessage: %s", message));
             sharedPreferences();
             String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
             editor.putString("message", receivedText);
@@ -293,6 +277,19 @@ public class MainActivity extends AppCompatActivity {
             refreshMessageReceived();
         }
     };
+
+    public static void sharedPreferences() {
+        sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
+        editor = sharedPreferences.edit();
+    }
+
+    public static void refreshMessageReceived() {
+        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+    }
+
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
+    }
 
     private void parseCommands(String receivedText) {
         Log.d(TAG, "Testing" + receivedText);
@@ -309,11 +306,13 @@ public class MainActivity extends AppCompatActivity {
                     // angle is sent in radians, convert to degrees
                     double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
                     String direction = "up";
-                    if ((0<=angle & angle<=45) | (315<angle & angle<360)) direction = "left";
-                    else if (45<angle & angle<=135) direction = "up";
-                    else if (135<angle & angle<=255) direction = "right";
-                    else if (255<angle & angle<=315) direction = "down";
-                    else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
+                    if ((0 <= angle & angle <= 45) | (315 < angle & angle < 360))
+                        direction = "left";
+                    else if (45 < angle & angle <= 135) direction = "up";
+                    else if (135 < angle & angle <= 255) direction = "right";
+                    else if (255 < angle & angle <= 315) direction = "down";
+                    else
+                        Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
                     // call method to update ROBOT, X, Y, direction
                     // moves robot and sets fragment to correct axis
@@ -327,7 +326,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("OBSTACLE",
                             String.format("Obstacle %d's image has been set to image ID %d.",
                                     obstacleNo, targetID));
-                } else if (command.equals("TIMING")){
+                } else if (command.equals("TIMING")) {
                     String timing = stringSplit[1];
                     sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
                 } else {
@@ -341,23 +340,21 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
-        showLog("Entering printMessage: " + message);
+        Log.d(TAG, String.format("Entering printMessage: %s", message));
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
             BluetoothConnectionService.write(bytes);
         }
-        showLog(message);
         editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
-        showLog("Exiting printMessage");
+        Log.d(TAG, String.format("Exiting printMessage: %s", message));
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
@@ -401,10 +398,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        showLog("Entering onSaveInstanceState");
+        Log.d(TAG, "Entering onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
         outState.putString(TAG, "onSaveInstanceState");
-        showLog("Exiting onSaveInstanceState");
+        Log.d(TAG, "Exiting onSaveInstanceState");
     }
 }
