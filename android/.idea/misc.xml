@@ -52,7 +52,7 @@
         <entry key="app/src/main/res/layout/activity_comms.xml" value="0.39375" />
         <entry key="app/src/main/res/layout/activity_image_recognition.xml" value="0.2942708333333333" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.3078125" />
-        <entry key="app/src/main/res/layout/bluetooth_pairing_window.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/bluetooth_pairing_window.xml" value="0.5" />
         <entry key="app/src/main/res/layout/bluetooth_pop_up_window.xml" value="0.46484375" />
         <entry key="app/src/main/res/layout/device_adapter_view.xml" value="0.46484375" />
         <entry key="app/src/main/res/layout/discovered_device_view.xml" value="0.16927083333333334" />

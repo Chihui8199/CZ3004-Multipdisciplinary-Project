@@ -82,28 +82,29 @@
         android:layout_width="150dp"
         android:layout_height="48dp"
         android:text="CONNECT"
+        android:layout_marginRight="30dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/discovDevicesListView"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/searchBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.50"
         app:layout_constraintTop_toBottomOf="@id/discovDevicesListView"
-        app:layout_constraintVertical_bias="0.107" />
+        app:layout_constraintVertical_bias="0.106" />
 
     <Button
         android:id="@+id/searchBtn"
-        android:background="@drawable/gradient_colour"
         style="@style/button"
         android:layout_width="150dp"
         android:layout_height="48dp"
-        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/gradient_colour"
         android:onClick="scanForDevices"
         android:text="SEARCH"
+
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/connectBtn"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="@id/discovDevicesListView"
+        app:layout_constraintEnd_toStartOf="@+id/connectBtn"
+        app:layout_constraintHorizontal_bias="0.878"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/discovDevicesListView"
-        app:layout_constraintVertical_bias="0.107" />
+        app:layout_constraintVertical_bias="0.01" />
 
     <TextView
         android:id="@+id/discovDevicesTitleTextView"
