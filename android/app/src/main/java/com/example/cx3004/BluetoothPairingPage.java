@@ -45,7 +45,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
     ListView discovDevicesListView;
     ListView pairedDevicesListView;
     Button connectBtn;
-    ProgressDialog clientConnectionDialog;
     ProgressDialog clientReconnectionDialog;
 
     SharedPreferences sharedPreferences;
@@ -232,12 +231,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
             }
         });
 
-        // set connection dialog
-        clientConnectionDialog = new ProgressDialog(BluetoothPairingPage.this);
-        clientConnectionDialog.setTitle("Connecting Bluetooth");
-        clientConnectionDialog.setMessage("Please Wait...");
-        clientConnectionDialog.setIndeterminate(true);
-
         // set reconnection dialog
         clientReconnectionDialog = new ProgressDialog(BluetoothPairingPage.this);
         clientReconnectionDialog.setTitle("Reconnecting");
@@ -420,8 +413,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
             sharedPreferences = getApplicationContext().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
             editor = sharedPreferences.edit();
             if (status.equals("connected")) {
-                // if connection/reconnection dialog is showing, dismiss it
-                if (clientConnectionDialog.isShowing()) clientConnectionDialog.dismiss();
+                // if reconnection dialog is showing, dismiss it
                 if (clientReconnectionDialog.isShowing()) clientReconnectionDialog.dismiss();
 
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
@@ -462,7 +454,6 @@ public class BluetoothPairingPage extends AppCompatActivity {
 
     // start connection through client thread
     public void startConnection() {
-        clientConnectionDialog.show(); // show connection dialog
         startBTConnection(mSelectedBTDevice, myUUID); // start client thread
     }
 
