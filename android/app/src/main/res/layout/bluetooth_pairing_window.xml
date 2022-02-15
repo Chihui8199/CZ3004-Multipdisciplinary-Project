@@ -10,7 +10,7 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background = "@drawable/gradient_colour"
+        android:background="@color/faint_orange"
         android:minHeight="?attr/actionBarSize"
         android:orientation="horizontal"
         android:theme="?attr/actionBarTheme"
@@ -19,9 +19,9 @@
 
         <ImageButton
             android:id="@+id/backBtn"
-            android:background="@null"
             android:layout_width="80dp"
             android:layout_height="50dp"
+            android:background="@null"
             android:scaleType="fitCenter"
             android:src="@drawable/arrow_back"
             tools:layout_editor_absoluteX="16dp"
@@ -38,7 +38,7 @@
             android:padding="@dimen/appbar_padding"
             android:text="@string/title_bluetooth_pairing"
             android:textAppearance="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
-            android:textColor="@color/colorHeadingText"
+            android:textColor="@color/dark_orange"
             android:textSize="@dimen/title_size"
             tools:layout_conversion_absoluteHeight="59dp"
             tools:layout_conversion_absoluteWidth="229dp"
@@ -53,17 +53,20 @@
             android:layout_marginEnd="0dp"
             android:splitTrack="false"
             android:text="@string/Toggle_Switch"
-            android:thumbTint="@color/faint_orange"
-            android:trackTint="@color/faint_orange_variant" />
+            android:textSize="18dp"
+            android:textStyle="bold"
+            android:thumbTint="@color/dark_orange"
+            android:trackTint="@color/dark_orange_variant" />
     </androidx.appcompat.widget.Toolbar>
 
     <TextView
         android:id="@+id/connStatusTextView"
-        android:layout_width="271dp"
+        android:layout_width="match_parent"
         android:layout_height="46dp"
+        android:background="@drawable/gradient_colour"
         android:foregroundGravity="center"
         android:gravity="center"
-        android:text="Disconnected"
+        android:text="@string/bluetooth_status"
         android:textAllCaps="true"
         android:textColor="#1B1A1A"
         android:textSize="16dp"
@@ -78,37 +81,35 @@
         style="@style/button"
         android:layout_width="150dp"
         android:layout_height="48dp"
-        android:text="CONNECT"
+        android:layout_marginEnd="28dp"
+        android:text="@string/connect_btn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/discovDevicesListView"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toEndOf="@id/searchBtn"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/discovDevicesListView"
-        app:layout_constraintVertical_bias="0.107" />
+        app:layout_constraintVertical_bias="0.157" />
 
     <Button
         android:id="@+id/searchBtn"
         style="@style/button"
         android:layout_width="150dp"
         android:layout_height="48dp"
-        android:layout_marginRight="20dp"
-        android:onClick="toggleButtonScan"
-
-        android:text="SEARCH"
+        android:layout_marginTop="20dp"
+        android:onClick="scanForDevices"
+        android:text="@string/search_btn"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/connectBtn"
-        app:layout_constraintHorizontal_chainStyle="packed"
-        app:layout_constraintStart_toStartOf="@id/discovDevicesListView"
+        app:layout_constraintEnd_toStartOf="@+id/connectBtn"
+        app:layout_constraintHorizontal_bias="0.878"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/discovDevicesListView"
-        app:layout_constraintVertical_bias="0.107" />
+        app:layout_constraintVertical_bias="0.01" />
 
     <TextView
         android:id="@+id/discovDevicesTitleTextView"
         style="@style/headerText"
-        android:layout_width="380dp"
-        android:layout_height="25dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:listSelector="#bdb9b9"
-        android:text="Device Found"
+        android:text="@string/found_devices_header"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/pairedDevicesListView"
@@ -117,45 +118,46 @@
 
     <ListView
         android:id="@+id/discovDevicesListView"
-        android:layout_width="379dp"
-        android:layout_height="277dp"
-        android:background="@drawable/border_white_background"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:background="@drawable/fade_top"
         android:gravity="bottom"
+        android:paddingLeft="@dimen/text_padding"
         android:scrollbars="vertical"
         android:text=""
         android:textColor="@color/colorBlack"
-        android:textSize="14sp"
+        android:textSize="@dimen/medium_text_size"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/discovDevicesTitleTextView"
-        tools:layout_editor_absoluteX="111dp"
-        tools:layout_editor_absoluteY="378dp" />
+        app:layout_constraintTop_toBottomOf="@id/discovDevicesTitleTextView" />
 
     <TextView
         android:id="@+id/pairedDevicesTitleTextView"
         style="@style/headerText"
-        android:layout_width="380dp"
-        android:layout_height="25dp"
-        android:text="Paired Devices"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/paired_devices_header"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/connStatusTextView"
-        tools:layout_editor_absoluteX="110dp" />
+        app:layout_constraintTop_toBottomOf="@id/connStatusTextView" />
 
     <ListView
         android:id="@+id/pairedDevicesListView"
-        android:layout_width="379dp"
-        android:layout_height="117dp"
-        android:background="@drawable/border_white_background"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:background="@drawable/fade_top"
         android:gravity="bottom"
-        android:listSelector="#bdb9b9"
+        android:listSelector="@color/list_selector"
+        android:paddingLeft="@dimen/text_padding"
         android:scrollbars="vertical"
         android:text=""
+        android:textAllCaps="true"
         android:textColor="@color/colorBlack"
-        android:textSize="14sp"
+        android:textSize="@dimen/medium_text_size"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pairedDevicesTitleTextView"
-        tools:layout_editor_absoluteX="110dp" />
+        app:layout_constraintTop_toBottomOf="@id/pairedDevicesTitleTextView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

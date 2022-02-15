@@ -37,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     ObstacleView[] obstacleViews;
     // flags are set when the corresponding obstacle is placed on the grid
     boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
-    static RobotView robotView;
+    public static RobotView robotView;
 
     static SectionsPagerAdapter sectionsPagerAdapter;
 
@@ -48,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     BluetoothConnectionService mBluetoothConnection;
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
-    ProgressDialog myDialog;
 
     private static final String TAG = "Main Activity";
 
@@ -82,16 +81,6 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent popup = new Intent(MainActivity.this, BluetoothPairingPage.class);
                 startActivity(popup);
-            }
-        });
-
-        myDialog = new ProgressDialog(MainActivity.this);
-        myDialog.setMessage("Waiting for other device to reconnect...");
-        myDialog.setCancelable(false);
-        myDialog.setButton(DialogInterface.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
             }
         });
 
@@ -175,26 +164,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Map stuff
-    public static int getXCoord() {
+    public static double getXCoord() {
         return robotView.getXCoord();
     }
 
-    public static int getYCoord() {
+    public static double getYCoord() {
         return robotView.getYCoord();
     }
 
-    public static void moveRobot(int xCoord, int yCoord, String direction) {
+    public static void moveRobot(double xCoord, double yCoord, String direction) {
         Log.d(TAG, "onClick: " + xCoord + yCoord + direction);
         // if coordinates are out of bounds, break out of function and not move the robot
         if (!robotView.checkBoundary(xCoord, yCoord)) return;
         robotView.move(xCoord, yCoord, direction);
         Log.d("ROBOT",
-                String.format("Robot has been moved to (%d, %d) on the map and is facing %s.",
+                String.format("Robot has been moved to (%f, %f) on the map and is facing %s.",
                         xCoord, yCoord, direction));
         refreshRobotState(xCoord, yCoord, direction);
     }
 
-    private static void refreshRobotState(int xCoord, int yCoord, String direction) {
+    private static void refreshRobotState(double xCoord, double yCoord, String direction) {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
     }
 
@@ -277,20 +266,14 @@ public class MainActivity extends AppCompatActivity {
             String status = intent.getStringExtra("Status");
             sharedPreferences();
             if (status.equals("connected")) {
-                try {
-                    myDialog.dismiss();
-                } catch (NullPointerException e) {
-                    e.printStackTrace();
-                }
                 Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_SHORT).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
 
             } else if (status.equals("disconnected")) {
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_SHORT).show();
                 editor.putString("connStatus", "Disconnected");
-                myDialog.show();
             }
             editor.commit();
         }
@@ -320,9 +303,17 @@ public class MainActivity extends AppCompatActivity {
                 String command = stringSplit[0];
                 //TODO Perhaps allow check length
                 if (command.equals("ROBOT")) {
-                    int xCoord = Integer.parseInt(stringSplit[1]);
-                    int yCoord = Integer.parseInt(stringSplit[2]);
-                    String direction = stringSplit[3];
+                    double xCoord = Double.parseDouble(stringSplit[1]);
+                    double yCoord = Double.parseDouble(stringSplit[2]);
+                    // process direction
+                    // angle is sent in radians, convert to degrees
+                    double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
+                    String direction = "up";
+                    if ((0<=angle & angle<=45) | (315<angle & angle<360)) direction = "left";
+                    else if (45<angle & angle<=135) direction = "up";
+                    else if (135<angle & angle<=255) direction = "right";
+                    else if (255<angle & angle<=315) direction = "down";
+                    else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
                     Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
                     // call method to update ROBOT, X, Y, direction
                     // moves robot and sets fragment to correct axis
@@ -336,6 +327,9 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("OBSTACLE",
                             String.format("Obstacle %d's image has been set to image ID %d.",
                                     obstacleNo, targetID));
+                } else if (command.equals("TIMING")){
+                    String timing = stringSplit[1];
+                    sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
                 } else {
                     Log.d("NO COMMANDS ACTIVATED", "NIL");
                 }
@@ -347,7 +341,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
-        showLog("Entering printMessage");
+        showLog("Entering printMessage: " + message);
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());

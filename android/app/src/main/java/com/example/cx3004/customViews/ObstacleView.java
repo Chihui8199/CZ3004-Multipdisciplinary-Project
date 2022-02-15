@@ -57,6 +57,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
             public boolean onLongClick(View view) {
                 DragShadowBuilder dragShadowBuilder = new DragShadowBuilder(view);
                 view.startDragAndDrop(null, dragShadowBuilder, ObstacleView.this, 0);
+                view.setVisibility(INVISIBLE);
                 return true;
             }
         });
@@ -118,6 +119,8 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
 
         setX(x * gridInterval);
         setY(screenY * gridInterval);
+
+        setVisibility(VISIBLE);
     }
 
     public void reset(){
@@ -136,6 +139,8 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
             // redraw
             invalidate();
         }
+
+        setVisibility(VISIBLE);
     }
 
     // called after layout

@@ -13,8 +13,9 @@ import com.example.cx3004.R;
 
 public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
     private int gridInterval;
-    public int x;
-    public int y;
+    // coordinates are measured from center of the robot
+    public double gridX;
+    public double gridY;
     public String direction;
 
     public RobotView(Context context, @Nullable AttributeSet attrs) {
@@ -52,11 +53,11 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
         // set robot at 0, 0
         //setX(0);
         //setY(0);
-        move(0, 3, "up");
+        move(1.5, 1.5, "up");
     }
 
 
-    public void move(int x, int y, String direction){
+    public void move(double x, double y, String direction){
         // set direction
         switch (direction) {
             case "left":
@@ -78,21 +79,21 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
         }
 
         // set coordinates
-        setX(x * gridInterval);
-        setY((19 - y) * gridInterval);
-        this.x = x;
-        this.y = y;
+        setX((float) ((x - 1.5) * gridInterval));
+        setY((float) ((19 - y - 1.5) * gridInterval));
+        this.gridX = x;
+        this.gridY = y;
     }
 
-    public int getXCoord() {
-        return x;
+    public double getXCoord() {
+        return gridX;
     }
 
-    public int getYCoord() {
-        return y;
+    public double getYCoord() {
+        return gridY;
     }
 
-    public boolean checkBoundary(int x, int y){
-        return (0<= x & x <= 16) & (3 <= y & y <= 19);
+    public boolean checkBoundary(double x, double y){
+        return (1.5<= x & x <= 17.5) & (1.5 <= y & y <= 17.5);
     }
 }

@@ -18,6 +18,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="black">#FF000000</color>
     <color name="light_grey">#FFF1F1F1</color>
+    <color name="list_selector">#bdb9b9</color>
 
     <color name="colorWhite">#FFFFFF</color>
     <color name="colorRed">#FF0000</color>

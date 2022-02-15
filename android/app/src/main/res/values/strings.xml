@@ -7,9 +7,15 @@
     <string name="tab_text_2">Comms</string>
     <string name="tab_text_3">Robot State</string>
     <string name="tab_text_4">Control</string>
+    <string name="tab_text_5">Fastest Car</string>
 
     <!--  Bluetooth  -->
     <string name="Toggle_Switch">OFF</string>
+    <string name="search_btn">SEARCH</string>
+    <string name="connect_btn">CONNECT</string>
+    <string name="bluetooth_status">Disconnected</string>
+    <string name="paired_devices_header">Paired Devices</string>
+    <string name="found_devices_header">Found Devices</string>
 
     <!--  Obstacle IDs  -->
     <string name="obstacle1_id">1</string>
@@ -31,8 +37,8 @@
     <string name="bluetooth_on">On</string>
     <string name="bluetooth_off">Off</string>
     <string name="sender_hint">Message to send...</string>
-    <string name="robot_x_state">X: 0</string>
-    <string name="robot_y_state">Y: 3</string>
+    <string name="robot_x_state">X: 1.5</string>
+    <string name="robot_y_state">Y: 1.5</string>
     <string name="robot_direction_state">Direction: UP</string>
 
     <!-- Context descriptions -->
