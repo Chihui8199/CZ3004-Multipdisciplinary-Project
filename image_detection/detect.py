@@ -55,7 +55,7 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
         source=ROOT / 'data/images',  # file/dir/URL/glob, 0 for webcam
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(320, 416),  # inference size (height, width)
-        conf_thres=0.4,  # confidence threshold
+        conf_thres=0.2,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
@@ -190,6 +190,9 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
                     box_size = (x2-x1)*(y2-y1)
                     angle = x2 - ((x2-x1)/2)
                     print('bounding box is ', x1, y1, x2, y2)
+                    print("IMAGE DETECTED IS: ",id)
+                    print("BOX SIZE IS: ", box_size)
+                    print("ANGLE IS: ", angle)
 
             # Print time (inference-only)
             LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
@@ -230,14 +233,15 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
     if(idd != None):
         print(idd)
         return str(idd),int(box_size),int(angle)
+        
     else:
-        return None,None,None
+        return None,0,0
 
 
 def parse_opt():
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'test.pt', help='model path(s)')
-    parser.add_argument('--source', type=str, default=0, help='file/dir/URL/glob, 0 for webcam')
+    parser.add_argument('--source', type=str, default='http://192.168.16.16/html/cam_pic_new.php', help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[416], help='inference size h,w')
     parser.add_argument('--conf-thres', type=float, default=0.40, help='confidence threshold')

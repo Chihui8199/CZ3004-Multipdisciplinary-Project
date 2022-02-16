@@ -16,6 +16,7 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,6 +44,8 @@ public class BluetoothConnectionService {
 
     public static boolean BluetoothConnectionStatus = false;
     private static ConnectedThread mConnectedThread;
+
+    ProgressDialog clientConnectionDialog;
 
     public BluetoothConnectionService(Context context) {
         this.mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -128,30 +131,53 @@ public class BluetoothConnectionService {
 
             // attempt connection using client socket
             try {
+                Log.d(TAG, "ConnectThread: Run basic connect.");
                 mSocket.connect();
-                Log.d(TAG, "RUN: ConnectThread connected.");
+                Log.d(TAG, "ConnectThread: Basic connect successful.");
                 connected(mSocket, mDevice);
             } catch (IOException e) {
-                // connection to device failed, show toast on ui thread
+                Log.e(TAG, "ConnectThread: Basic connect failed: " + e.getMessage());
+                e.printStackTrace();
                 try {
-                    BluetoothPairingPage mBluetoothPopUpActivity = (BluetoothPairingPage) mContext;
-                    mBluetoothPopUpActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            String deviceName = mDevice.getName();
-                            deviceName = (deviceName == null) ? mDevice.getAddress() : deviceName;
-                            Toast.makeText(mContext,
-                                    String.format("Failed to connect to %s. Try initiating connection from %s!", deviceName, deviceName),
-                                    Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                } catch (Exception z) {
-                    z.printStackTrace();
-                }
+                    mSocket.close();
+                    Log.d(TAG, "ConnectThread: Close basic connect socket.");
 
-                // close connect thread
-                cancel();
-                Log.d(TAG, "ConnectThread: could not connect to UUID " + deviceUUID);
+                    // https://stackoverflow.com/questions/18657427/ioexception-read-failed-socket-might-closed-bluetooth-on-android-4-3/25647197#25647197
+                    Log.d(TAG, "ConnectThread: Run connect with specified port number.");
+                    mSocket =(BluetoothSocket) mDevice.getClass().getMethod("createRfcommSocket", new Class[] {int.class}).invoke(mDevice,1);
+                    mSocket.connect();
+                    Log.d(TAG, "ConnectThread: Specified port number connect successful.");
+                    connected(mSocket, mDevice);
+                }
+                // connection has failed, nothing left to try
+                catch (Exception e1) {
+                    Log.e(TAG, "ConnectThread: Specified port number connect failed: " + e1.getMessage());
+                    e1.printStackTrace();
+
+                    // connection to device failed, show toast on ui thread
+                    try {
+                        BluetoothPairingPage mBluetoothPopUpActivity = (BluetoothPairingPage) mContext;
+                        mBluetoothPopUpActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                String deviceName = mDevice.getName();
+                                deviceName = (deviceName == null) ? mDevice.getAddress() : deviceName;
+                                Toast.makeText(mContext,
+                                        String.format("Failed to connect to %s. Try initiating connection from %s!", deviceName, deviceName),
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } catch (Exception z) {
+                        z.printStackTrace();
+                    }
+
+                    // dimiss connection dialog
+                    clientConnectionDialog.dismiss();
+
+                    // close connect thread
+                    cancel();
+                    Log.d(TAG, "ConnectThread: could not connect to UUID " + deviceUUID);
+                }
             }
 
             Log.d(TAG, "ConnectThread: Exiting run().");
@@ -185,6 +211,7 @@ public class BluetoothConnectionService {
         Log.d(TAG, "startClient: Started.");
 
         if (mConnectThread == null){
+            clientConnectionDialog = ProgressDialog.show(mContext, "Connecting Bluetooth", "Please Wait...", true);
             mConnectThread = new ConnectThread(device, uuid);
             mConnectThread.start();
         }
@@ -290,6 +317,9 @@ public class BluetoothConnectionService {
         Log.d(TAG, "connected: Starting.");
         mDevice = device;
         if (mInsecureAcceptThread != null) mInsecureAcceptThread.cancel();
+
+        // dimiss connection dialog
+        clientConnectionDialog.dismiss();
 
         mConnectedThread = new ConnectedThread(mSocket);
         mConnectedThread.start();
