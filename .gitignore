@@ -85,3 +85,9 @@ lint/outputs/
 lint/tmp/
 # lint/reports/
 .DS_Store
+threading/.idea/inspectionProfiles/Project_Default.xml
+*.xml
+*.pyc
+threading/venv/lib/python3.8/site-packages/Accessibility/__init__.py
+threading/venv/lib/python3.8/site-packages/Accessibility/_Accessibility.abi3.so
+threading/venv/lib/python3.8/site-packages/Accessibility/_metadata.py
