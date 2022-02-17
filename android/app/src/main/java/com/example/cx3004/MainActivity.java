@@ -30,13 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
 
     ObstacleView[] obstacleViews;
-    // flags are set when the corresponding obstacle is placed on the grid
-    boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
     public static RobotView robotView;
 
     static SectionsPagerAdapter sectionsPagerAdapter;
@@ -96,7 +95,10 @@ public class MainActivity extends AppCompatActivity {
                 R.id.obstacle2,
                 R.id.obstacle3,
                 R.id.obstacle4,
-                R.id.obstacle5
+                R.id.obstacle5,
+                R.id.obstacle6,
+                R.id.obstacle7,
+                R.id.obstacle8
         };
         obstacleViews = new ObstacleView[obstacleIDs.length];
         for (int i = 0; i < obstacleIDs.length; i++)
@@ -175,6 +177,44 @@ public class MainActivity extends AppCompatActivity {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
     }
 
+    public void sendObstacleMsg(View v) {
+        Log.d("OBSTACLE", "Set obstacle button clicked.");
+
+        // get largest set obstacle
+        int largestIndex = -1;
+        for (int i = obstacleViews.length - 1; i >= 0; i--) {
+            if (obstacleViews[i].setOnMap) {
+                largestIndex = i;
+                break;
+            }
+        }
+        // if no obstacles have been set, show a toast and break out of function
+        if (largestIndex == -1) {
+            Toast.makeText(MainActivity.this, "No obstacles have been set!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.d("OBSTACLE", String.format("The largest set obstacle is obstacle %d.", largestIndex + 1));
+
+        // check that all obstacles before the largest set obstacles are set
+        // if no, show a toast and break out of the function
+        ArrayList<Integer> unsetObstacles = new ArrayList<Integer>();
+        for (int i = 0; i < largestIndex; i++) {
+            if (!obstacleViews[i].setOnMap) {
+                int obstacleNo = i + 1;
+                Log.d("OBSTACLE", String.format("Obstacle %d has not been set.", obstacleNo));
+                Toast.makeText(MainActivity.this, String.format("Obstacle %d has not been set!", obstacleNo), Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        // send msg
+        Log.d("OBSTACLE", "Sending obstacle messages...");
+        for (int i = 0; i <= largestIndex; i++) {
+            remoteSendMsg(obstacleViews[i].getMessage());
+            Log.d("OBSTACLE", String.format("Message for Obstacle %d has been sent.", i + 1));
+        }
+    }
+
     private void showImageFacePopup(ObstacleView obstacle) {
 
         final PopupWindow popupWindow = new PopupWindow(this);
@@ -207,27 +247,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                // check if all obstacles have been placed on map
-                // if an obstacle has not been set, break out of function
-                for (ObstacleView obstacle : obstacleViews)
-                    if (!obstacle.setOnMap) return;
-                Log.d(GRIDTAG, "All obstacles have been placed on map.");
-
-                // if all obstacles have been set, send obstacle coordinate messages
-                for (ObstacleView obstacle : obstacleViews) {
-                    remoteSendMsg(obstacle.getMessage());
-                    Log.d(BTTAG,
-                            String.format("Obstacle message has been sent for obstacle %d",
-                                    obstacle.getObstacleId()));
-                }
-            }
-        });
-
-
     }
 
     //Bluetooth Stuff

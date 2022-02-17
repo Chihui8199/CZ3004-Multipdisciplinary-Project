@@ -162,7 +162,25 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     }
 
     public String getMessage() {
-        return String.format("Obstacle %d (%d, %d, %s)", id, x, y, imageFace);
+        int imageFaceNo;
+        switch (imageFace) {
+            case "up":
+                imageFaceNo = 0;
+                break;
+            case "left":
+                imageFaceNo = 1;
+                break;
+            case "down":
+                imageFaceNo = 2;
+                break;
+            case "right":
+                imageFaceNo = 3;
+                break;
+            default:
+                imageFaceNo = 0;
+                break;
+        }
+        return String.format("T[%d, %d, %d]", x, y, imageFaceNo);
     }
 
     public int getObstacleId() {
