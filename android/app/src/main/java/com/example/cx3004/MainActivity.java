@@ -30,6 +30,7 @@ import com.example.cx3004.customViews.SquareGridView;
 import com.google.android.material.tabs.TabLayout;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
@@ -190,11 +191,39 @@ public class MainActivity extends AppCompatActivity {
 
     public void sendObstacleMsg(View v){
         Log.d("OBSTACLE", "Set obstacle button clicked.");
-        for (ObstacleView obstacle: obstacleViews) {
-            if (obstacle.setOnMap) {
-                Log.d("OBSTACLE", String.format("Sending message for Obstacle %d,", obstacle.getObstacleId()));
-                remoteSendMsg(obstacle.getMessage());
+
+        // get largest set obstacle
+        int largestIndex = -1;
+        for (int i=obstacleViews.length-1; i>=0; i--){
+            if (obstacleViews[i].setOnMap){
+                largestIndex = i;
+                break;
             }
+        }
+        // if no obstacles have been set, show a toast and break out of function
+        if (largestIndex == -1) {
+            Toast.makeText(MainActivity.this, "No obstacles have been set!", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Log.d("OBSTACLE", String.format("The largest set obstacle is obstacle %d.", largestIndex+1));
+
+        // check that all obstacles before the largest set obstacles are set
+        // if no, show a toast and break out of the function
+        ArrayList<Integer> unsetObstacles = new ArrayList<Integer>();
+        for (int i=0; i<largestIndex; i++){
+            if (!obstacleViews[i].setOnMap){
+                int obstacleNo = i + 1;
+                Log.d("OBSTACLE", String.format("Obstacle %d has not been set.", obstacleNo));
+                Toast.makeText(MainActivity.this, String.format("Obstacle %d has not been set!", obstacleNo), Toast.LENGTH_SHORT).show();
+                return;
+            }
+        }
+
+        // send msg
+        Log.d("OBSTACLE", "Sending obstacle messages...");
+        for (int i=0; i<=largestIndex; i++) {
+            remoteSendMsg(obstacleViews[i].getMessage());
+            Log.d("OBSTACLE", String.format("Message for Obstacle %d has been sent.", i+1));
         }
     }
 
