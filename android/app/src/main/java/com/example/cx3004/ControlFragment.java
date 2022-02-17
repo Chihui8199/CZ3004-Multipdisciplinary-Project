@@ -60,42 +60,29 @@ public class ControlFragment extends Fragment {
         moveUpImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                xCoord = ((MainActivity) getActivity()).getXCoord();
-                yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord + 1, "up");
-
                 // TODO Check with RPI what command to send
-                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, UP, 1");
+                ((MainActivity) getActivity()).remoteSendMsg("Q(ROBOT UP)");
             }
         });
 
         moveRightImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                xCoord = ((MainActivity) getActivity()).getXCoord();
-                yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord + 1, yCoord, "right");
-                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, RIGHT, 1");
+                ((MainActivity) getActivity()).remoteSendMsg("R(ROBOT RIGHT)");
             }
         });
 
         moveLeftImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                xCoord = ((MainActivity) getActivity()).getXCoord();
-                yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord - 1, yCoord, "left");
-                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, LEFT, 1");
+                ((MainActivity) getActivity()).remoteSendMsg("E(ROBOT LEFT)");
             }
         });
 
         moveDownImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                xCoord = ((MainActivity) getActivity()).getXCoord();
-                yCoord = ((MainActivity) getActivity()).getYCoord();
-                ((MainActivity) getActivity()).moveRobot(xCoord, yCoord - 1, "down");
-                ((MainActivity) getActivity()).remoteSendMsg("REMOTE, DOWN, 1");
+                ((MainActivity) getActivity()).remoteSendMsg("W(ROBOT DOWN)");
             }
         });
 
