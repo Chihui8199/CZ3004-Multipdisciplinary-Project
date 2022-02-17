@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MAIN ACTIVITY";
     private static final String ROBOTTAG = "ROBOT";
     private static final String GRIDTAG = "GRID";
-    private static final String BTTAG = "BLUETOOTH";
+    private static final String BTTAG = "BT ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -112,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
                     case DragEvent.ACTION_DROP:
                         ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
                         Log.d(GRIDTAG, String.format("Obstacle %d was dropped on the map.",
-                                        droppedObstacle.getObstacleId()));
+                                droppedObstacle.getObstacleId()));
                         droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
                         Log.d(GRIDTAG,
                                 String.format("Obstacle %d was moved to (%d, %d) on the map.",
@@ -257,9 +257,9 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String message = intent.getStringExtra("receivedMessage");
+            Log.d(BTTAG, String.format("receivedMessage: %s", message));
             // Read message to parse as commands
             parseCommands(message);
-            Log.d(TAG, String.format("receivedMessage: %s", message));
             sharedPreferences();
             String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
             editor.putString("message", receivedText);
@@ -282,16 +282,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void parseCommands(String receivedText) {
+        Log.d(BTTAG, "Trying to parse receivedMsg as cmd");
         //TODO to update timing commands
         // Process Algo Msg which is a list of list
         if (receivedText.contains("[[")) {
             try {
                 parseAlgoMsg(receivedText);
+                Log.d(BTTAG, "Parsing msg received from Algo team");
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         } else {
-            Log.d("NO COMMANDS ACTIVATED", "NIL");
+            Log.d(BTTAG, "Msg does not contain readable cmd");
         }
     }
 
@@ -305,6 +307,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static void parseCoordsCmd(JSONArray coordsArray) throws JSONException {
         // retrieves x,y,angle from algo msg
+        Log.d(BTTAG, String.format("Started parsing coords from Algo team msg"));
         double xCoord = coordsArray.getDouble(0);
         double yCoord = coordsArray.getDouble(1);
         double angleRad = coordsArray.getDouble(2);
@@ -317,84 +320,42 @@ public class MainActivity extends AppCompatActivity {
         else if (45 < angleDeg & angleDeg <= 135) direction = "up";
         else if (135 < angleDeg & angleDeg <= 255) direction = "right";
         else if (255 < angleDeg & angleDeg <= 315) direction = "down";
-        else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
+        else Log.d(BTTAG, "Unknown direction passed. Direction set to 'up' by default");
 
         // call method to update ROBOT, X, Y, direction
         // moves robot and sets fragment to correct axis
         moveRobot(xCoord, yCoord, direction);
-        Log.d(TAG, String.format("Robot Status set as: X: %f Y: %f Z %s", xCoord, yCoord, direction));
     }
 
     private void parseObstacleTargets(JSONArray entireArrayMsg) {
+        Log.d(BTTAG, "Started parsing targetedID from Algo team msg");
         // iterate from 1 - end of list to get targets
         int obstacleNo;
         int targetID;
-        for (int i = 1, size = entireArrayMsg.length(); i <= size; i++) {
-            obstacleNo = i;
-            try {
+        try {
+            for (int i = 1, size = entireArrayMsg.length(); i <= size; i++) {
+                obstacleNo = i;
                 targetID = entireArrayMsg.getJSONArray(i).getInt(0);
                 // update the image face
                 if (targetID != -1) {
                     // call method to update Obstacle Number, ID
                     obstacleViews[obstacleNo - 1].setImage(targetID);
-                    Log.d("OBSTACLE", String.format("Obstacle %d's image has been set to image ID %d.", obstacleNo, targetID));
+                    Log.d(GRIDTAG, String.format("Obstacle %d's image has been set to image ID %d.", obstacleNo, targetID));
+                } else {
+                    Log.d(GRIDTAG, String.format("Obstacle %d's image is not received", obstacleNo));
                 }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+        } catch (ArrayIndexOutOfBoundsException a) {
+            Log.d(BTTAG, "Length of Array sent not correct!");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
-// TODO: remove commented portion if all is well
-
-//    private void parseCommands(String receivedText) {
-//        Log.d(TAG, "Testing" + receivedText);
-//        try {
-//            if (receivedText.contains(",")) {
-//                String[] stringSplit = receivedText.split(",");
-//                String command = stringSplit[0];
-//                if (command.equals("ROBOT")) {
-//                    double xCoord = Double.parseDouble(stringSplit[1]);
-//                    double yCoord = Double.parseDouble(stringSplit[2]);
-//                    // process direction
-//                    // angle is sent in radians, convert to degrees
-//                    double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
-//                    String direction = "up";
-//                    if ((0 <= angle & angle <= 45) | (315 < angle & angle < 360))
-//                        direction = "left";
-//                    else if (45 < angle & angle <= 135) direction = "up";
-//                    else if (135 < angle & angle <= 255) direction = "right";
-//                    else if (255 < angle & angle <= 315) direction = "down";
-//                    else
-//                        Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
-//                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
-//                    // call method to update ROBOT, X, Y, direction
-//                    // moves robot and sets fragment to correct axis
-//                    moveRobot(xCoord, yCoord, direction);
-//                } else if (command.equals("TARGET")) {
-//                    int obstacleNo = Integer.parseInt(stringSplit[1]);
-//                    int targetID = Integer.parseInt(stringSplit[2]);
-//                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
-//                    // call method to update Obstacle Number, ID
-//                    obstacleViews[obstacleNo - 1].setImage(targetID);
-//                    Log.d("OBSTACLE",
-//                            String.format("Obstacle %d's image has been set to image ID %d.",
-//                                    obstacleNo, targetID));
-//                } else if (command.equals("TIMING")) {
-//                    String timing = stringSplit[1];
-//                    sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
-//                } else {
-//                    Log.d("NO COMMANDS ACTIVATED", "NIL");
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
-        Log.d(TAG, String.format("Entering printMessage: %s", message));
+        Log.d(BTTAG, String.format("Entering remoteSendMessage: %s", message));
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
@@ -403,7 +364,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
-        Log.d(TAG, String.format("Exiting printMessage: %s", message));
+        Log.d(BTTAG, String.format("Exiting remoteSendMessage: %s", message));
     }
 
     @Override

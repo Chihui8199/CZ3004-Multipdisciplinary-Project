@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.UUID;
 
 public class BluetoothPairingPage extends AppCompatActivity {
-    private static final String TAG = "DebuggingBluetoothPairing";
+    private static final String TAG = "BT ACTIVITY";
     public static boolean active = false;
     private String connStatus;
     BluetoothAdapter mBluetoothAdapter;

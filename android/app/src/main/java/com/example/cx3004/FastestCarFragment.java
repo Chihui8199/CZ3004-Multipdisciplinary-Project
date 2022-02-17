@@ -1,29 +1,15 @@
 package com.example.cx3004;
 
-import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.method.ScrollingMovementMethod;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.nio.charset.Charset;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -73,7 +59,7 @@ public class FastestCarFragment extends Fragment {
         return root;
     }
 
-    public void setTiming(String timing){
+    public void setTiming(String timing) {
         TextView timingText = (TextView) getView().findViewById(R.id.timing);
         timingText.setText(String.format("Timing: %s", timing));
     }
