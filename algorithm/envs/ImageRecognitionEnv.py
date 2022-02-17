@@ -381,28 +381,30 @@ class ImageRecognitionEnv(gym.Env):
             nodes.set_data(points_x, points_y)
             car, = ax.plot([self.car.x], [self.car.y],
                            marker=car_marker.transformed(mpl.transforms.Affine2D().rotate_deg(math.degrees(self.car.z - math.pi / 2))),
-                           ls="", markersize=35, color='black')
-            # car.set_data()
+                           ls="", markersize=34, color='black')
             if self.path:
                 path.set_data([i[0] for i in self.path], [i[1] for i in self.path])
             info.set_text("x: {:.2f} y: {:.2f} angle: {:.1f}".format(self.car.x, self.car.y, self.car.z),)
 
             return info, obstacles, nodes, car,
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(6, 6), dpi=80)
+        # figure()
         ax.grid()
 
         ax.set_xlim(0, 200)
+        ax.set_xticks(list(range(0, 201, 10)))
         ax.set_ylim(0, 200)
+        ax.set_yticks(list(range(0, 201, 10)))
 
         car_path, attributes = svg2paths(os.path.join(RES_PATH, "car-top-view-svgrepo-com.svg"))
         car_marker = parse_path(attributes[0]['d'])
         car_marker.vertices -= car_marker.vertices.mean(axis=0)
-        car_marker = car_marker.transformed(mpl.transforms.Affine2D().rotate_deg(180))
+        car_marker = car_marker.transformed(mpl.transforms.Affine2D().scale(1.5, 1).rotate_deg(180))
 
         info = ax.text(5, 5, "")
         path, = ax.plot([], [])
-        obstacles, = ax.plot([], [], marker="s", ls="", markersize=18)
+        obstacles, = ax.plot([], [], marker="s", ls="", markersize=18.5)
         nodes, = ax.plot([], [], marker="o", ls="")
 
         anim = FuncAnimation(fig, _update, interval=100, blit=True)
