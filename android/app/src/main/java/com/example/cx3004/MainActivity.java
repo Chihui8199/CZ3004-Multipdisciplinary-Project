@@ -29,6 +29,9 @@ import com.example.cx3004.customViews.RobotView;
 import com.example.cx3004.customViews.SquareGridView;
 import com.google.android.material.tabs.TabLayout;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
 import java.nio.charset.Charset;
 import java.util.UUID;
 
@@ -236,8 +239,6 @@ public class MainActivity extends AppCompatActivity {
                             String.format("Obstacle message has been sent for obstacle %d",
                                     obstacle.getObstacleId()));
                 }
-
-
             }
         });
 
@@ -295,49 +296,116 @@ public class MainActivity extends AppCompatActivity {
     };
 
     private void parseCommands(String receivedText) {
-        Log.d(TAG, "Testing" + receivedText);
-        //TODO Better error catching
-        try {
-            if (receivedText.contains(",")) {
-                String[] stringSplit = receivedText.split(",");
-                String command = stringSplit[0];
-                //TODO Perhaps allow check length
-                if (command.equals("ROBOT")) {
-                    double xCoord = Double.parseDouble(stringSplit[1]);
-                    double yCoord = Double.parseDouble(stringSplit[2]);
-                    // process direction
-                    // angle is sent in radians, convert to degrees
-                    double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
-                    String direction = "up";
-                    if ((0<=angle & angle<=45) | (315<angle & angle<360)) direction = "left";
-                    else if (45<angle & angle<=135) direction = "up";
-                    else if (135<angle & angle<=255) direction = "right";
-                    else if (255<angle & angle<=315) direction = "down";
-                    else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
-                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
-                    // call method to update ROBOT, X, Y, direction
-                    // moves robot and sets fragment to correct axis
-                    moveRobot(xCoord, yCoord, direction);
-                } else if (command.equals("TARGET")) {
-                    int obstacleNo = Integer.parseInt(stringSplit[1]);
-                    int targetID = Integer.parseInt(stringSplit[2]);
-                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
-                    // call method to update Obstacle Number, ID
-                    obstacleViews[obstacleNo - 1].setImage(targetID);
-                    Log.d("OBSTACLE",
-                            String.format("Obstacle %d's image has been set to image ID %d.",
-                                    obstacleNo, targetID));
-                } else if (command.equals("TIMING")){
-                    String timing = stringSplit[1];
-                    sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
-                } else {
-                    Log.d("NO COMMANDS ACTIVATED", "NIL");
-                }
+        //TODO to update timing commands
+        // Process Algo Msg which is a list of list
+        if (receivedText.contains("[[")) {
+            try {
+                parseAlgoMsg(receivedText);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        } else {
+            Log.d("NO COMMANDS ACTIVATED", "NIL");
         }
     }
+
+    private void parseAlgoMsg(String receivedText) throws JSONException {
+        JSONArray jsonArr = new JSONArray(receivedText);
+        // process robot current x,y,direction
+        parseCoordsCmd(jsonArr.getJSONArray(0));
+        // update obstacle with target image
+        parseObstacleTargets(jsonArr);
+    }
+
+    private static void parseCoordsCmd(JSONArray coordsArray) throws JSONException {
+        // retrieves x,y,angle from algo msg
+        double xCoord = coordsArray.getDouble(0);
+        double yCoord = coordsArray.getDouble(1);
+        double angleRad = coordsArray.getDouble(2);
+
+        // process angle into android application readable directions
+        String direction = "up";
+        double angleDeg = angleRad / (2 * Math.PI) * 360;
+        if ((0 <= angleDeg & angleDeg <= 45) | (315 < angleDeg & angleDeg < 360))
+            direction = "left";
+        else if (45 < angleDeg & angleDeg <= 135) direction = "up";
+        else if (135 < angleDeg & angleDeg <= 255) direction = "right";
+        else if (255 < angleDeg & angleDeg <= 315) direction = "down";
+        else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
+
+        // call method to update ROBOT, X, Y, direction
+        // moves robot and sets fragment to correct axis
+        moveRobot(xCoord, yCoord, direction);
+        Log.d(TAG, String.format("Robot Status set as: X: %f Y: %f Z %s", xCoord, yCoord, direction));
+    }
+
+    private void parseObstacleTargets(JSONArray entireArrayMsg) {
+        // iterate from 1 - end of list to get targets
+        int obstacleNo;
+        int targetID;
+        for (int i = 1, size = entireArrayMsg.length(); i < size; i++) {
+            obstacleNo = i;
+            try {
+                targetID = entireArrayMsg.getJSONArray(i).getInt(0);
+                // update the image face
+                if (targetID != -1) {
+                    // call method to update Obstacle Number, ID
+                    obstacleViews[obstacleNo - 1].setImage(targetID);
+                    Log.d("OBSTACLE", String.format("Obstacle %d's image has been set to image ID %d.", obstacleNo, targetID));
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+//    private void parseCommands(String receivedText) {
+//        Log.d(TAG, "Testing" + receivedText);
+//        //TODO Better error catching
+//        try {
+//            if (receivedText.contains(",")) {
+//                String[] stringSplit = receivedText.split(",");
+//                String command = stringSplit[0];
+//                //TODO Perhaps allow check length
+//                if (command.equals("ROBOT")) {
+//                    double xCoord = Double.parseDouble(stringSplit[1]);
+//                    double yCoord = Double.parseDouble(stringSplit[2]);
+//                    // process direction
+//                    // angle is sent in radians, convert to degrees
+//                    double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
+//                    String direction = "up";
+//                    if ((0 <= angle & angle <= 45) | (315 < angle & angle < 360))
+//                        direction = "left";
+//                    else if (45 < angle & angle <= 135) direction = "up";
+//                    else if (135 < angle & angle <= 255) direction = "right";
+//                    else if (255 < angle & angle <= 315) direction = "down";
+//                    else
+//                        Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
+//                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
+//                    // call method to update ROBOT, X, Y, direction
+//                    // moves robot and sets fragment to correct axis
+//                    moveRobot(xCoord, yCoord, direction);
+//                } else if (command.equals("TARGET")) {
+//                    int obstacleNo = Integer.parseInt(stringSplit[1]);
+//                    int targetID = Integer.parseInt(stringSplit[2]);
+//                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
+//                    // call method to update Obstacle Number, ID
+//                    obstacleViews[obstacleNo - 1].setImage(targetID);
+//                    Log.d("OBSTACLE",
+//                            String.format("Obstacle %d's image has been set to image ID %d.",
+//                                    obstacleNo, targetID));
+//                } else if (command.equals("TIMING")) {
+//                    String timing = stringSplit[1];
+//                    sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
+//                } else {
+//                    Log.d("NO COMMANDS ACTIVATED", "NIL");
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
