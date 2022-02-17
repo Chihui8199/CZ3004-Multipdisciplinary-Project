@@ -161,10 +161,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private static void showLog(String message) {
-        Log.d(TAG, message);
-    }
-    
     public static void moveRobot(double xCoord, double yCoord, String direction) {
         // if coordinates are out of bounds, break out of function and not move the robot
         if (!robotView.checkBoundary(xCoord, yCoord)) return;
@@ -235,18 +231,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Bluetooth Stuff
-    public static void sharedPreferences() {
-        sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
-        editor = sharedPreferences.edit();
-    }
-
-    public static void refreshMessageReceived() {
-        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
-    }
-
-    private static SharedPreferences getSharedPreferences(Context context) {
-        return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
-    }
 
     // Broadcast Receiver 5:  for Bluetooth Connection Status
     private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
@@ -275,7 +259,7 @@ public class MainActivity extends AppCompatActivity {
             String message = intent.getStringExtra("receivedMessage");
             // Read message to parse as commands
             parseCommands(message);
-            showLog("receivedMessage: message --- " + message);
+            Log.d(TAG, String.format("receivedMessage: %s", message));
             sharedPreferences();
             String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
             editor.putString("message", receivedText);
@@ -283,6 +267,19 @@ public class MainActivity extends AppCompatActivity {
             refreshMessageReceived();
         }
     };
+
+    public static void sharedPreferences() {
+        sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
+        editor = sharedPreferences.edit();
+    }
+
+    public static void refreshMessageReceived() {
+        CommsFragment.getMessageReceivedTextView().setText(sharedPreferences.getString("message", ""));
+    }
+
+    private static SharedPreferences getSharedPreferences(Context context) {
+        return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
+    }
 
     private void parseCommands(String receivedText) {
         //TODO to update timing commands
@@ -397,23 +394,21 @@ public class MainActivity extends AppCompatActivity {
 
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
-        showLog("Entering printMessage: " + message);
+        Log.d(TAG, String.format("Entering printMessage: %s", message));
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
             BluetoothConnectionService.write(bytes);
         }
-        showLog(message);
         editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
-        showLog("Exiting printMessage");
+        Log.d(TAG, String.format("Exiting printMessage: %s", message));
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
@@ -457,10 +452,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        showLog("Entering onSaveInstanceState");
+        Log.d(TAG, "Entering onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
         outState.putString(TAG, "onSaveInstanceState");
-        showLog("Exiting onSaveInstanceState");
+        Log.d(TAG, "Exiting onSaveInstanceState");
     }
 }
