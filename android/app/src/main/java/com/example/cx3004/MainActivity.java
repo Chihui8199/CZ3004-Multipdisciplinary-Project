@@ -49,7 +49,10 @@ public class MainActivity extends AppCompatActivity {
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
 
-    private static final String TAG = "Main Activity";
+    private static final String TAG = "MAIN ACTIVITY";
+    private static final String ROBOTTAG = "ROBOT";
+    private static final String GRIDTAG = "GRID";
+    private static final String BTTAG = "BLUETOOTH";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,11 +111,10 @@ public class MainActivity extends AppCompatActivity {
                 switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DROP:
                         ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
-                        Log.d("OBSTACLE",
-                                String.format("Obstacle %d was dropped on the map.",
+                        Log.d(GRIDTAG, String.format("Obstacle %d was dropped on the map.",
                                         droppedObstacle.getObstacleId()));
                         droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
-                        Log.d("OBSTACLE",
+                        Log.d(GRIDTAG,
                                 String.format("Obstacle %d was moved to (%d, %d) on the map.",
                                         droppedObstacle.getObstacleId(),
                                         droppedObstacle.getGridX(),
@@ -123,11 +125,11 @@ public class MainActivity extends AppCompatActivity {
                     case DragEvent.ACTION_DRAG_ENDED:
                         if (!dragEvent.getResult()) {
                             droppedObstacle = (ObstacleView) dragEvent.getLocalState();
-                            Log.d("OBSTACLE",
+                            Log.d(GRIDTAG,
                                     String.format("Obstacle %d was dropped outside of the map.",
                                             droppedObstacle.getObstacleId()));
                             droppedObstacle.reset();
-                            Log.d("OBSTACLE",
+                            Log.d(GRIDTAG,
                                     String.format("Obstacle %d was reset.",
                                             droppedObstacle.getObstacleId()));
                         }
@@ -146,13 +148,13 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 for (ObstacleView obstacle : obstacleViews) {
                     obstacle.setGridInterval(gridMap.gridInterval);
-                    Log.d("OBSTACLE",
+                    Log.d(GRIDTAG,
                             String.format("Obstacle %d has been resized to match grid boxes.",
                                     obstacle.getObstacleId()));
                 }
                 robotView.setGridInterval(gridMap.gridInterval);
                 robotView.bringToFront();
-                Log.d("ROBOT",
+                Log.d(ROBOTTAG,
                         "Robot has been resized to match grid boxes " +
                                 "and positioned at bottom-left corner of map.");
             }
@@ -164,11 +166,10 @@ public class MainActivity extends AppCompatActivity {
     }
     
     public static void moveRobot(double xCoord, double yCoord, String direction) {
-        Log.d(TAG, "onClick: " + xCoord + yCoord + direction);
         // if coordinates are out of bounds, break out of function and not move the robot
         if (!robotView.checkBoundary(xCoord, yCoord)) return;
         robotView.move(xCoord, yCoord, direction);
-        Log.d("ROBOT",
+        Log.d(ROBOTTAG,
                 String.format("Robot has been moved to (%f, %f) on the map and is facing %s.",
                         xCoord, yCoord, direction));
         refreshRobotState(xCoord, yCoord, direction);
@@ -202,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     obstacle.setImageFace(face);
-                    Log.d("OBSTACLE",
+                    Log.d(GRIDTAG,
                             String.format("Image face for obstacle %d has been set to '%s'.",
                                     obstacle.getObstacleId(), face));
                     obstacle.setOnMap = true;
@@ -218,12 +219,12 @@ public class MainActivity extends AppCompatActivity {
                 // if an obstacle has not been set, break out of function
                 for (ObstacleView obstacle : obstacleViews)
                     if (!obstacle.setOnMap) return;
-                Log.d("OBSTACLE", "All obstacles have been placed on map.");
+                Log.d(GRIDTAG, "All obstacles have been placed on map.");
 
                 // if all obstacles have been set, send obstacle coordinate messages
                 for (ObstacleView obstacle : obstacleViews) {
                     remoteSendMsg(obstacle.getMessage());
-                    Log.d("SEND MESSAGE",
+                    Log.d(BTTAG,
                             String.format("Obstacle message has been sent for obstacle %d",
                                     obstacle.getObstacleId()));
                 }
@@ -255,12 +256,12 @@ public class MainActivity extends AppCompatActivity {
             String status = intent.getStringExtra("Status");
             sharedPreferences();
             if (status.equals("connected")) {
-                Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
+                Log.d(BTTAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
                 Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_SHORT).show();
                 editor.putString("connStatus", "Connected to " + mDevice.getName());
 
             } else if (status.equals("disconnected")) {
-                Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
+                Log.d(BTTAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
                 Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_SHORT).show();
                 editor.putString("connStatus", "Disconnected");
             }
@@ -331,7 +332,7 @@ public class MainActivity extends AppCompatActivity {
         // iterate from 1 - end of list to get targets
         int obstacleNo;
         int targetID;
-        for (int i = 1, size = entireArrayMsg.length(); i < size; i++) {
+        for (int i = 1, size = entireArrayMsg.length(); i <= size; i++) {
             obstacleNo = i;
             try {
                 targetID = entireArrayMsg.getJSONArray(i).getInt(0);
