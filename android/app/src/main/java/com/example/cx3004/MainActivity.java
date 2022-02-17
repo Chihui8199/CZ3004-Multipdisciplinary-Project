@@ -35,8 +35,6 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity {
 
     ObstacleView[] obstacleViews;
-    // flags are set when the corresponding obstacle is placed on the grid
-    boolean[] obstacleFlags = new boolean[]{false, false, false, false, false};
     public static RobotView robotView;
 
     static SectionsPagerAdapter sectionsPagerAdapter;
@@ -93,7 +91,10 @@ public class MainActivity extends AppCompatActivity {
                 R.id.obstacle2,
                 R.id.obstacle3,
                 R.id.obstacle4,
-                R.id.obstacle5
+                R.id.obstacle5,
+                R.id.obstacle6,
+                R.id.obstacle7,
+                R.id.obstacle8
         };
         obstacleViews = new ObstacleView[obstacleIDs.length];
         for (int i = 0; i < obstacleIDs.length; i++)
@@ -187,6 +188,16 @@ public class MainActivity extends AppCompatActivity {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
     }
 
+    public void sendObstacleMsg(View v){
+        Log.d("OBSTACLE", "Set obstacle button clicked.");
+        for (ObstacleView obstacle: obstacleViews) {
+            if (obstacle.setOnMap) {
+                Log.d("OBSTACLE", String.format("Sending message for Obstacle %d,", obstacle.getObstacleId()));
+                remoteSendMsg(obstacle.getMessage());
+            }
+        }
+    }
+
     private void showImageFacePopup(ObstacleView obstacle) {
 
         final PopupWindow popupWindow = new PopupWindow(this);
@@ -219,29 +230,6 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
         }
-
-        popupWindow.setOnDismissListener(new PopupWindow.OnDismissListener() {
-            @Override
-            public void onDismiss() {
-                // check if all obstacles have been placed on map
-                // if an obstacle has not been set, break out of function
-                for (ObstacleView obstacle : obstacleViews)
-                    if (!obstacle.setOnMap) return;
-                Log.d("OBSTACLE", "All obstacles have been placed on map.");
-
-                // if all obstacles have been set, send obstacle coordinate messages
-                for (ObstacleView obstacle : obstacleViews) {
-                    remoteSendMsg(obstacle.getMessage());
-                    Log.d("SEND MESSAGE",
-                            String.format("Obstacle message has been sent for obstacle %d",
-                                    obstacle.getObstacleId()));
-                }
-
-
-            }
-        });
-
-
     }
 
     //Bluetooth Stuff

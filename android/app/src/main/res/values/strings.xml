@@ -23,6 +23,12 @@
     <string name="obstacle3_id">3</string>
     <string name="obstacle4_id">4</string>
     <string name="obstacle5_id">5</string>
+    <string name="obstacle6_id">6</string>
+    <string name="obstacle7_id">7</string>
+    <string name="obstacle8_id">8</string>
+
+    <!-- Map -->
+    <string name="set_btn">SET</string>
 
     <!-- Titles & headers -->
     <string name="title_blank_page">Blank Page</string>
