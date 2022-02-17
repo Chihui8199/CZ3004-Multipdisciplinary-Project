@@ -91,10 +91,10 @@ class Obstacle(Entity):
         if self.explored:
             return []  # no more points to be visited
         if self.target_surface_id == 0:
-            return [self.x, self.y + self.y_offset, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+            return [self.x, self.y + self.y_offset, 0]
         elif self.target_surface_id == 1:
-            return [self.x - self.x_offset, self.y, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+            return [self.x - self.x_offset, self.y, 1]
         elif self.target_surface_id == 2:
-            return [self.x, self.y - self.y_offset, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+            return [self.x, self.y - self.y_offset, 2]
         else:
-            return [self.x + self.x_offset, self.y, self.surfaces[self.target_surface_id].to_be_viewed_at.value]
+            return [self.x + self.x_offset, self.y, 3]

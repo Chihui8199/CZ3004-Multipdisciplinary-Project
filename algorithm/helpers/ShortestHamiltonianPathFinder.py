@@ -14,12 +14,15 @@ class ShortestHamiltonianPathFinder:
         :return: places to visit in sequence
         """
         points = [[env.car.x, env.car.y]]
+        _points = [[env.car.x, env.car.y]]
         for o in env.obstacles:
             if not o.explored:
-                points.append(o.get_best_point_to_visit()[:2])
+                points.append(o.get_best_point_to_visit())
+                _points.append(o.get_best_point_to_visit()[:2])
+
         if len(points) == 1:
             return []  # nothing to be visited, just/even no starting point
-        distance_matrix = euclidean_distance_matrix(np.array(points))
+        distance_matrix = euclidean_distance_matrix(np.array(_points))
         permutation, _ = solve_tsp_dynamic_programming(distance_matrix)
         return [points[idx] for idx in permutation]
 

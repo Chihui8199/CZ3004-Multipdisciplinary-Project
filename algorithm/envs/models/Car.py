@@ -51,8 +51,8 @@ class Car(Entity):
             for i in range(samples):
                 time = i * sample_rate
                 traj = Entity(
-                    x=self.x + v * time * math.cos(self.z),
-                    y=self.y + v * time * math.sin(self.z),
+                    x=self.x + round(v * time * math.cos(self.z)),
+                    y=self.y + round(v * time * math.sin(self.z)),
                     z=self.z,
                     length=self.length,
                     width=self.width
@@ -67,14 +67,22 @@ class Car(Entity):
             else:
                 radius = 20
 
-            for i in range(samples):
+            for i in range(samples + 1):
                 time = i * sample_rate
-                x = self.x - radius * math.cos(self.z + math.pi/2) + radius * math.cos(-v * time / radius + self.z + math.pi/2)
-                y = self.y - radius * math.sin(self.z + math.pi/2) + radius * math.sin(-v * time / radius + self.z + math.pi/2)
+                if i == samples:
+                    x = round(self.x - radius * math.cos(self.z + math.pi / 2) + radius * math.cos(
+                        -v * time / radius + self.z + math.pi / 2))
+                    y = round(self.y - radius * math.sin(self.z + math.pi / 2) + radius * math.sin(
+                        -v * time / radius + self.z + math.pi / 2))
+                else:
+                    x = self.x - radius * math.cos(self.z + math.pi / 2) + radius * math.cos(
+                        -v * time / radius + self.z + math.pi / 2)
+                    y = self.y - radius * math.sin(self.z + math.pi / 2) + radius * math.sin(
+                        -v * time / radius + self.z + math.pi / 2)
                 traj = Entity(
                     x=x,
                     y=y,
-                    z=(-v * time / radius + self.z)%(2*math.pi),
+                    z=(-v * time / radius + self.z),
                     length=self.length,
                     width=self.width
                 )

@@ -230,7 +230,7 @@ class ImageRecognitionEnv(gym.Env):
         traj, path_cost = self.car.get_traj(action)
         collision = self._check_collision(traj)
         if collision:
-            return None, -100, True, dict()  # obs, reward, done, additional info (None for now)
+            return None, -100, True, True  # obs, reward, done, additional info (collision info for now)
         else:
             if self.mock:
                 self.car.set(traj[-1].x, traj[-1].y, traj[-1].z)  # no need to set separately in mock
@@ -257,7 +257,7 @@ class ImageRecognitionEnv(gym.Env):
                 self.completed = True
                 logging.info("successfully completed one ep with no collision!")
 
-            return obs, self._calculate_reward(obs, action, path_cost), is_done, dict()
+            return obs, self._calculate_reward(obs, action, path_cost), is_done, False
 
     def update(self, rectified_car_pos: Car):
         """
