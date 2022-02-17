@@ -347,15 +347,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+// TODO: remove commented portion if all is well
 
 //    private void parseCommands(String receivedText) {
 //        Log.d(TAG, "Testing" + receivedText);
-//        //TODO Better error catching
 //        try {
 //            if (receivedText.contains(",")) {
 //                String[] stringSplit = receivedText.split(",");
 //                String command = stringSplit[0];
-//                //TODO Perhaps allow check length
 //                if (command.equals("ROBOT")) {
 //                    double xCoord = Double.parseDouble(stringSplit[1]);
 //                    double yCoord = Double.parseDouble(stringSplit[2]);

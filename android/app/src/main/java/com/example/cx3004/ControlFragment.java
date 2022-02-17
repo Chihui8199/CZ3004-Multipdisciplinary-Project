@@ -56,11 +56,9 @@ public class ControlFragment extends Fragment {
 
 
         // Button Listener
-        //TODO Need to check if it's ok to create static var like this
         moveUpImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO Check with RPI what command to send
                 ((MainActivity) getActivity()).remoteSendMsg("Q(ROBOT UP)");
             }
         });
