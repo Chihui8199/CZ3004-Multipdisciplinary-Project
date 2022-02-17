@@ -61,16 +61,20 @@ class Car(Entity):
                     traj.add_noise()
                 traj_list.append(traj)
         else:
-            radius = 20
+            # hardcode
+            if angle > 0:
+                radius = -20
+            else:
+                radius = 20
 
             for i in range(samples):
                 time = i * sample_rate
-                x = self.x - radius * math.cos(-self.z + math.pi/2) + radius * math.cos(v * time / radius - self.z + math.pi/2)
-                y = self.y - radius * math.sin(-self.z + math.pi/2) + radius * math.sin(v * time / radius - self.z + math.pi/2)
+                x = self.x - radius * math.cos(self.z + math.pi/2) + radius * math.cos(-v * time / radius + self.z + math.pi/2)
+                y = self.y - radius * math.sin(self.z + math.pi/2) + radius * math.sin(-v * time / radius + self.z + math.pi/2)
                 traj = Entity(
                     x=x,
                     y=y,
-                    z=v * time / radius - self.z,
+                    z=(-v * time / radius + self.z)%(2*math.pi),
                     length=self.length,
                     width=self.width
                 )
