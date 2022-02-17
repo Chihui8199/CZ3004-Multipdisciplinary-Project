@@ -355,10 +355,17 @@ class ImageRecognitionEnv(gym.Env):
         ui_thread.start()
 
     def _render(self):
+        import os
+
         from matplotlib.animation import FuncAnimation
         import matplotlib.pyplot as plt
+        import matplotlib as mpl
+        from svgpathtools import svg2paths
+        from svgpath2mpl import parse_path
+        from res import RES_PATH
 
         def _update(*args):
+            nonlocal car_marker
             obstacles_x = []
             obstacles_y = []
             points_x = []
@@ -372,10 +379,10 @@ class ImageRecognitionEnv(gym.Env):
                     points_y.append(point[1])
             obstacles.set_data(obstacles_x, obstacles_y)
             nodes.set_data(points_x, points_y)
-            # import matplotlib as mpl
-            # t = mpl.markers.MarkerStyle(marker='p')
-            # t._transform = t.get_transform().rotate_deg(angle)
-            car.set_data([self.car.x], [self.car.y])
+            car, = ax.plot([self.car.x], [self.car.y],
+                           marker=car_marker.transformed(mpl.transforms.Affine2D().rotate_deg(math.degrees(self.car.z - math.pi / 2))),
+                           ls="", markersize=35, color='black')
+            # car.set_data()
             if self.path:
                 path.set_data([i[0] for i in self.path], [i[1] for i in self.path])
             info.set_text("x: {:.2f} y: {:.2f} angle: {:.1f}".format(self.car.x, self.car.y, self.car.z),)
@@ -388,12 +395,15 @@ class ImageRecognitionEnv(gym.Env):
         ax.set_xlim(0, 200)
         ax.set_ylim(0, 200)
 
+        car_path, attributes = svg2paths(os.path.join(RES_PATH, "car-top-view-svgrepo-com.svg"))
+        car_marker = parse_path(attributes[0]['d'])
+        car_marker.vertices -= car_marker.vertices.mean(axis=0)
+        car_marker = car_marker.transformed(mpl.transforms.Affine2D().rotate_deg(180))
+
         info = ax.text(5, 5, "")
         path, = ax.plot([], [])
         obstacles, = ax.plot([], [], marker="s", ls="", markersize=18)
         nodes, = ax.plot([], [], marker="o", ls="")
-        car_dir = ax.plot([], [], marker="o", ls="")
-        car, = ax.plot([], [], marker="p", ls="", markersize=35)
 
         anim = FuncAnimation(fig, _update, interval=100, blit=True)
         fig.tight_layout()

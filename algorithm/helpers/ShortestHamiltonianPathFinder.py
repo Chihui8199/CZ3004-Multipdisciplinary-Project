@@ -21,7 +21,7 @@ class ShortestHamiltonianPathFinder:
             return []  # nothing to be visited, just/even no starting point
         distance_matrix = euclidean_distance_matrix(np.array(points))
         permutation, _ = solve_tsp_dynamic_programming(distance_matrix)
-        return [points[idx] for idx in permutation[1:]]
+        return [points[idx] for idx in permutation]
 
 
 if __name__ == '__main__':
@@ -36,4 +36,9 @@ if __name__ == '__main__':
     env.add_obstacle(x=40, y=40, target_face_id=3)
     env.add_obstacle(x=100, y=40, target_face_id=0)
     env.reset()
-    print("nodes to visit in sequence: ", ShortestHamiltonianPathFinder.get_visit_sequence(env))
+    nodes = ShortestHamiltonianPathFinder.get_visit_sequence(env)
+    print("nodes to visit in sequence: ", nodes)
+    env.path = nodes
+    env.render()
+    while True:
+        pass
