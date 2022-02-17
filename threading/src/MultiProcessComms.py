@@ -2,23 +2,16 @@ import time
 from datetime import datetime
 from multiprocessing import Process, Value, Queue, Manager
 
-import cv2
-import imagezmq
-
-from picamera import PiCamera
-from picamera.array import PiRGBArray
-
 from Android import Android
 from Robot import Robot
 from Algorithm import Algorithm
-# from src.config import STOPPING_IMAGE, IMAGE_WIDTH, IMAGE_HEIGHT, IMAGE_FORMAT
 from protocols import *      
 
 class MultiProcessComms:
     """
     This class handles multi-processing communications between Robot, Algorithm and Android.
     """
-    def __init__(self, image_processing_server_url: str=None):
+    def __init__(self):
         """
         Instantiates a MultiProcess Communications session and set up the necessary variables.
 
@@ -48,42 +41,27 @@ class MultiProcessComms:
         
         self.write_process = Process(target=self._write_target)
         self.write_android_process = Process(target=self._write_android)
-        
-        # the current action / status of the robot
-        self.status = Status.IDLE  # robot starts off being idle
 
         self.dropped_connection = Value('i',0) # 0 - Robot, 1 - algorithm
 
-        self.image_process = None
-
-        if image_processing_server_url is not None:
-            self.image_process = Process(target=self._process_pic)
-
-            # pictures taken using the PiCamera are placed in this queue
-            self.image_queue = self.manager.Queue()
-
-            self.image_processing_server_url = image_processing_server_url
-            self.image_count = Value('i',0)
-        
-        
     def start(self):        
         try:
-            # self.robot.connect()
+            self.robot.connect()
             # self.algorithm.connect()
             self.android.connect()
 
-            print('Connected to Robot, Algorithm and Android')
-            
+            # print('Connected to Robot, Algorithm and Android')
+            print('Connected to Robot and Android')
+
             self.read_robot_process.start()
-            self.read_algorithm_process.start()
+            # self.read_algorithm_process.start()
             self.read_android_process.start()
             self.write_process.start()
             self.write_android_process.start()
-
-            if self.image_process is not None:
-                self.image_process.start()
             
-            print('Started all processes: read-Robot, read-algorithm, read-android, write, image')
+            # print('Started all processes: read-Robot, read-algorithm, read-android, write, image')
+            print('Started processes: read-Robot, read-android, write')
+
 
             print('Multiprocess communication session started')
             
@@ -94,7 +72,7 @@ class MultiProcessComms:
 
     def end(self):
         # children processes should be killed once this parent process is killed
-        self.algorithm.disconnect_all()
+        # self.algorithm.disconnect_all()
         self.android.disconnect_all()
         print('Multiprocess communication session ended')
 
@@ -106,8 +84,8 @@ class MultiProcessComms:
                 if not self.read_robot_process.is_alive():
                     self._reconnect_robot()
                     
-                if not self.read_algorithm_process.is_alive():
-                    self._reconnect_algorithm()
+                # if not self.read_algorithm_process.is_alive():
+                #     self._reconnect_algorithm()
                     
                 if not self.read_android_process.is_alive():
                     self._reconnect_android()
@@ -120,9 +98,7 @@ class MultiProcessComms:
                         
                 if not self.write_android_process.is_alive():
                     self._reconnect_android()
-                
-                if self.image_process is not None and not self.image_process.is_alive():self.image_process.terminate()
-                    
+                                    
             except Exception as error:
                 print("Error during reconnection: ",error)
                 raise error
@@ -147,25 +123,25 @@ class MultiProcessComms:
 
         print('Reconnected to Robot')
 
-    def _reconnect_algorithm(self):
-        self.algorithm.disconnect()
+    # def _reconnect_algorithm(self):
+    #     self.algorithm.disconnect()
         
-        self.read_algorithm_process.terminate()
-        self.write_process.terminate()
-        self.write_android_process.terminate()
+    #     self.read_algorithm_process.terminate()
+    #     self.write_process.terminate()
+    #     self.write_android_process.terminate()
 
-        self.algorithm.connect()
+    #     self.algorithm.connect()
 
-        self.read_algorithm_process = Process(target=self._read_algorithm)
-        self.read_algorithm_process.start()
+    #     self.read_algorithm_process = Process(target=self._read_algorithm)
+    #     self.read_algorithm_process.start()
 
-        self.write_process = Process(target=self._write_target)
-        self.write_process.start()
+    #     self.write_process = Process(target=self._write_target)
+    #     self.write_process.start()
         
-        self.write_android_process = Process(target=self._write_android)
-        self.write_android_process.start()
+    #     self.write_android_process = Process(target=self._write_android)
+    #     self.write_android_process.start()
 
-        print('Reconnected to Algorithm')
+    #     print('Reconnected to Algorithm')
 
     def _reconnect_android(self):
         self.android.disconnect()
@@ -194,6 +170,7 @@ class MultiProcessComms:
                 
                 if raw_message is None:
                     continue
+
                 message_list = raw_message.splitlines()
                 
                 for message in message_list:
@@ -203,143 +180,42 @@ class MultiProcessComms:
                         
                     self.message_queue.put_nowait(self._format_for(
                         ALGORITHM_HEADER, 
-                        message + NEWLINE
+                        message[1:] + NEWLINE
                     ))
                     
             except Exception as error:
                 print('Process read_Robot failed: ' + str(error))
                 break    
 
-    def _read_algorithm(self):
-        while True:
-            try:
-                raw_message = self.algorithm.read()
+    # def _read_algorithm(self):
+    #     while True:
+    #         try:
+    #             raw_message = self.algorithm.read()
                 
-                if raw_message is None:
-                    continue
+    #             if raw_message is None:
+    #                 continue
                 
-                message_list = raw_message.splitlines()
+    #             message_list = raw_message.splitlines()
                 
-                for message in message_list:
+    #             for message in message_list:
                 
-                    if len(message) <= 0:
-                        continue
+    #                 if len(message) <= 0:
+    #                     continue
 
-                    elif message[0] == AlgorithmToRPi.TAKE_PICTURE:
-
-                        if self.image_count.value >= 5:
-                            self.message_queue.put_nowait(self._format_for(
-                            ALGORITHM_HEADER, 
-                            RPiToAlgorithm.DONE_IMG_REC + NEWLINE
-                        ))
-                        
-                        else:
-                            
-                            message = message[2:-1]  # to remove 'C[' and ']'
-                            # self.to_android_message_queue.put_nowait(
-                                # RPiToAndroid.STATUS_TAKING_PICTURE + NEWLINE
-                            # )
-                            image = self._take_pic()
-                            print('Picture taken')
-                            self.message_queue.put_nowait(self._format_for(
-                                ALGORITHM_HEADER, 
-                                RPiToAlgorithm.DONE_TAKING_PICTURE + NEWLINE
-                            ))
-                            self.image_queue.put_nowait([image,message])
-
-                    elif message == AlgorithmToRPi.EXPLORATION_COMPLETE:
-                        # to let image processing server end all processing and display all images
-                        self.status = Status.IDLE
-                        self.image_queue.put_nowait([cv2.imread(STOPPING_IMAGE),"-1,-1|-1,-1|-1,-1"])
-
-                        # self.to_android_message_queue.put_nowait(
-                            # RPiToAndroid.STATUS_IDLE + NEWLINE
-                        # )
-
-                    elif message[0] == AlgorithmToAndroid.MDF_STRING:
-                        self.to_android_message_queue.put_nowait( 
-                            message[1:] + NEWLINE
-                        )
+    #                 elif message[0] == AlgorithmToAndroid.SEND_STATUS:
+    #                     self.to_android_message_queue.put_nowait( 
+    #                         message[1:] + NEWLINE
+    #                     )
                     
-                    else:  # (message[0]=='W' or message in ['D|', 'A|', 'Z|']):
-                        #self._forward_message_algorithm_to_android(message)
-                        self.message_queue.put_nowait(self._format_for(
-                            ROBOT_HEADER, 
-                            message + NEWLINE
-                        ))
+    #                 else:  # message[0] == 'I'
+    #                     self.message_queue.put_nowait(self._format_for(
+    #                         ROBOT_HEADER, 
+    #                         message[1:] + NEWLINE
+    #                     ))
                 
-            except Exception as error:
-                print('Process read_algorithm failed: ' + str(error))
-                break
-
-    def _forward_message_algorithm_to_android(self, message):
-        messages_for_android = message.split(MESSAGE_SEPARATOR)
-
-        for message_for_android in messages_for_android:
-            
-            if len(message_for_android) <= 0:
-                continue
-                
-            elif message_for_android[0] == AlgorithmToAndroid.TURN_LEFT:
-                self.to_android_message_queue.put_nowait(
-                    RPiToAndroid.TURN_LEFT + NEWLINE
-                )
-                
-                # self.to_android_message_queue.put_nowait(
-                    # RPiToAndroid.STATUS_TURNING_LEFT + NEWLINE
-                # )
-            
-            elif message_for_android[0] == AlgorithmToAndroid.TURN_RIGHT:
-                self.to_android_message_queue.put_nowait(
-                    RPiToAndroid.TURN_RIGHT + NEWLINE
-                )
-                
-                # self.to_android_message_queue.put_nowait(
-                    # RPiToAndroid.STATUS_TURNING_RIGHT + NEWLINE
-                # )
-            
-            # elif message_for_android[0] == AlgorithmToAndroid.CALIBRATING_CORNER:
-                # self.to_android_message_queue.put_nowait(
-                    # RPiToAndroid.STATUS_CALIBRATING_CORNER + NEWLINE
-                # )
-            
-            # elif message_for_android[0] == AlgorithmToAndroid.SENSE_ALL:
-                # self.to_android_message_queue.put_nowait(
-                    # RPiToAndroid.STATUS_SENSE_ALL + NEWLINE
-                # )
-                
-            # elif message_for_android[0] == AlgorithmToAndroid.ALIGN_RIGHT:
-                # self.to_android_message_queue.put_nowait(
-                    # RPiToAndroid.STATUS_ALIGN_RIGHT + NEWLINE
-                # )
-                
-            # elif message_for_android[0] == AlgorithmToAndroid.ALIGN_FRONT:
-                # self.to_android_message_queue.put_nowait(
-                    # RPiToAndroid.STATUS_ALIGN_FRONT + NEWLINE
-                # )
-            
-            elif message_for_android[0] == AlgorithmToAndroid.MOVE_FORWARD:
-                # if self.status == Status.EXPLORING:
-                    # self.to_android_message_queue.put_nowait(
-                        # RPiToAndroid.STATUS_EXPLORING + NEWLINE
-                    # )
-                
-                # elif self.status == Status.FASTEST_PATH:
-                    # self.to_android_message_queue.put_nowait(
-                        # RPiToAndroid.STATUS_FASTEST_PATH + NEWLINE
-                    # )
-                num_steps_forward = int(message_for_android.decode()[1:])
-
-                # TODO
-                print('Number of steps to move forward:', num_steps_forward)
-                for _ in range(num_steps_forward):
-                    self.to_android_message_queue.put_nowait(
-                        RPiToAndroid.MOVE_UP + NEWLINE
-                    )           
-                    
-                    # self.to_android_message_queue.put_nowait(
-                        # RPiToAndroid.STATUS_MOVING_FORWARD + NEWLINE
-                    # )        
+    #         except Exception as error:
+    #             print('Process read_algorithm failed: ' + str(error))
+    #             break
 
     def _read_android(self):
         while True:
@@ -355,41 +231,62 @@ class MultiProcessComms:
                     if len(message) <= 0:
                         continue
 
-                    elif message in (AndroidToRobot.ALL_MESSAGES + [AndroidToRPi.CALIBRATE_SENSOR]):
-                        if message == AndroidToRPi.CALIBRATE_SENSOR:
+                    elif message[0] in (AndroidToRobot.ALL_MESSAGES):
+                        if message[0] == AndroidToRobot.MOVE_UP:
                             self.message_queue.put_nowait(self._format_for(
-                                ROBOT_HEADER, 
-                                RPiToRobot.CALIBRATE_SENSOR + NEWLINE
-                            ))
-                        
+                            ROBOT_HEADER, "f0501000149" + NEWLINE
+                        ))
+                        elif message[0] == AndroidToRobot.MOVE_BACK:
+                            self.message_queue.put_nowait(self._format_for(
+                            ROBOT_HEADER, "b0501000149" + NEWLINE
+                        ))
+                        elif message[0] == AndroidToRobot.TURN_LEFT:
+                            self.message_queue.put_nowait(self._format_for(
+                            ROBOT_HEADER, "f0501000127" + NEWLINE
+                        ))
                         else:
                             self.message_queue.put_nowait(self._format_for(
-                                ROBOT_HEADER, message + NEWLINE
-                            ))
+                            ROBOT_HEADER, "f0501000200" + NEWLINE
+                        ))
                         
-                    else:  # if message in ['ES|', 'FS|', 'SendArena']:
-                        if message == AndroidToAlgorithm.START_EXPLORATION:
-                            self.status = Status.EXPLORING
-                            self.message_queue.put_nowait(self._format_for(
-                                ROBOT_HEADER, 
-                                RPiToRobot.START_EXPLORATION + NEWLINE
-                            ))
-
-                        elif message == AndroidToAlgorithm.START_FASTEST_PATH:
-                            self.status = Status.FASTEST_PATH
-                            self.message_queue.put_nowait(self._format_for(
-                                ROBOT_HEADER, 
-                                RPiToRobot.START_FASTEST_PATH + NEWLINE
-                            ))
-
+                    else:
                         self.message_queue.put_nowait(self._format_for(
                             ALGORITHM_HEADER, 
-                            message + NEWLINE
+                            message[1:] + NEWLINE
                         ))
                     
             except Exception as error:
                 print('Process read_android failed: ' + str(error))
                 break
+    
+    # def _read_android(self):
+    #     while True:
+    #         try:
+    #             raw_message = self.android.read()
+                
+    #             if raw_message is None:
+    #                 continue
+                
+    #             message_list = raw_message.splitlines()
+                
+    #             for message in message_list:
+    #                 if len(message) <= 0:
+    #                     continue
+
+    #                 elif message in (AndroidToRobot.ALL_MESSAGES):
+    #                     self.message_queue.put_nowait(self._format_for(
+    #                         ROBOT_HEADER, message[1:] + NEWLINE
+    #                     ))
+                        
+    #                 else:
+    #                     self.message_queue.put_nowait(self._format_for(
+    #                         ALGORITHM_HEADER, 
+    #                         message[1:] + NEWLINE
+    #                     ))
+                    
+    #         except Exception as error:
+    #             print('Process read_android failed: ' + str(error))
+    #             break
 
     def _write_target(self):
         while True:
@@ -402,8 +299,8 @@ class MultiProcessComms:
                     if target == ROBOT_HEADER:
                         self.robot.write(payload)
                         
-                    elif target == ALGORITHM_HEADER:
-                        self.algorithm.write(payload)
+                    # elif target == ALGORITHM_HEADER:
+                    #     self.algorithm.write(payload)
                         
                     else:
                         print("Invalid header", target)
@@ -411,7 +308,7 @@ class MultiProcessComms:
             except Exception as error:
                 print('Process write_target failed: ' + str(error))
 
-                if target == Robot_HEADER:
+                if target == ROBOT_HEADER:
                     self.dropped_connection.value = 0
 
                 elif target == ALGORITHM_HEADER:
@@ -430,88 +327,6 @@ class MultiProcessComms:
             except Exception as error:
                 print('Process write_android failed: ' + str(error))
                 break
-				
-    # def _take_pic(self):
-    #     try:
-    #         start_time = datetime.now()
-
-    #         # initialize the camera and grab a reference to the raw camera capture
-    #         camera = PiCamera(resolution=(IMAGE_WIDTH, IMAGE_HEIGHT))  # '1920x1080'
-    #         rawCapture = PiRGBArray(camera)
-            
-    #         # allow the camera to warmup
-    #         time.sleep(0.1)
-            
-    #         # grab an image from the camera
-    #         camera.capture(rawCapture, format=IMAGE_FORMAT)
-    #         image = rawCapture.array
-    #         camera.close()
-
-    #         print('Time taken to take picture: ' + str(datetime.now() - start_time) + 'seconds')
-            
-    #         # to gather training images
-    #         # os.system("raspistill -o images/test"+
-    #         # str(start_time.strftime("%d%m%H%M%S"))+".png -w 1920 -h 1080 -q 100")
-        
-    #     except Exception as error:
-    #         print('Taking picture failed: ' + str(error))
-        
-    #     return image
-    
-    # def _process_pic(self):
-    #     # initialize the ImageSender object with the socket address of the server
-    #     image_sender = imagezmq.ImageSender(connect_to=self.image_processing_server_url)
-    #     image_id_list = []
-    #     while True:
-    #         try:
-    #             if not self.image_queue.empty():
-    #                 start_time = datetime.now()
-                    
-    #                 image_message =  self.image_queue.get_nowait()
-    #                 # format: 'x,y|x,y|x,y'
-    #                 obstacle_coordinates = image_message[1]
-                    
-    #                 reply = image_sender.send_image(
-    #                     'image from RPi', 
-    #                     image_message[0]
-    #                 )
-    #                 reply = reply.decode('utf-8')
-
-    #                 if reply == 'End':
-    #                     break  # stop sending images
-                    
-    #                 # example replies
-    #                 # "1|2|3" 3 symbols in order from left to right
-    #                 # "1|-1|3" 2 symbols, 1 on the left, 1 on the right
-    #                 # "1" 1 symbol either on the left, middle or right
-    #                 else:
-    #                     detections = reply.split(MESSAGE_SEPARATOR)
-    #                     obstacle_coordinate_list = obstacle_coordinates.split(MESSAGE_SEPARATOR)
-
-    #                     for detection, coordinates in zip(detections, obstacle_coordinate_list):
-                            
-    #                         if coordinates == '-1,-1':
-    #                             continue  # if no obstacle, skip mapping of symbol id
-    #                         elif detection == '-1':
-    #                             continue  # if no symbol detected, skip mapping of symbol id
-    #                         else:
-    #                             id_string_to_android = '{"image":[' + coordinates + \
-    #                             ',' + detection + ']}'
-    #                             print(id_string_to_android)
-                                
-    #                             if detection not in image_id_list:
-    #                                 self.image_count.value += 1
-    #                                 image_id_list.put_nowait(detection)
-                                
-    #                             self.to_android_message_queue.put_nowait(
-    #                                 id_string_to_android + NEWLINE
-    #                             )
-
-    #                 print('Time taken to process image: ' + \
-    #                     str(datetime.now() - start_time) + ' seconds')
-
-    #         except Exception as error:
-    #             print('Image processing failed: ' + str(error))
 
     def _format_for(self, target, payload):
         return {

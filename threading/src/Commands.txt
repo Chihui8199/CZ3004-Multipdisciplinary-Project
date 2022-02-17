@@ -3,7 +3,7 @@ Sender > Receiver, Header, Meaning of Header (you should append your message to 
 
 # Android
 Android > Robot, "Q", Robot move up
-Android > Robot, "W", Robot move down
+Android > Robot, "W", Robot move back
 Android > Robot, "E", Robot turn left
 Android > Robot, "R", Robot turn right
 
@@ -17,7 +17,6 @@ Algo > Robot, "I", Algo send command to Robot (V, A, T)
 
 Algo > Android, "P", Algo send status to Android (status is a long list)
 
-Algo > RPi, "A", Algo command RPi to take photo (RPi will then send the taken image to the image recognizer via the imagezmq package)
 
 # RPi
 RPi > Algo, "S", RPi inform Algo that photo has been taken and Algo can resume exploration

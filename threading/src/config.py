@@ -14,13 +14,3 @@ ALGORITHM_SOCKET_BUFFER_SIZE = 2048
 # Arduino USB connection settings
 SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
-
-# IMAGE_WIDTH = 1920
-# IMAGE_HEIGHT = 1080
-# IMAGE_FORMAT = 'bgr'
-
-# BASE_IP = 'tcp://192.168.16.'
-# PORT = ':5555'
-# IMAGE_PROCESSING_SERVER_URLS = {
-#     'zaki': BASE_IP + '54' + PORT,
-# }
