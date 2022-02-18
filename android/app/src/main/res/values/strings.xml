@@ -46,6 +46,7 @@
     <string name="robot_x_state">X: 1.5</string>
     <string name="robot_y_state">Y: 1.5</string>
     <string name="robot_direction_state">Direction: UP</string>
+    <string name="robot_status">STATUS: -</string>
 
     <!-- Context descriptions -->
     <string name="nav_button_description">Navigation</string>

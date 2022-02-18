@@ -1,43 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/robot_state_fragment"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".RobotStateFragment">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/robot_x_state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/robot_x_state"
-        android:layout_row="0"
-        android:layout_column="0"
-        android:layout_columnWeight="1"
-        android:layout_columnSpan="1"
-        style="@style/textDisplay" />
 
     <TextView
         android:id="@+id/robot_y_state"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        style="@style/textDisplay"
+        android:layout_width="170dp"
+        android:layout_height="64dp"
+        android:layout_marginEnd="100dp"
         android:text="@string/robot_y_state"
-        android:layout_row="0"
-        android:layout_column="1"
-        android:layout_columnWeight="1"
-        android:layout_columnSpan="1"
-        style="@style/textDisplay" />
+        app:layout_constraintBottom_toTopOf="@+id/robot_direction_state"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/robot_x_state" />
+
+    <TextView
+        android:id="@+id/robot_x_state"
+        style="@style/textDisplay"
+        android:layout_width="170dp"
+        android:layout_height="64dp"
+        android:layout_marginStart="176dp"
+        android:text="@string/robot_x_state"
+        app:layout_constraintBottom_toTopOf="@+id/robot_direction_state"
+        app:layout_constraintEnd_toStartOf="@id/robot_y_state"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/robot_direction_state"
+        style="@style/textDisplay"
+        android:layout_width="440dp"
+        android:layout_height="62dp"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="492dp"
+        android:text="@string/robot_direction_state"
+        app:layout_constraintBottom_toTopOf="@+id/robot_status"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.49"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/robot_status"
+        style="@style/textDisplay"
+        android:layout_width="440dp"
+        android:layout_height="62dp"
+        android:layout_gravity="fill_horizontal"
+        android:layout_marginBottom="30dp"
+        android:text="@string/robot_status"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/robot_direction_state"
-        android:layout_row="1"
-        android:layout_column="0"
-        android:layout_columnSpan="2"
-        android:layout_gravity="fill_horizontal"
-        style="@style/textDisplay" />
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="82dp" />
 
-</GridLayout>
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_begin="522dp" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
