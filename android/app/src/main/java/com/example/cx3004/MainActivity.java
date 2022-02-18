@@ -174,7 +174,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static void refreshRobotState(double xCoord, double yCoord, String direction) {
-        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
+        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction, "MOVING");
     }
 
     public void sendObstacleMsg(View v) {

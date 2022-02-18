@@ -23,6 +23,7 @@ public class RobotStateFragment extends Fragment {
     TextView xTextView;
     TextView yTextView;
     TextView directionTextView;
+    TextView statusTextView;
 
     public static RobotStateFragment newInstance() {
         RobotStateFragment fragment = new RobotStateFragment();
@@ -46,9 +47,14 @@ public class RobotStateFragment extends Fragment {
         xTextView = (TextView) getView().findViewById(R.id.robot_x_state);
         yTextView = (TextView) getView().findViewById(R.id.robot_y_state);
         directionTextView = (TextView) getView().findViewById(R.id.robot_direction_state);
+        statusTextView = (TextView) getView().findViewById(R.id.robot_status_state);
     }
 
-    public void setRobotState(double x, double y, String direction) {
+    public void setRobotState(double x, double y, String direction){
+        setRobotState(x, y, direction, null);
+    }
+
+    public void setRobotState(double x, double y, String direction, String status) {
         // remove trailing zeros from coords
         DecimalFormat coordFormat = new DecimalFormat("0.#");
         String xStr = String.format("X: %s", coordFormat.format(x));
@@ -59,6 +65,7 @@ public class RobotStateFragment extends Fragment {
         xTextView.setText(xStr);
         yTextView.setText(yStr);
         directionTextView.setText(directionStr);
+        if (status != null) statusTextView.setText(status);
 
         Log.d("ROBOT STATE",
                 String.format("Robot state has been set to: %s, %s, %s",
