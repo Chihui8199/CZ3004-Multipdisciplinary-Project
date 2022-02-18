@@ -27,7 +27,7 @@ import java.util.UUID;
 public class BluetoothConnectionService {
     BluetoothPairingPage mBluetoothPairingPage;
     private static BluetoothConnectionService instance;
-    private static final String TAG = "DebuggingTag";
+    private static final String TAG = "BT ACTIVITY";
 
     private static final String appName = "CX3004";
     public static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
@@ -319,7 +319,7 @@ public class BluetoothConnectionService {
         if (mInsecureAcceptThread != null) mInsecureAcceptThread.cancel();
 
         // dimiss connection dialog
-        clientConnectionDialog.dismiss();
+        if (clientConnectionDialog != null)clientConnectionDialog.dismiss();
 
         mConnectedThread = new ConnectedThread(mSocket);
         mConnectedThread.start();
