@@ -13,6 +13,7 @@ import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -175,6 +176,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static void refreshRobotState(double xCoord, double yCoord, String direction) {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction, "MOVING");
+    }
+
+    public void start(View v){
+        remoteSendMsg("Gstart");
     }
 
     public void sendObstacleMsg(View v) {

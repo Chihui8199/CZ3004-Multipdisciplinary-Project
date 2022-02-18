@@ -47,7 +47,7 @@ public class RobotStateFragment extends Fragment {
         xTextView = (TextView) getView().findViewById(R.id.robot_x_state);
         yTextView = (TextView) getView().findViewById(R.id.robot_y_state);
         directionTextView = (TextView) getView().findViewById(R.id.robot_direction_state);
-        statusTextView = (TextView) getView().findViewById(R.id.robot_status_state);
+        statusTextView = (TextView) getView().findViewById(R.id.robot_status);
     }
 
     public void setRobotState(double x, double y, String direction){
@@ -65,7 +65,7 @@ public class RobotStateFragment extends Fragment {
         xTextView.setText(xStr);
         yTextView.setText(yStr);
         directionTextView.setText(directionStr);
-        if (status != null) statusTextView.setText(status);
+        if (status != null) statusTextView.setText(String.format("Status: %s", status));
 
         Log.d("ROBOT STATE",
                 String.format("Robot state has been set to: %s, %s, %s",
