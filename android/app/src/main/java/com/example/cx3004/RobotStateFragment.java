@@ -10,7 +10,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
@@ -49,7 +48,7 @@ public class RobotStateFragment extends Fragment {
         directionTextView = (TextView) getView().findViewById(R.id.robot_direction_state);
     }
 
-    public void setRobotState(double x, double y, String direction){
+    public void setRobotState(double x, double y, String direction) {
         // remove trailing zeros from coords
         DecimalFormat coordFormat = new DecimalFormat("0.#");
         String xStr = String.format("X: %s", coordFormat.format(x));

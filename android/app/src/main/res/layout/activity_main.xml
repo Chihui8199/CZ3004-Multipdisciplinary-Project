@@ -55,12 +55,12 @@
 
             <com.example.cx3004.customViews.RobotView
                 android:id="@+id/robot"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="match_parent" />
 
             <com.example.cx3004.customViews.SquareGridView
                 android:id="@+id/grid_map"
-                android:layout_width="0dp"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 app:border_color="@color/dark_orange"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -68,60 +68,106 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
+            <Button
+                android:id="@+id/setButton"
+                style="@style/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="sendObstacleMsg"
+                android:text="@string/set_btn"
+                app:layout_constraintBottom_toTopOf="@id/obstacle1"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/grid_map"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintHorizontal_weight="1"/>
+
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/item_padding"
                 android:text="@string/obstacle1_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle2"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/obstacle5"
                 app:layout_constraintStart_toEndOf="@+id/grid_map"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toBottomOf="@id/setButton"
+                app:layout_constraintHorizontal_weight="1"/>
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/item_padding"
                 android:text="@string/obstacle2_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle3"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/obstacle6"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
-                app:layout_constraintTop_toBottomOf="@id/obstacle1" />
+                app:layout_constraintTop_toBottomOf="@id/obstacle1"
+                app:layout_constraintHorizontal_weight="1"/>
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/item_padding"
                 android:text="@string/obstacle3_id"
                 app:layout_constraintBottom_toTopOf="@id/obstacle4"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/obstacle7"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
-                app:layout_constraintTop_toBottomOf="@id/obstacle2" />
+                app:layout_constraintTop_toBottomOf="@id/obstacle2"
+                app:layout_constraintHorizontal_weight="1"/>
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle4"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/item_padding"
                 android:text="@string/obstacle4_id"
-                app:layout_constraintBottom_toTopOf="@id/obstacle5"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/obstacle8"
                 app:layout_constraintStart_toEndOf="@id/grid_map"
-                app:layout_constraintTop_toBottomOf="@id/obstacle3" />
+                app:layout_constraintTop_toBottomOf="@id/obstacle3"
+                app:layout_constraintHorizontal_weight="1"/>
 
             <com.example.cx3004.customViews.ObstacleView
                 android:id="@+id/obstacle5"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="@dimen/item_padding"
                 android:text="@string/obstacle5_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle6"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/obstacle1"
+                app:layout_constraintTop_toBottomOf="@id/setButton"
+                app:layout_constraintHorizontal_weight="1"/>
+
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle6"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/obstacle6_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle7"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/obstacle2"
+                app:layout_constraintTop_toBottomOf="@id/obstacle5"
+                app:layout_constraintHorizontal_weight="1"/>
+
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/obstacle7_id"
+                app:layout_constraintBottom_toTopOf="@id/obstacle8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@id/obstacle3"
+                app:layout_constraintTop_toBottomOf="@id/obstacle6"
+                app:layout_constraintHorizontal_weight="1"/>
+
+            <com.example.cx3004.customViews.ObstacleView
+                android:id="@+id/obstacle8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/obstacle8_id"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/grid_map"
-                app:layout_constraintTop_toBottomOf="@id/obstacle4" />
+                app:layout_constraintStart_toEndOf="@id/obstacle4"
+                app:layout_constraintTop_toBottomOf="@id/obstacle7"
+                app:layout_constraintHorizontal_weight="1"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -7,7 +7,6 @@ import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.Intent;
-import android.os.ParcelUuid;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -16,18 +15,13 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.Queue;
 import java.util.UUID;
 
 public class BluetoothConnectionService {
     BluetoothPairingPage mBluetoothPairingPage;
     private static BluetoothConnectionService instance;
-    private static final String TAG = "DebuggingTag";
+    private static final String TAG = "BTACTIVITY";
 
     private static final String appName = "CX3004";
     public static final UUID myUUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");

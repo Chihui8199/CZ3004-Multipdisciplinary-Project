@@ -85,14 +85,6 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
         this.gridY = y;
     }
 
-    public double getXCoord() {
-        return gridX;
-    }
-
-    public double getYCoord() {
-        return gridY;
-    }
-
     public boolean checkBoundary(double x, double y){
         return (1.5<= x & x <= 17.5) & (1.5 <= y & y <= 17.5);
     }

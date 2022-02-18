@@ -13,10 +13,10 @@ import java.util.ArrayList;
 public class DeviceAdapterList extends ArrayAdapter<BluetoothDevice> {
     private LayoutInflater mLayoutInflater;
     private ArrayList<BluetoothDevice> mDevices;
-    private int  mViewResourceId;
+    private int mViewResourceId;
 
-    public DeviceAdapterList(Context context, int tvResourceId, ArrayList<BluetoothDevice> devices){
-        super(context, tvResourceId,devices);
+    public DeviceAdapterList(Context context, int tvResourceId, ArrayList<BluetoothDevice> devices) {
+        super(context, tvResourceId, devices);
         this.mDevices = devices;
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mViewResourceId = tvResourceId;
