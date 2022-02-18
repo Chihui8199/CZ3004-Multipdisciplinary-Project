@@ -127,6 +127,10 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
             imageFace = "";
             setOnMap = false;
 
+            // reset background
+            setText(String.valueOf(id));
+            setBackgroundResource(R.color.black);
+
             // reset position
             setX(initX);
             setY(initY);
