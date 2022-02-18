@@ -1,10 +1,19 @@
 import logging
 import socket
 import time
+from multiprocessing.dummy import Process
 from typing import Union
 
+from controllers import MainController
 from envs import make_env
-from server import *
+from envs.models import Car
+from graph import GraphBuilder
+from helpers import ShortestHamiltonianPathFinder
+
+RPI_IP = '192.168.16.16'
+RPI_PORT = 8080
+HOST_PORT = 8080
+logging.getLogger().setLevel(logging.DEBUG)
 
 
 # noinspection PyBroadException
@@ -17,12 +26,21 @@ class Server:
         self._connect()
 
         self.env = make_env("RobotMove-v0")
+        self.env.render()
+        self.env.set_car(x=100, y=20)
+        self.controller = MainController()
+        self.graph = None
+        self.graph_building_thread = None
+        self.target_points = None
+        self.current_target_idx = None
+        self.ideal_position = None
         # TODO: include
         #  1. controllers
         #  2. graph builders
         #  3. cv module
 
         self.incoming_msg_handlers = {
+            "F": self._plan_and_act(),
             "T": self._handle_add_obstacles_msg,
             "Y": self._handle_end_of_step_msg,
             "D": self._handle_end_msg
@@ -76,30 +94,48 @@ class Server:
         except Exception as error:
             logging.exception('Algorithm write failed')
 
-    def _handle_add_obstacles_msg(self, msg: str):
-        # TODO:
-        #  1. parse the message based on the format
-        #  2. set obstacle in env
-        #  3. start generating graph
-        #   (IN ANOTHER THEAD!!! OTHERWISE WILL MISS THE OTHER INCOMING MESSAGE!)
+    @staticmethod
+    def _parse_2d_list(msg):
+        return eval(msg.strip())  # well this is dangerous, but quite useful...
 
-        # now is just a test stub
-        parsed_message = [[100, 100, 2], [40, 80, 0]]
+    def _handle_add_obstacles_msg(self, msg: str):
+        def _generate_graph():
+            self.target_points = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[1:]
+            self.current_target_idx = 0
+            self.graph = GraphBuilder(self.env.reset(), self.env)
+            self.graph.createGraph()
+
+        parsed_message = self._parse_2d_list(msg)
         for obs in parsed_message:
             self.env.add_obstacle(x=obs[0], y=obs[1], target_face_id=obs[2])
-        # TODO: start generating graph
+        self.graph_building_thread = Process(target=_generate_graph)
+        self.graph_building_thread.start()
 
     def _handle_end_of_step_msg(self, msg: str):
         # TODO:
         #  1. parse sensor data
         #  2. record env sensor data
         #  3. ask cv module to take pic (recognize)
-        #  4. rectify position
+        #  4. rectify position and confirm if pass and what's the next point to visit
         #  5. send obs to android (RPI)
         #  6. clear env sensor data
-        #  7. plan path
-        #  8. send action to robot (RPI)
-        pass
+        #  7. call _plan_and_act
+        # TODO: now just use the ideal one
+        self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
+                                              z=self.ideal_position[0][2]))
+        self._plan_and_act()
+
+    def _plan_and_act(self):
+        if self.graph_building_thread is not None:
+            self.graph_building_thread.join()
+            self.graph_building_thread = None
+        action = self.controller.act(observation=self.env.get_current_obs(),
+                                     env=self.env,
+                                     target=self.target_points[self.current_target_idx],
+                                     graph=self.graph)[0]
+        self.ideal_position, _, _, _ = self.env.step(action)
+        # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
+        self.write("I" + str(action))
 
     def _handle_end_msg(self, msg: str):
         assert msg is None, "Eng message should not contain any body"
