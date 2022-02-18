@@ -209,10 +209,10 @@ public class MainActivity extends AppCompatActivity {
 
         // send msg
         Log.d("OBSTACLE", "Sending obstacle messages...");
-        for (int i = 0; i <= largestIndex; i++) {
-            remoteSendMsg(obstacleViews[i].getMessage());
-            Log.d("OBSTACLE", String.format("Message for Obstacle %d has been sent.", i + 1));
-        }
+        String[] obstacleMsgs = new String[largestIndex+1];
+        for (int i = 0; i <= largestIndex; i++) obstacleMsgs[i] = obstacleViews[i].getMessage();
+        remoteSendMsg(String.format("T[%s]", String.join(", ", obstacleMsgs)));
+        Log.d("OBSTACLE", "Message for obstacles has been sent.");
     }
 
     private void showImageFacePopup(ObstacleView obstacle) {
