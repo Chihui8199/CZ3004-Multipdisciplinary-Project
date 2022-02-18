@@ -1,4 +1,5 @@
 import logging
+import math
 import socket
 import time
 from multiprocessing.dummy import Process
@@ -40,7 +41,7 @@ class Server:
         #  3. cv module
 
         self.incoming_msg_handlers = {
-            "F": self._plan_and_act(),
+            "F": self._plan_and_act,
             "T": self._handle_add_obstacles_msg,
             "Y": self._handle_end_of_step_msg,
             "D": self._handle_end_msg
@@ -102,9 +103,29 @@ class Server:
         def _generate_graph():
             self.target_points = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[1:]
             self.current_target_idx = 0
-            self.graph = GraphBuilder(self.env.reset(), self.env)
-            self.graph.createGraph()
+            # self.graph = GraphBuilder(self.env.reset(), self.env)
+            # self.graph.createGraph()
+            file_path = './graph_server.pickle'
 
+            import os
+            import pickle
+
+            # os.path.exists(file_path)
+            # graph = None
+
+            if os.path.exists(file_path):
+                with open(file_path, 'rb') as f:
+                    self.graph = pickle.load(f)
+                self.env.reset()
+            else:
+                with open(file_path, 'wb') as f:
+                    self.graph = GraphBuilder(self.env.reset(), self.env)
+                    self.graph.createGraph()
+                    pickle.dump(self.graph, f)
+            self.graph.revert()
+            print("<<<")
+
+        print(">>>>>>>>")
         parsed_message = self._parse_2d_list(msg)
         for obs in parsed_message:
             self.env.add_obstacle(x=obs[0], y=obs[1], target_face_id=obs[2])
@@ -123,9 +144,9 @@ class Server:
         # TODO: now just use the ideal one
         self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
                                               z=self.ideal_position[0][2]))
-        self._plan_and_act()
+        self._plan_and_act(None)
 
-    def _plan_and_act(self):
+    def _plan_and_act(self, msg: str):
         if self.graph_building_thread is not None:
             self.graph_building_thread.join()
             self.graph_building_thread = None
@@ -137,10 +158,10 @@ class Server:
         # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
         msg = ''
         if action[0] > 0:
-            msg += 'F'
+            msg += 'f'
         else:
-            msg += 'B'
-        distance = "{0:03d}1000".format(round(abs(action[0] * action[1])))
+            msg += 'b'
+        distance = "{0:03d}1000".format(math.floor(abs(action[0] * action[2])))
         msg += distance
         if action[1] < 0:
             msg += '245'
