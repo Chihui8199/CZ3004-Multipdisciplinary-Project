@@ -1,5 +1,7 @@
 import logging
 import time
+import pickle
+import os.path
 
 from controllers import MainController
 
@@ -23,9 +25,6 @@ def main():
     env.add_obstacle(x=40, y=100, target_face_id=2)
     obs = env.reset()
 
-    import pickle
-    import os.path
-
     file_path = './graph.pickle'
     os.path.exists(file_path)
     graph = None
@@ -42,6 +41,7 @@ def main():
     graph.revert()  # reset graph
 
     controller = MainController()
+    env.path = ShortestHamiltonianPathFinder.get_visit_sequence(env)
     seq = ShortestHamiltonianPathFinder.get_visit_sequence(env)[1:]
 
     env.render()

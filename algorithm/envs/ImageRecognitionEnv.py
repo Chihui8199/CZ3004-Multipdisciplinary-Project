@@ -2,7 +2,7 @@ import logging
 import math
 import random
 from threading import Thread
-from time import time
+import time
 from collections import deque
 from typing import List, Union, Tuple
 from itertools import chain
@@ -72,8 +72,11 @@ class ImageRecognitionEnv(gym.Env):
         """
         # TODO: check collision
         obstacle = Obstacle(**kwargs)
-        collision = self._check_collision([obstacle],
-                                          include_current_car=True)
+
+        # collision = self._check_collision([obstacle],
+        #                                   include_current_car=True)
+        collision = False
+
         if collision:
             logging.warning(f"attempting to add an collided obstacle! {kwargs}")
             return -1
@@ -228,6 +231,10 @@ class ImageRecognitionEnv(gym.Env):
             logging.debug(f"action: {action}")
 
         traj, path_cost = self.car.get_traj(action)
+        for i, t in enumerate(traj):
+            if i % 100 == 0:
+                self.set_car(x=t.x, y=t.y)
+                time.sleep(0.01)
         collision = self._check_collision(traj)
         if collision:
             return None, -100, True, True  # obs, reward, done, additional info (collision info for now)
@@ -292,7 +299,7 @@ class ImageRecognitionEnv(gym.Env):
         :param data:
         :return:
         """
-        self.sensor_data.append((time(), data))  # TODO: timestamp may not be needed, but I just leave it here for now
+        self.sensor_data.append((time.time(), data))  # TODO: timestamp may not be needed, but I just leave it here for now
 
     def get_sensor_data(self):
         return list(self.sensor_data)
@@ -381,7 +388,7 @@ class ImageRecognitionEnv(gym.Env):
             nodes.set_data(points_x, points_y)
             car, = ax.plot([self.car.x], [self.car.y],
                            marker=car_marker.transformed(mpl.transforms.Affine2D().rotate_deg(math.degrees(self.car.z - math.pi / 2))),
-                           ls="", markersize=34, color='black')
+                           ls="", markersize=36, color='black')
             if self.path:
                 path.set_data([i[0] for i in self.path], [i[1] for i in self.path])
             info.set_text("x: {:.2f} y: {:.2f} angle: {:.1f}".format(self.car.x, self.car.y, self.car.z),)

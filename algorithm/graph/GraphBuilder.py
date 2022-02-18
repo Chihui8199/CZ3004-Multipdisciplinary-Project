@@ -111,5 +111,5 @@ class GraphBuilder:
         return arr
 
     def revert(self):
-        self.env.set_car(x=20, y=20)
+        self.env.set_car(x=100, y=20)
 
