@@ -31,8 +31,6 @@ if __name__ == '__main__':
             graph.createGraph()
             pickle.dump(graph, f)
 
-    graph = GraphBuilder(obs, env)
-    graph.createGraph()
     graph.revert()
 
     controller = MainController()
