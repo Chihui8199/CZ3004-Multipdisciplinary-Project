@@ -1,28 +1,23 @@
 package com.example.cx3004.customViews;
 
-import android.content.ClipData;
-import android.content.ClipDescription;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.content.ContextCompat;
 
 import com.example.cx3004.R;
 
-/** A view class for obstacles.
-* This view should only be used within the SquareGridView
-*/
+/**
+ * A view class for obstacles.
+ * This view should only be used within the SquareGridView
+ */
 public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
 
     private int id;
@@ -71,7 +66,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         borderPaint.setColor(Color.RED);
         borderPaint.setStrokeWidth(10);
 
-        switch (imageFace){
+        switch (imageFace) {
             case "up":
                 canvas.drawLine(0, 0, gridInterval, 0, borderPaint);
                 break;
@@ -101,11 +96,11 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
                 '}';
     }
 
-    public void move(float xCoord, float yCoord){
+    public void move(float xCoord, float yCoord) {
         // snaps obstacle to the grid
 
         // store initial coordinates if obstacle has not been placed on map
-        if (!setOnMap){
+        if (!setOnMap) {
             initX = getX();
             initY = getY();
         }
@@ -123,7 +118,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         setVisibility(VISIBLE);
     }
 
-    public void reset(){
+    public void reset() {
         // only perform reset if obstacle was placed on the map
         if (setOnMap) {
             // reset attributes
@@ -144,7 +139,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     }
 
     // called after layout
-    public void setGridInterval(int gridInterval){
+    public void setGridInterval(int gridInterval) {
         this.gridInterval = gridInterval;
 
         // resize view
@@ -159,16 +154,16 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         invalidate(); // redraw obstacle with new image face border
     }
 
-    public void setImage(int imageID){
+    public void setImage(int imageID) {
         setText("");
         String imageResourceID = String.format("obstacle_image_%d", imageID);
         int imageResourceIntID = getResources().getIdentifier(imageResourceID, "drawable", getContext().getPackageName());
         if (imageResourceIntID != 0) setBackgroundResource(imageResourceIntID);
     }
 
-    public String getMessage(){
+    public String getMessage() {
         int imageFaceNo;
-        switch (imageFace){
+        switch (imageFace) {
             case "up":
                 imageFaceNo = 0;
                 break;
@@ -188,15 +183,15 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
         return String.format("T[%d, %d, %d]", x, y, imageFaceNo);
     }
 
-    public int getObstacleId(){
+    public int getObstacleId() {
         return id;
     }
 
-    public int getGridX(){
+    public int getGridX() {
         return x;
     }
 
-    public int getGridY(){
+    public int getGridY() {
         return y;
     }
 }

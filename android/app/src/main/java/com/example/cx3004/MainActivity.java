@@ -1,11 +1,9 @@
 package com.example.cx3004;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.bluetooth.BluetoothDevice;
 import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -15,7 +13,6 @@ import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -28,6 +25,9 @@ import com.example.cx3004.customViews.ObstacleView;
 import com.example.cx3004.customViews.RobotView;
 import com.example.cx3004.customViews.SquareGridView;
 import com.google.android.material.tabs.TabLayout;
+
+import org.json.JSONArray;
+import org.json.JSONException;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -48,7 +48,10 @@ public class MainActivity extends AppCompatActivity {
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
 
-    private static final String TAG = "Main Activity";
+    private static final String TAG = "MAIN ACTIVITY";
+    private static final String ROBOTTAG = "ROBOT";
+    private static final String GRIDTAG = "GRID";
+    private static final String BTTAG = "BT ACTIVITY";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,11 +113,10 @@ public class MainActivity extends AppCompatActivity {
                 switch (dragEvent.getAction()) {
                     case DragEvent.ACTION_DROP:
                         ObstacleView droppedObstacle = (ObstacleView) dragEvent.getLocalState();
-                        Log.d("OBSTACLE",
-                                String.format("Obstacle %d was dropped on the map.",
-                                        droppedObstacle.getObstacleId()));
+                        Log.d(GRIDTAG, String.format("Obstacle %d was dropped on the map.",
+                                droppedObstacle.getObstacleId()));
                         droppedObstacle.move(dragEvent.getX(), dragEvent.getY());
-                        Log.d("OBSTACLE",
+                        Log.d(GRIDTAG,
                                 String.format("Obstacle %d was moved to (%d, %d) on the map.",
                                         droppedObstacle.getObstacleId(),
                                         droppedObstacle.getGridX(),
@@ -125,11 +127,11 @@ public class MainActivity extends AppCompatActivity {
                     case DragEvent.ACTION_DRAG_ENDED:
                         if (!dragEvent.getResult()) {
                             droppedObstacle = (ObstacleView) dragEvent.getLocalState();
-                            Log.d("OBSTACLE",
+                            Log.d(GRIDTAG,
                                     String.format("Obstacle %d was dropped outside of the map.",
                                             droppedObstacle.getObstacleId()));
                             droppedObstacle.reset();
-                            Log.d("OBSTACLE",
+                            Log.d(GRIDTAG,
                                     String.format("Obstacle %d was reset.",
                                             droppedObstacle.getObstacleId()));
                         }
@@ -148,38 +150,24 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 for (ObstacleView obstacle : obstacleViews) {
                     obstacle.setGridInterval(gridMap.gridInterval);
-                    Log.d("OBSTACLE",
+                    Log.d(GRIDTAG,
                             String.format("Obstacle %d has been resized to match grid boxes.",
                                     obstacle.getObstacleId()));
                 }
                 robotView.setGridInterval(gridMap.gridInterval);
                 robotView.bringToFront();
-                Log.d("ROBOT",
+                Log.d(ROBOTTAG,
                         "Robot has been resized to match grid boxes " +
                                 "and positioned at bottom-left corner of map.");
             }
         });
     }
 
-    private static void showLog(String message) {
-        Log.d(TAG, message);
-    }
-
-    // Map stuff
-    public static double getXCoord() {
-        return robotView.getXCoord();
-    }
-
-    public static double getYCoord() {
-        return robotView.getYCoord();
-    }
-
     public static void moveRobot(double xCoord, double yCoord, String direction) {
-        Log.d(TAG, "onClick: " + xCoord + yCoord + direction);
         // if coordinates are out of bounds, break out of function and not move the robot
         if (!robotView.checkBoundary(xCoord, yCoord)) return;
         robotView.move(xCoord, yCoord, direction);
-        Log.d("ROBOT",
+        Log.d(ROBOTTAG,
                 String.format("Robot has been moved to (%f, %f) on the map and is facing %s.",
                         xCoord, yCoord, direction));
         refreshRobotState(xCoord, yCoord, direction);
@@ -189,13 +177,13 @@ public class MainActivity extends AppCompatActivity {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
     }
 
-    public void sendObstacleMsg(View v){
+    public void sendObstacleMsg(View v) {
         Log.d("OBSTACLE", "Set obstacle button clicked.");
 
         // get largest set obstacle
         int largestIndex = -1;
-        for (int i=obstacleViews.length-1; i>=0; i--){
-            if (obstacleViews[i].setOnMap){
+        for (int i = obstacleViews.length - 1; i >= 0; i--) {
+            if (obstacleViews[i].setOnMap) {
                 largestIndex = i;
                 break;
             }
@@ -205,13 +193,13 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "No obstacles have been set!", Toast.LENGTH_SHORT).show();
             return;
         }
-        Log.d("OBSTACLE", String.format("The largest set obstacle is obstacle %d.", largestIndex+1));
+        Log.d("OBSTACLE", String.format("The largest set obstacle is obstacle %d.", largestIndex + 1));
 
         // check that all obstacles before the largest set obstacles are set
         // if no, show a toast and break out of the function
         ArrayList<Integer> unsetObstacles = new ArrayList<Integer>();
-        for (int i=0; i<largestIndex; i++){
-            if (!obstacleViews[i].setOnMap){
+        for (int i = 0; i < largestIndex; i++) {
+            if (!obstacleViews[i].setOnMap) {
                 int obstacleNo = i + 1;
                 Log.d("OBSTACLE", String.format("Obstacle %d has not been set.", obstacleNo));
                 Toast.makeText(MainActivity.this, String.format("Obstacle %d has not been set!", obstacleNo), Toast.LENGTH_SHORT).show();
@@ -221,9 +209,9 @@ public class MainActivity extends AppCompatActivity {
 
         // send msg
         Log.d("OBSTACLE", "Sending obstacle messages...");
-        for (int i=0; i<=largestIndex; i++) {
+        for (int i = 0; i <= largestIndex; i++) {
             remoteSendMsg(obstacleViews[i].getMessage());
-            Log.d("OBSTACLE", String.format("Message for Obstacle %d has been sent.", i+1));
+            Log.d("OBSTACLE", String.format("Message for Obstacle %d has been sent.", i + 1));
         }
     }
 
@@ -251,7 +239,7 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View view) {
                     obstacle.setImageFace(face);
-                    Log.d("OBSTACLE",
+                    Log.d(GRIDTAG,
                             String.format("Image face for obstacle %d has been set to '%s'.",
                                     obstacle.getObstacleId(), face));
                     obstacle.setOnMap = true;
@@ -262,6 +250,43 @@ public class MainActivity extends AppCompatActivity {
     }
 
     //Bluetooth Stuff
+
+    // Broadcast Receiver 5:  for Bluetooth Connection Status
+    private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            BluetoothDevice mDevice = intent.getParcelableExtra("Device");
+            String status = intent.getStringExtra("Status");
+            sharedPreferences();
+            if (status.equals("connected")) {
+                Log.d(BTTAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
+                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_SHORT).show();
+                editor.putString("connStatus", "Connected to " + mDevice.getName());
+
+            } else if (status.equals("disconnected")) {
+                Log.d(BTTAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
+                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_SHORT).show();
+                editor.putString("connStatus", "Disconnected");
+            }
+            editor.commit();
+        }
+    };
+
+    BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String message = intent.getStringExtra("receivedMessage");
+            Log.d(BTTAG, String.format("receivedMessage: %s", message));
+            // Read message to parse as commands
+            parseCommands(message);
+            sharedPreferences();
+            String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
+            editor.putString("message", receivedText);
+            editor.commit();
+            refreshMessageReceived();
+        }
+    };
+
     public static void sharedPreferences() {
         sharedPreferences = MainActivity.getSharedPreferences(MainActivity.context);
         editor = sharedPreferences.edit();
@@ -275,106 +300,95 @@ public class MainActivity extends AppCompatActivity {
         return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
     }
 
-    // Broadcast Receiver 5:  for Bluetooth Connection Status
-    private BroadcastReceiver btConnectionReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            BluetoothDevice mDevice = intent.getParcelableExtra("Device");
-            String status = intent.getStringExtra("Status");
-            sharedPreferences();
-            if (status.equals("connected")) {
-                Log.d(TAG, "mBroadcastReceiver5: Device now connected to " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Device now connected to " + mDevice.getName(), Toast.LENGTH_SHORT).show();
-                editor.putString("connStatus", "Connected to " + mDevice.getName());
-
-            } else if (status.equals("disconnected")) {
-                Log.d(TAG, "mBroadcastReceiver5: Disconnected from " + mDevice.getName());
-                Toast.makeText(MainActivity.this, "Disconnected from " + mDevice.getName(), Toast.LENGTH_SHORT).show();
-                editor.putString("connStatus", "Disconnected");
-            }
-            editor.commit();
-        }
-    };
-
-    BroadcastReceiver messageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String message = intent.getStringExtra("receivedMessage");
-            // Read message to parse as commands
-            parseCommands(message);
-            showLog("receivedMessage: message --- " + message);
-            sharedPreferences();
-            String receivedText = sharedPreferences.getString("message", "") + "\n" + message;
-            editor.putString("message", receivedText);
-            editor.commit();
-            refreshMessageReceived();
-        }
-    };
-
     private void parseCommands(String receivedText) {
-        Log.d(TAG, "Testing" + receivedText);
-        //TODO Better error catching
+        Log.d(BTTAG, "Trying to parse receivedMsg as cmd");
+        //TODO to update timing commands
+        // Process Algo Msg which is a list of list
+        if (receivedText.contains("[[")) {
+            try {
+                parseAlgoMsg(receivedText);
+                Log.d(BTTAG, "Parsing msg received from Algo team");
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(BTTAG, "Msg does not contain readable cmd");
+        }
+    }
+
+    private void parseAlgoMsg(String receivedText) throws JSONException {
+        JSONArray jsonArr = new JSONArray(receivedText);
+        // process robot current x,y,direction
+        parseCoordsCmd(jsonArr.getJSONArray(0));
+        // update obstacle with target image
+        parseObstacleTargets(jsonArr);
+    }
+
+    private static void parseCoordsCmd(JSONArray coordsArray) throws JSONException {
+        // retrieves x,y,angle from algo msg
+        Log.d(BTTAG, String.format("Started parsing coords from Algo team msg"));
+        double xCoord = coordsArray.getDouble(0);
+        double yCoord = coordsArray.getDouble(1);
+        double angleRad = coordsArray.getDouble(2);
+
+        // process angle into android application readable directions
+        String direction = "up";
+        double angleDeg = angleRad / (2 * Math.PI) * 360;
+        if ((0 <= angleDeg & angleDeg <= 45) | (315 < angleDeg & angleDeg < 360))
+            direction = "left";
+        else if (45 < angleDeg & angleDeg <= 135) direction = "up";
+        else if (135 < angleDeg & angleDeg <= 255) direction = "right";
+        else if (255 < angleDeg & angleDeg <= 315) direction = "down";
+        else Log.d(BTTAG, "Unknown direction passed. Direction set to 'up' by default");
+
+        // call method to update ROBOT, X, Y, direction
+        // moves robot and sets fragment to correct axis
+        moveRobot(xCoord, yCoord, direction);
+    }
+
+    private void parseObstacleTargets(JSONArray entireArrayMsg) {
+        Log.d(BTTAG, "Started parsing targetedID from Algo team msg");
+        // iterate from 1 - end of list to get targets
+        int obstacleNo;
+        int targetID;
         try {
-            if (receivedText.contains(",")) {
-                String[] stringSplit = receivedText.split(",");
-                String command = stringSplit[0];
-                //TODO Perhaps allow check length
-                if (command.equals("ROBOT")) {
-                    double xCoord = Double.parseDouble(stringSplit[1]);
-                    double yCoord = Double.parseDouble(stringSplit[2]);
-                    // process direction
-                    // angle is sent in radians, convert to degrees
-                    double angle = Double.parseDouble(stringSplit[3]) / (2 * Math.PI) * 360;
-                    String direction = "up";
-                    if ((0<=angle & angle<=45) | (315<angle & angle<360)) direction = "left";
-                    else if (45<angle & angle<=135) direction = "up";
-                    else if (135<angle & angle<=255) direction = "right";
-                    else if (255<angle & angle<=315) direction = "down";
-                    else Log.d("COMMAND", "Unknown direction passed. Direction set to 'up' by default");
-                    Log.d("COMMAND ACTIVATED ", command + " " + xCoord + " " + yCoord + " " + direction);
-                    // call method to update ROBOT, X, Y, direction
-                    // moves robot and sets fragment to correct axis
-                    moveRobot(xCoord, yCoord, direction);
-                } else if (command.equals("TARGET")) {
-                    int obstacleNo = Integer.parseInt(stringSplit[1]);
-                    int targetID = Integer.parseInt(stringSplit[2]);
-                    Log.d("COMMAND ACTIVATED ", command + " " + obstacleNo + " " + targetID);
+            for (int i = 1, size = entireArrayMsg.length(); i <= size; i++) {
+                obstacleNo = i;
+                targetID = entireArrayMsg.getJSONArray(i).getInt(0);
+                // update the image face
+                if (targetID != -1) {
                     // call method to update Obstacle Number, ID
                     obstacleViews[obstacleNo - 1].setImage(targetID);
-                    Log.d("OBSTACLE",
-                            String.format("Obstacle %d's image has been set to image ID %d.",
-                                    obstacleNo, targetID));
-                } else if (command.equals("TIMING")){
-                    String timing = stringSplit[1];
-                    sectionsPagerAdapter.fastestCarFragment.setTiming(timing);
+                    Log.d(GRIDTAG, String.format("Obstacle %d's image has been set to image ID %d.", obstacleNo, targetID));
                 } else {
-                    Log.d("NO COMMANDS ACTIVATED", "NIL");
+                    Log.d(GRIDTAG, String.format("Obstacle %d's image is not received", obstacleNo));
                 }
             }
+        } catch (ArrayIndexOutOfBoundsException a) {
+            Log.d(BTTAG, "Length of Array sent not correct!");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+
     // Send message to bluetooth remotely
     public static void remoteSendMsg(String message) {
-        showLog("Entering printMessage: " + message);
+        Log.d(BTTAG, String.format("Entering remoteSendMessage: %s", message));
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
             BluetoothConnectionService.write(bytes);
         }
-        showLog(message);
         editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
         editor.commit();
         refreshMessageReceived();
-        showLog("Exiting printMessage");
+        Log.d(BTTAG, String.format("Exiting remoteSendMessage: %s", message));
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         switch (requestCode) {
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
@@ -418,10 +432,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        showLog("Entering onSaveInstanceState");
+        Log.d(TAG, "Entering onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
         outState.putString(TAG, "onSaveInstanceState");
-        showLog("Exiting onSaveInstanceState");
+        Log.d(TAG, "Exiting onSaveInstanceState");
     }
 }

@@ -56,31 +56,31 @@ public class SquareGridView extends View {
 
         // Draw grid outer border
         canvas.drawLines(new float[]{
-                0, 0, gridSize, 0, // top border
-                0, gridSize, gridSize, gridSize, // bottom border
-                0, 0, 0, gridSize, // left border
-                gridSize, 0, gridSize, gridSize, // right border
-        },
+                        0, 0, gridSize, 0, // top border
+                        0, gridSize, gridSize, gridSize, // bottom border
+                        0, 0, 0, gridSize, // left border
+                        gridSize, 0, gridSize, gridSize, // right border
+                },
                 outerBorderPaint);
 
         // Draw vertical lines
         // for each grid box, draw the left border
-        for (int i=1; i<dim; i++)
+        for (int i = 1; i < dim; i++)
             canvas.drawLine(
-                    i*gridInterval,
+                    i * gridInterval,
                     0,
-                    i*gridInterval,
+                    i * gridInterval,
                     gridSize,
                     innerBorderPaint);
 
         // Draw vertical lines
         // for each grid box, draw the left border
-        for (int i=1; i<dim; i++)
+        for (int i = 1; i < dim; i++)
             canvas.drawLine(
                     0,
-                    i*gridInterval,
+                    i * gridInterval,
                     gridSize,
-                    i*gridInterval,
+                    i * gridInterval,
                     innerBorderPaint);
     }
 
