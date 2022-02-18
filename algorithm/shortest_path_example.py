@@ -23,9 +23,23 @@ def main():
     env.add_obstacle(x=40, y=100, target_face_id=2)
     obs = env.reset()
 
-    graph = GraphBuilder(obs, env)
-    graph.createGraph()
-    graph.revert()
+    import pickle
+    import os.path
+
+    file_path = './graph.pickle'
+    os.path.exists(file_path)
+    graph = None
+
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as f:
+            graph = pickle.load(f)
+    else:
+        with open(file_path, 'wb') as f:
+            graph = GraphBuilder(obs, env)
+            graph.createGraph()
+            pickle.dump(graph, f)
+
+    graph.revert()  # reset graph
 
     controller = MainController()
     seq = ShortestHamiltonianPathFinder.get_visit_sequence(env)[1:]
