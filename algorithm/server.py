@@ -135,7 +135,20 @@ class Server:
                                      graph=self.graph)[0]
         self.ideal_position, _, _, _ = self.env.step(action)
         # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
-        self.write("I" + str(action))
+        msg = ''
+        if action[0] > 0:
+            msg += 'F'
+        else:
+            msg += 'B'
+        distance = "{0:03d}1000".format(round(abs(action[0] * action[1])))
+        msg += distance
+        if action[1] < 0:
+            msg += '245'
+        elif action[1] == 0:
+            msg += '149'
+        else:
+            msg += '112'
+        self.write("I" + msg)
 
     def _handle_end_msg(self, msg: str):
         assert msg is None, "Eng message should not contain any body"
