@@ -4,11 +4,11 @@ def init():
     try:
         conn = Algorithm()
         conn.connect()
-        ## testing send streaming
-        conn.write("Hello from Rpi")
-        ## testing receive streaming
-        # while True:
-        #     conn.read()
+        # testing send streaming
+        conn.write("Hello from Rpi by Group16")
+        # testing receive streaming
+        while True:
+            conn.read()
 
 
     except Exception:

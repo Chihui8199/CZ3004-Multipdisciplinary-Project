@@ -1,5 +1,6 @@
 import bluetooth as bt
 from config import ANDROID_SOCKET_BUFFER_SIZE, LOCALE, RFCOMM_CHANNEL, UUID
+import logging
 
 
 '''
@@ -40,8 +41,8 @@ class Android:
                     print("Successfully connected to Android at address: " + str(address))
                     retry = False
 
-            except Exception as error:	
-                print("Connection with Android failed: " + str(error))
+            except Exception:	
+                logging.exception("Connection with Android failed")
 
                 if self.client_sock is not None:
                     self.client_sock.close()
@@ -62,8 +63,8 @@ class Android:
 
             print("Android disconnected Successfully")
 
-        except Exception as error:	
-            print("Android disconnect failed: " + str(error))
+        except Exception:	
+            logging.exception("Android disconnect failed")
             
     def disconnect_all(self):
         try:
@@ -77,8 +78,8 @@ class Android:
 
             print("Android disconnected Successfully")
 
-        except Exception as error:	
-            print("Android disconnect failed: " + str(error))
+        except Exception:	
+            logging.exception("Android disconnect_all failed")
         
     def read(self):
         try:
@@ -95,7 +96,7 @@ class Android:
             return None
             
         except Exception as error:
-            print('Android read failed: ' + str(error))
+            logging.exception("Android read failed")
             raise error
 
     def write(self, message):
@@ -105,5 +106,5 @@ class Android:
             self.client_sock.send(message)
 
         except Exception as error:	
-            print('Android write failed: ' + str(error))
+            logging.exception("Android write failed")
             raise error

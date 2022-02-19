@@ -1,4 +1,5 @@
 import serial
+import logging
 from config import SERIAL_PORT, BAUD_RATE, LOCALE
 
 
@@ -52,8 +53,8 @@ class Robot:
 
                 print('Successfully closed connection with Robot')
 
-        except Exception as error:
-            print('Robot close connection failed: ' + str(error))
+        except Exception:
+            logging.exception("Robot disconnect failed")
             
     def read(self):
         try:
@@ -67,7 +68,7 @@ class Robot:
             return None
 
         except Exception as error:
-            print('Robot read failed: ' + str(error))
+            logging.exception("Robot read failed")
             raise error
     
     def write(self, message):
@@ -77,5 +78,5 @@ class Robot:
             self.connection.write(message)
 
         except Exception as error:
-            print('Robot write failed: ' + str(error))
+            logging.exception("Robot read failed")
             raise error

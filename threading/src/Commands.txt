@@ -9,8 +9,12 @@ Android > Robot, "R", Robot turn right
 
 Android > Algo, "T", Android send obstacle info and starting coordinates to Algo
 
+Android > Rpi, "G", Android tell RPi to start
+
+
 # Robot
-Robot > Algo, "Y", Robot send sensor values to Algo
+Robot > Rpi, "H", Robot tell RPi that the Robot stops moving
+
 
 # Algo
 Algo > Robot, "I", Algo send command to Robot (V, A, T)
@@ -19,5 +23,6 @@ Algo > Android, "P", Algo send status to Android (status is a long list)
 
 
 # RPi
-RPi > Algo, "S", RPi inform Algo that photo has been taken and Algo can resume exploration
-RPi > Algo, "D", RPi inform Algo that all images have been taken
+RPi > Algo, "D", RPi inform Algo that time is up (running out 6 minutes)
+
+RPi > Algo, "F", Rpi tell Algo to start

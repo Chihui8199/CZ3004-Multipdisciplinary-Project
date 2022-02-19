@@ -1,3 +1,4 @@
+import logging
 import socket
 from config import LOCALE, ALGORITHM_SOCKET_BUFFER_SIZE, WIFI_IP, WIFI_PORT
 
@@ -34,8 +35,9 @@ class Algorithm:
                     print('Successfully connected with Algorithm: ' + str(self.address))
                     retry = False
 
-            except Exception as error:
-                print('Connection with Algorithm failed: ' + str(error))
+            except Exception:
+                logging.exception("Connection with Algorithm failed")
+
 
                 if self.client_sock is not None:
                     self.client_sock.close()
@@ -54,8 +56,8 @@ class Algorithm:
             
             print("Algorithm disconnected Successfully")
 
-        except Exception as error:
-            print("Algorithm disconnect failed: " + str(error))
+        except Exception:
+            logging.exception("Algorithm disconnect failed")
 
     def disconnect_all(self):
         try:
@@ -69,8 +71,8 @@ class Algorithm:
 
             print("Algorithm disconnected Successfully")
 
-        except Exception as error:
-            print("Algorithm disconnect failed: " + str(error))
+        except Exception:
+            logging.exception("Algorithm disconnect_all failed")
 
     def read(self):
         try:
@@ -84,16 +86,16 @@ class Algorithm:
             return None
 
         except Exception as error:
-            print('Algorithm read failed: '+ str(error))
+            logging.exception("Algorithm read failed")
             raise error
 
     def write(self, message):
         try:
             print('To Algorithm:')
             print(message)
-            self.client_sock.send(message)
+            self.client_sock.send(message.encode())
 
         except Exception as error:
-            print('Algorithm write failed: '+ str(error))
+            logging.exception("Algorithm write failed")
             raise error
             
