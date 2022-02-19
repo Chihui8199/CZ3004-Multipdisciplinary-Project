@@ -13,6 +13,7 @@ import android.view.DragEvent;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import android.widget.Toast;
@@ -174,7 +175,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private static void refreshRobotState(double xCoord, double yCoord, String direction) {
-        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction);
+        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction, "MOVING");
+    }
+
+    public void start(View v){
+        remoteSendMsg("Gstart");
     }
 
     public void sendObstacleMsg(View v) {
@@ -209,10 +214,10 @@ public class MainActivity extends AppCompatActivity {
 
         // send msg
         Log.d("OBSTACLE", "Sending obstacle messages...");
-        for (int i = 0; i <= largestIndex; i++) {
-            remoteSendMsg(obstacleViews[i].getMessage());
-            Log.d("OBSTACLE", String.format("Message for Obstacle %d has been sent.", i + 1));
-        }
+        String[] obstacleMsgs = new String[largestIndex+1];
+        for (int i = 0; i <= largestIndex; i++) obstacleMsgs[i] = obstacleViews[i].getMessage();
+        remoteSendMsg(String.format("T[%s]", String.join(", ", obstacleMsgs)));
+        Log.d("OBSTACLE", "Message for obstacles has been sent.");
     }
 
     private void showImageFacePopup(ObstacleView obstacle) {

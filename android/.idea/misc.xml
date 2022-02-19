@@ -38,6 +38,7 @@
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/fragment_main.xml" value="0.12320143884892086" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/fragment_map_tab.xml" value="0.12320143884892086" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/fragment_robot_state.xml" value="0.12320143884892086" />
+        <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/fragment_start.xml" value="0.13588709677419356" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/layout/image_face_popup.xml" value="0.12320143884892086" />
         <entry key="..\:/Users/blue-/OneDrive/Desktop/CX3004/android/app/src/main/res/menu/nav_menu.xml" value="0.13588709677419356" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.1" />
@@ -64,7 +65,8 @@
         <entry key="app/src/main/res/layout/fragment_controls.xml" value="0.39375" />
         <entry key="app/src/main/res/layout/fragment_fastest_car_task.xml" value="0.3098958333333333" />
         <entry key="app/src/main/res/layout/fragment_main.xml" value="0.3098958333333333" />
-        <entry key="app/src/main/res/layout/fragment_robot_state.xml" value="0.3390625" />
+        <entry key="app/src/main/res/layout/fragment_robot_state.xml" value="0.4169381107491857" />
+        <entry key="app/src/main/res/layout/robot.xml" value="0.35625" />
         <entry key="app/src/main/res/layout/testing.xml" value="0.40591397849462363" />
         <entry key="app/src/main/res/menu/nav_menu.xml" value="0.44140625" />
       </map>

@@ -127,6 +127,10 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
             imageFace = "";
             setOnMap = false;
 
+            // reset background
+            setText(String.valueOf(id));
+            setBackgroundResource(R.color.black);
+
             // reset position
             setX(initX);
             setY(initY);
@@ -180,7 +184,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
                 imageFaceNo = 0;
                 break;
         }
-        return String.format("T[%d, %d, %d]", x, y, imageFaceNo);
+        return String.format("[%d, %d, %d]", x, y, imageFaceNo);
     }
 
     public int getObstacleId() {
