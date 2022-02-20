@@ -31,7 +31,7 @@ class Car(Entity):
         self.width = width
         self.rectification_model = rectification_model
 
-    def get_traj(self, action, sample_rate: float = 0.01, noise: bool = False) -> Tuple[List[Entity], float]:
+    def get_traj(self, action, sample_rate: float = 0.5, noise: bool = False) -> Tuple[List[Entity], float]:
         """
         simulate the traj as if no obstacles, no boundaries; and calculate length of the traj
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
@@ -48,15 +48,25 @@ class Car(Entity):
         # whether car rotating
         if math.fabs(angle) < pow(10, -3):
             # no rotation
-            for i in range(samples):
-                time = i * sample_rate
-                traj = Entity(
-                    x=self.x + round(v * time * math.cos(self.z)),
-                    y=self.y + round(v * time * math.sin(self.z)),
-                    z=self.z,
-                    length=self.length,
-                    width=self.width
-                )
+            for i in range(samples+1):
+                if i == samples:
+                    time = i * sample_rate
+                    traj = Entity(
+                        x=self.x + round(v * time * math.cos(self.z)),
+                        y=self.y + round(v * time * math.sin(self.z)),
+                        z=self.z,
+                        length=self.length,
+                        width=self.width
+                    )
+                else:
+                    time = i * sample_rate
+                    traj = Entity(
+                        x=self.x + (v * time * math.cos(self.z)),
+                        y=self.y + (v * time * math.sin(self.z)),
+                        z=self.z,
+                        length=self.length,
+                        width=self.width
+                    )
                 if noise:
                     traj.add_noise()
                 traj_list.append(traj)
