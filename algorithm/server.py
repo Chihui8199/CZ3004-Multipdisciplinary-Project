@@ -169,7 +169,10 @@ class Server:
             else:
                 msg += 'b'
             if abs(abs(action[0]*action[2])-31)< 2:
-                dis = 42
+                if action[0] > 0:
+                    dis = 60
+                else:
+                    dis = 46
             else:
                 dis = action[0] * action[2]
             distance = "{0:03d}1000".format(math.floor(abs(dis)))
@@ -181,6 +184,7 @@ class Server:
             else:
                 msg += '112'
             self.write("I" + msg)
+            break
 
     def _handle_end_msg(self, msg: str):
         assert msg is None, "Eng message should not contain any body"

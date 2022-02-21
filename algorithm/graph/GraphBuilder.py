@@ -44,7 +44,7 @@ class GraphBuilder:
             if rotation:
                 self.graph.addEdge(current, target, 10 * math.pi)
             else:
-                self.graph.addEdge(current, target, 10)
+                self.graph.addEdge(current, target, 5)
             self.action_map[f'{current}_{target}'] = action
 
     def createGraph(self):
