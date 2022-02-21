@@ -232,7 +232,7 @@ class ImageRecognitionEnv(gym.Env):
 
         traj, path_cost = self.car.get_traj(self.car.x, self.car.y, self.car.z, action)
         for i, t in enumerate(traj):
-            # if i % 5 == 0:
+            if i % 10 == 0:
                 self.set_car(x=t.x, y=t.y, z=t.z)
                 time.sleep(0.01)
         collision = self.check_collision(traj)

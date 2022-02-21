@@ -19,8 +19,8 @@ adjacency_list = graph.getGraph()
 path = adjacency_list.dijkstra(504, 668)
 actions = graph.getAction(path)
 
-print(path)
-print(actions)
+# print(path)
+# print(actions)
 
 # id = nodes*y + 4*x+dir nodes=41*4
 # graph.dijkstra(adjacency_matrix, 504, 668)

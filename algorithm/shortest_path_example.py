@@ -29,22 +29,26 @@ def main():
     os.path.exists(file_path)
     graph = None
 
-    # try:
-    #     if os.path.exists(file_path):
-    #         with open(file_path, 'rb') as f:
-    #             graph = pickle.load(f)
-    #     else:
-    #         with open(file_path, 'wb') as f:
-    #             graph = GraphBuilder(obs, env)
-    #             graph.createGraph()
-    #             pickle.dump(graph, f)
-    # except:
-    with open(file_path, 'wb') as f:
-        start = time.time()
-        graph = GraphBuilder(obs, env)
-        graph.createGraph()
-        pickle.dump(graph, f)
-        print("building time: ", time.time() - start)
+    overwrite = True
+
+    try:
+        if os.path.exists(file_path) and not overwrite:
+            with open(file_path, 'rb') as f:
+                graph = pickle.load(f)
+        else:
+            with open(file_path, 'wb') as f:
+                start = time.time()
+                graph = GraphBuilder(obs, env)
+                graph.createGraph()
+                pickle.dump(graph, f)
+                print("building time: ", time.time() - start)
+    except:
+        with open(file_path, 'wb') as f:
+            start = time.time()
+            graph = GraphBuilder(obs, env)
+            graph.createGraph()
+            pickle.dump(graph, f)
+            print("building time: ", time.time() - start)
 
     # graph.revert()  # reset graph
 

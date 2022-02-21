@@ -121,7 +121,7 @@ class Server:
                     self.graph = GraphBuilder(self.env.reset(), self.env)
                     self.graph.createGraph()
                     pickle.dump(self.graph, f)
-            self.graph.revert()
+            # self.graph.revert()
             print("<<<")
 
         print(">>>>>>>>")
