@@ -87,7 +87,7 @@ class ImageRecognitionEnv(gym.Env):
     def set_car(self, **kwargs):
         self.car = Car(**kwargs)
 
-    def _check_collision(self, traj: List[Entity], include_current_car: bool = False):
+    def check_collision(self, traj: List[Entity], include_current_car: bool = False):
         """
         Check if the passed-in entity collide with any exisiting entity
         :param traj: list of entities to test collision
@@ -230,12 +230,12 @@ class ImageRecognitionEnv(gym.Env):
         if self.mock:
             logging.debug(f"action: {action}")
 
-        traj, path_cost = self.car.get_traj(action)
+        traj, path_cost = self.car.get_traj(self.car.x, self.car.y, self.car.z, action)
         for i, t in enumerate(traj):
-            if i % 100 == 0:
+            # if i % 5 == 0:
                 self.set_car(x=t.x, y=t.y, z=t.z)
                 time.sleep(0.01)
-        collision = self._check_collision(traj)
+        collision = self.check_collision(traj)
         if collision:
             return None, -100, True, True  # obs, reward, done, additional info (collision info for now)
         else:
@@ -276,7 +276,7 @@ class ImageRecognitionEnv(gym.Env):
         if self.mock:
             logging.warning("you should not use update in a mock env")
         self.steps += 1
-        if self._check_collision([rectified_car_pos]):
+        if self.check_collision([rectified_car_pos]):
             # ideally this should not happen, but we need to handle it
             # TODO: in case the position is really not valid, we should have a fallback strategy
             raise ValueError(f"invalid car position! x: {rectified_car_pos.get_positioning_status()};\n ")

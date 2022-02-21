@@ -31,7 +31,7 @@ class Car(Entity):
         self.width = width
         self.rectification_model = rectification_model
 
-    def get_traj(self, action, sample_rate: float = 0.5, noise: bool = False) -> Tuple[List[Entity], float]:
+    def get_traj(self, x, y, z, action, sample_rate: float = 0.1, noise: bool = False) -> Tuple[List[Entity], float]:
         """
         simulate the traj as if no obstacles, no boundaries; and calculate length of the traj
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
@@ -52,18 +52,18 @@ class Car(Entity):
                 if i == samples:
                     time = i * sample_rate
                     traj = Entity(
-                        x=self.x + round(v * time * math.cos(self.z)),
-                        y=self.y + round(v * time * math.sin(self.z)),
-                        z=self.z,
+                        x=x + round(v * time * math.cos(z)),
+                        y=y + round(v * time * math.sin(z)),
+                        z=z,
                         length=self.length,
                         width=self.width
                     )
                 else:
                     time = i * sample_rate
                     traj = Entity(
-                        x=self.x + (v * time * math.cos(self.z)),
-                        y=self.y + (v * time * math.sin(self.z)),
-                        z=self.z,
+                        x=x + (v * time * math.cos(z)),
+                        y=y + (v * time * math.sin(z)),
+                        z=z,
                         length=self.length,
                         width=self.width
                     )
@@ -80,19 +80,19 @@ class Car(Entity):
             for i in range(samples + 1):
                 time = i * sample_rate
                 if i == samples:
-                    x = round(self.x - radius * math.cos(self.z + math.pi / 2) + radius * math.cos(
-                        -v * time / radius + self.z + math.pi / 2))
-                    y = round(self.y - radius * math.sin(self.z + math.pi / 2) + radius * math.sin(
-                        -v * time / radius + self.z + math.pi / 2))
+                    new_x = round(x - radius * math.cos(z + math.pi / 2) + radius * math.cos(
+                        -v * time / radius + z + math.pi / 2))
+                    new_y = round(y - radius * math.sin(z + math.pi / 2) + radius * math.sin(
+                        -v * time / radius + z + math.pi / 2))
                 else:
-                    x = self.x - radius * math.cos(self.z + math.pi / 2) + radius * math.cos(
-                        -v * time / radius + self.z + math.pi / 2)
-                    y = self.y - radius * math.sin(self.z + math.pi / 2) + radius * math.sin(
-                        -v * time / radius + self.z + math.pi / 2)
+                    new_x = x - radius * math.cos(z + math.pi / 2) + radius * math.cos(
+                        -v * time / radius + z + math.pi / 2)
+                    new_y = y - radius * math.sin(z + math.pi / 2) + radius * math.sin(
+                        -v * time / radius + z + math.pi / 2)
                 traj = Entity(
-                    x=x,
-                    y=y,
-                    z=(-v * time / radius + self.z),
+                    x=new_x,
+                    y=new_y,
+                    z=(-v * time / radius + z),
                     length=self.length,
                     width=self.width
                 )

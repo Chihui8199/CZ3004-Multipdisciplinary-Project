@@ -2,6 +2,7 @@ import collections
 import math
 import time
 
+from envs import ImageRecognitionEnv
 from envs.models import Car, Entity
 from helpers import collide_with
 from graph import Dijkstra
@@ -16,15 +17,14 @@ class GraphBuilder:
     def __init__(self, observation, env):
         self.observation = observation  # [[car_x, car_y, angle], obstacles([x, y, Facing])]
         self.env = env
-        self._env = env
         self.graph = Dijkstra.Graph(pow(nodes, 2))
         self.action_map = {}
 
     def checkValidAction(self, action, current, target, x, y, new_x, new_y, dir, new_dir, rotation=False):
-        self.env.set_car(x=x*5, y=y*5, z=((dir+1)*math.pi/2)%(2*math.pi))
-        self.env.reset()
-        obs_, cost, done, collision = self.env.step(action)
-        # self.env.update(rectified_car_pos=Car(x=obs_[0][0], y=obs_[0][1], z=obs_[0][2]))
+        traj, path_cost = Car().get_traj(x=x*5, y=y*5, z=((dir+1)*math.pi/2)%(2*math.pi), sample_rate=0.1, action=action)
+        collision = self.env.check_collision(traj=traj)
+        # print(x, y, dir, new_x, new_y, new_dir, collision)
+        # time.sleep(1)
         if collision is False:
             # print(f">>> {current}, {target} ({new_x},{new_y},{new_dir},{rotation})")
             # print(f"<{current}->{target}>")
@@ -106,7 +106,7 @@ class GraphBuilder:
             return arr
 
         for i in range(len(path)-1):
-            print(self.action_map[f'{path[i]}_{path[i+1]}'])
+            # print(self.action_map[f'{path[i]}_{path[i+1]}'])
             arr.append(self.action_map[f'{path[i]}_{path[i+1]}'])
         return arr
 

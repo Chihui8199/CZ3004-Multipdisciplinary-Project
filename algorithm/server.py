@@ -27,7 +27,6 @@ class Server:
         self._connect()
 
         self.env = make_env("RobotMove-v0")
-        self.env.render()
         self.env.set_car(x=100, y=20)
         self.controller = MainController()
         self.graph = None
