@@ -104,7 +104,7 @@ class Server:
             self.current_target_idx = 0
             # self.graph = GraphBuilder(self.env.reset(), self.env)
             # self.graph.createGraph()
-            file_path = './graph_server.pickle'
+            file_path = './graph_server_test.pickle'
 
             import os
             import pickle
@@ -149,26 +149,38 @@ class Server:
         if self.graph_building_thread is not None:
             self.graph_building_thread.join()
             self.graph_building_thread = None
-        action = self.controller.act(observation=self.env.get_current_obs(),
-                                     env=self.env,
-                                     target=self.target_points[self.current_target_idx],
-                                     graph=self.graph)[0]
-        self.ideal_position, _, _, _ = self.env.step(action)
-        # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
-        msg = ''
-        if action[0] > 0:
-            msg += 'f'
-        else:
-            msg += 'b'
-        distance = "{0:03d}1000".format(math.floor(abs(action[0] * action[2])))
-        msg += distance
-        if action[1] < 0:
-            msg += '245'
-        elif action[1] == 0:
-            msg += '149'
-        else:
-            msg += '112'
-        self.write("I" + msg)
+        while True:
+            action = self.controller.act(observation=self.env.get_current_obs(),
+                                         env=self.env,
+                                         target=self.target_points[self.current_target_idx],
+                                         graph=self.graph)
+            if action is None:
+                self.current_target_idx += 1
+                if self.current_target_idx == len(self.target_points):
+                    print("done")
+                    exit(0)
+                continue
+            self.ideal_position, _, _, _ = self.env.step(action)
+
+            # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
+            msg = ''
+            if action[0] > 0:
+                msg += 'f'
+            else:
+                msg += 'b'
+            if abs(abs(action[0]*action[2])-31)< 2:
+                dis = 42
+            else:
+                dis = action[0] * action[2]
+            distance = "{0:03d}1000".format(math.floor(abs(dis)))
+            msg += distance
+            if action[1] < 0:
+                msg += '245'
+            elif action[1] == 0:
+                msg += '149'
+            else:
+                msg += '112'
+            self.write("I" + msg)
 
     def _handle_end_msg(self, msg: str):
         assert msg is None, "Eng message should not contain any body"
