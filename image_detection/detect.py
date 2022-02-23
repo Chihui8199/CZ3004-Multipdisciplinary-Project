@@ -74,14 +74,14 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
         exist_ok=False,  # existing project/name ok, do not increment
         line_thickness=3,  # bounding box thickness (pixels)
         hide_labels=False,  # hide labels
-        hide_conf=False,  # hide confidences
+        hide_conf=True,  # hide confidences
         half=False,  # use FP16 half-precision inference
         dnn=False,  # use OpenCV DNN for ONNX inference
         ):
     source = str(source)
     idd = None
     box_size = 0
-    angle = 0
+    angle = 1000
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -178,7 +178,14 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
 
                     if save_img or save_crop or view_img:  # Add bbox to image
                         c = int(cls)  # integer class
-                        label = None if hide_labels else (names[c] if hide_conf else f'{names[c]} {conf:.2f}')
+                        imageId = {"1":11,"2":12,"3":13, "4":14,"5":15,"6":16,"7":17,"8":18,"9":19, 
+                    "A":20, "B":21,"C":22,"D":23,"E":24 ,"F":25,"G":26, "H":27, 
+                    "S":28,"T":29,"U":30,"V":31, "W":32, "X":33 ,"Y":34,"Z":35, 
+                    "up_arrow":36, "down_arrow":37,"right_arrow":38,"left_arrow":39,"circle":40}
+
+                        id_num = imageId[names[c]]
+                        id_num = names[c]+",ID:"+str(id_num)
+                        label = None if hide_labels else (id_num if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
                         if save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
@@ -189,10 +196,10 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
                     y2 = int(xyxy[3].item())
                     box_size = (x2-x1)*(y2-y1)
                     angle = x2 - ((x2-x1)/2)
-                    print('bounding box is ', x1, y1, x2, y2)
-                    print("IMAGE DETECTED IS: ",id)
-                    print("BOX SIZE IS: ", box_size)
-                    print("ANGLE IS: ", angle)
+                    #print('bounding box is ', x1, y1, x2, y2)
+                    #print("IMAGE DETECTED IS: ",id)
+                    #print("BOX SIZE IS: ", box_size)
+                    #print("ANGLE IS: ", angle)
 
             # Print time (inference-only)
             LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
@@ -206,7 +213,9 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
-                    cv2.imwrite(save_path, im0)
+                    if idd != None:
+                        save_path = str(save_dir)+'/'+str(idd)+'.png'
+                        cv2.imwrite(save_path, im0)
                 else:  # 'video' or 'stream'
                     if vid_path[i] != save_path:  # new video
                         vid_path[i] = save_path
@@ -231,11 +240,11 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
     if update:
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
     if(idd != None):
-        print(idd)
+        #print(idd)
         return str(idd),int(box_size),int(angle)
         
     else:
-        return None,0,0
+        return "None",0,0
 
 
 def parse_opt():
