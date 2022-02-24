@@ -148,7 +148,7 @@ class Server:
         if object_id != 0:
             stitch()
             exit(0)
-            
+
         self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
                                               z=self.ideal_position[0][2]))
         self._plan_and_act(None)
@@ -162,6 +162,7 @@ class Server:
                                          env=self.env,
                                          target=self.target_points[self.current_target_idx],
                                          graph=self.graph)
+            
             if action is None:
                 self.current_target_idx += 1
                 if self.current_target_idx == len(self.target_points):
@@ -169,6 +170,7 @@ class Server:
                     exit(0)
                 continue
             self.ideal_position, _, _, _ = self.env.step(action)
+
 
             # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
             msg = ''

@@ -22,7 +22,7 @@ def detect():
     ROOT = FILE.parents[0]
     filename = str(uuid.uuid4())
     #filename = "data/images/" + filename + ".png
-    save_dir = increment_path(Path("data/images") / "img", exist_ok=False)
+    save_dir = increment_path(Path('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/data/images') / "img", exist_ok=False)
     save_dir.mkdir(parents=True, exist_ok=True)
     #print(str(save_dir))
     img_file = str(save_dir)+'/'+filename+'.png'
@@ -107,7 +107,7 @@ def stitch():
 
         count = count +1
 
-    cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result', combine) #CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
+    cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result/result.png', combine) #CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
     cv2.imshow("Final Collage",combine)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
