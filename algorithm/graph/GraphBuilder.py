@@ -153,16 +153,14 @@ class GraphBuilder:
 
     def getAction(self, path):
         arr = []
-        arr2 = []
         if len(path) < 2:
-            return arr, arr2
+            return arr
 
         for i in range(len(path) - 1):
             # print(self.action_map[f'{path[i]}_{path[i+1]}'])
             arr.append(self.action_map[f'{path[i]}_{path[i + 1]}'])
-            arr2.append(self.robot_msg[f'{path[i]}_{path[i + 1]}'])
 
-        return arr, arr2
+        return arr
 
     # def revert(self):
     #     self.env.set_car(x=100, y=20)

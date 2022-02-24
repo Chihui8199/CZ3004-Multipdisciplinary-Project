@@ -30,10 +30,10 @@ class MainController(BaseController):
         adjacency_list = graph.getGraph()
         path = adjacency_list.dijkstra(car_id, target_id)
         # print("path: ", path)
-        actions, robot_msg = graph.getAction(path)
+        actions = graph.getAction(path)
         # print("actions: ", actions)
 
         if len(actions) > 0:
-            return actions[0], robot_msg[0]
+            return actions[0]
         else:
-            return None, None
+            return None
