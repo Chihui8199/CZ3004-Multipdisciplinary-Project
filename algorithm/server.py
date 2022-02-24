@@ -173,24 +173,15 @@ class Server:
             # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
             msg = ''
             if action[0] > 0:
-                msg += 'f'
+                msg += 'f0001000'
             else:
-                msg += 'b'
-            if abs(abs(action[0]*action[2])-31)< 2:
-                if action[0] > 0:
-                    dis = 60
-                else:
-                    dis = 46
-            else:
-                dis = action[0] * action[2]
-            distance = "{0:03d}1000".format(math.floor(abs(dis)))
-            msg += distance
+                msg += 'b0001000'
             if action[1] < 0:
-                msg += '245'
+                msg += '250'
             elif action[1] == 0:
                 msg += '149'
             else:
-                msg += '112'
+                msg += '100'
             self.write("I" + msg)
             break
 
