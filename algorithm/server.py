@@ -4,6 +4,9 @@ import socket
 import time
 from multiprocessing.dummy import Process
 from typing import Union
+from image_rec.img_rec import detect
+from image_rec.img_rec import stitch
+
 
 from controllers import MainController
 from envs import make_env
@@ -141,6 +144,11 @@ class Server:
         #  6. clear env sensor data
         #  7. call _plan_and_act
         # TODO: now just use the ideal one
+        object_name, object_id, dist, angle = detect()
+        if object_id != 0:
+            stitch()
+            exit(0)
+            
         self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
                                               z=self.ideal_position[0][2]))
         self._plan_and_act(None)
