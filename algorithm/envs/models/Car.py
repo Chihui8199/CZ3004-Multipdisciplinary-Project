@@ -73,9 +73,9 @@ class Car(Entity):
         else:
             # hardcode
             if angle > 0:
-                radius = -20
+                radius = -35
             else:
-                radius = 20
+                radius = 35
 
             for i in range(samples + 1):
                 time = i * sample_rate
