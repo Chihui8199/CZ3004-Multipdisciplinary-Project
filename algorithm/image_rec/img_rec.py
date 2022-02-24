@@ -1,6 +1,7 @@
 
-from detect import *
-from detectbullseye import *
+#from detect import *
+from image_rec.detect import *
+from image_rec.detect import *
 from cv2 import *
 import uuid
 import os
@@ -59,7 +60,7 @@ def detect():
     return id,id_num, int(box_size), int(angle)
 
 def stitch():
-    directory = 'C:/Users/mdzak/Desktop/mdp/runs/detect/exp' #NEED TO BE CHANGED TO DIRECTORY OF DETECTED IMAGES
+    directory = 'C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/runs/detect/exp' #NEED TO BE CHANGED TO DIRECTORY OF DETECTED IMAGES
     count = 0
     for filename in os.listdir(directory):
         f = os.path.join(directory, filename)
@@ -106,7 +107,7 @@ def stitch():
 
         count = count +1
 
-    cv2.imwrite('C:/Users/mdzak/Desktop/mdp/result/result.png', combine) #CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
+    cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result', combine) #CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
     cv2.imshow("Final Collage",combine)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
