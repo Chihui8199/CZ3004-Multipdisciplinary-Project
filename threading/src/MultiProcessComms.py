@@ -74,7 +74,7 @@ class MultiProcessComms:
                 when robot is done, send: Y
                 receive a message from algo: I[V, A, T] e.g. 'I[1, 0, 1]'
                 send the message to robot
-            when done, send: D
+            when time out, send: D
             '''
 
             self.message_queue.put_nowait(self._format_for(ALGORITHM_HEADER, "T[[100, 100, 0], [100, 100, 1], [100, 100, 2], [100, 100, 3]]"))
@@ -83,6 +83,7 @@ class MultiProcessComms:
 
             
         except Exception as error:
+            logging.exception('Multiprocess communication start failed')
             raise error
 
         self._allow_reconnection()
@@ -203,11 +204,11 @@ class MultiProcessComms:
                         "Y"
                     ))
 
-                    else: 
-                        self.message_queue.put_nowait(self._format_for(
-                            ALGORITHM_HEADER, 
-                            message
-                        ))
+                    # else: 
+                    #     self.message_queue.put_nowait(self._format_for(
+                    #         ALGORITHM_HEADER, 
+                    #         message
+                    #     ))
 
                 ## NORMAL FLOW:
                 # for message in message_list:
@@ -275,19 +276,19 @@ class MultiProcessComms:
 
                     if message[0] == ord(AndroidToRobot.MOVE_UP):
                         self.message_queue.put_nowait(self._format_for(
-                        ROBOT_HEADER, "f0011000149".encode()
+                        ROBOT_HEADER, "f0001000149".encode() 
                     ))
                     elif message[0] == ord(AndroidToRobot.MOVE_BACK):
                         self.message_queue.put_nowait(self._format_for(
-                        ROBOT_HEADER, "b0011000149".encode()
+                        ROBOT_HEADER, "b0001000149".encode()
                     ))
-                    elif message[0] == ord(AndroidToRobot.TURN_LEFT):
+                    elif message[0] == ord(AndroidToRobot.TURN_LEFT): # forward turn left
                         self.message_queue.put_nowait(self._format_for(
-                        ROBOT_HEADER, "f0011000112".encode()
+                        ROBOT_HEADER, "f0001000100".encode()
                     ))
-                    elif message[0] == ord(AndroidToRobot.TURN_RIGHT):
+                    elif message[0] == ord(AndroidToRobot.TURN_RIGHT): # forward turn right
                         self.message_queue.put_nowait(self._format_for(
-                        ROBOT_HEADER, "f0011000245".encode()
+                        ROBOT_HEADER, "f0001000250".encode()
                     ))
                     elif message[0] == ord(AndroidToRpi.START):
                         self.message_queue.put_nowait(self._format_for(
