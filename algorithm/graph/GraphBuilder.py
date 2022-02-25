@@ -14,7 +14,7 @@ nodes = (side_len // step_count + 1) * 4  # 41 * 4 directions
 
 # list all actions
 forward_cost = 5
-radius = 35
+radius = 40
 rotation_cost = radius / 2 * math.pi
 forward = [1, 0, forward_cost]
 backward = [-1, 0, forward_cost]

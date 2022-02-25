@@ -6,7 +6,9 @@ from envs.models import Direction, Sign, Entity
 
 
 class Obstacle(Entity):
-    BEST_VIEW_DISTANCE = 20
+    ACTUAL_OBS, OBS_LEN = 10, 20
+    BEST_VIEW_DISTANCE = 20 - (OBS_LEN - ACTUAL_OBS) / 2
+
     """
     Represents the robot car
     """
@@ -18,7 +20,7 @@ class Obstacle(Entity):
             self.gt = Sign.UNKNOWN  # only used in mock
             self.is_target = is_target
 
-    def __init__(self, x: float, y: float, target_face_id: int, length: float = 10, width: float = 10, mock: bool = False):
+    def __init__(self, x: float, y: float, target_face_id: int, length: float = OBS_LEN, width: float = OBS_LEN, mock: bool = False):
         """
         :param x: x coordinate of the center of the obstacle (x-distance in cm to the origin)
         :param y: y coordinate of the center the obstacle (y-distance in cm to the origin)

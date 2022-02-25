@@ -38,7 +38,6 @@ class Car(Entity):
         the simplest way is to return a list of sampled positions (as entities)
         """
         # traj is a array of car positions, cost is the length of the path
-        print(action)
         v, angle, t = action[0], action[1], action[2]
         # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
         traj_list = []
@@ -74,9 +73,9 @@ class Car(Entity):
         else:
             # hardcode
             if angle > 0:
-                radius = -35
+                radius = -40
             else:
-                radius = 35
+                radius = 40
 
             for i in range(samples + 1):
                 time = i * sample_rate

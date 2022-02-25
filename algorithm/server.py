@@ -176,14 +176,21 @@ class Server:
             msg = ''
             if action[0] > 0:
                 msg += 'f0001000'
+                if action[1] < 0:
+                    msg += '210'
+                elif action[1] == 0:
+                    msg += '149'
+                else:
+                    msg += '109'
             else:
                 msg += 'b0001000'
-            if action[1] < 0:
-                msg += '250'
-            elif action[1] == 0:
-                msg += '149'
-            else:
-                msg += '100'
+                if action[1] < 0:
+                    msg += '200'
+                elif action[1] == 0:
+                    msg += '149'
+                else:
+                    msg += '114'
+
             self.write("I" + msg)
             break
 
