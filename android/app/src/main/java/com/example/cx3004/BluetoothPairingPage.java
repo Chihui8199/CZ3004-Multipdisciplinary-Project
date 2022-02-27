@@ -107,16 +107,21 @@ public class BluetoothPairingPage extends AppCompatActivity {
         connectBtn = (Button) findViewById(R.id.connectBtn);
 
         // register receivers
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(bondingBroadcastReceiver, filter);
-        IntentFilter filter2 = new IntentFilter("ConnectionStatus");
-        LocalBroadcastManager.getInstance(this).registerReceiver(btConnectionReceiver, filter2);
+        // register enable bluetooth receiver
         IntentFilter BTIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
         registerReceiver(enableBTBroadcastReceiver, BTIntent);
+        // register discovery receivers
         IntentFilter discoverIntent = new IntentFilter(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
         registerReceiver(discoverStatusBroadcastReceiver, discoverIntent);
         IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         registerReceiver(discoveryBroadcastReceiver, discoverDevicesIntent);
+        // register bonding receiver
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+        registerReceiver(bondingBroadcastReceiver, filter);
+        // register connection status receiver
+        IntentFilter filter2 = new IntentFilter("ConnectionStatus");
+        LocalBroadcastManager.getInstance(this).registerReceiver(btConnectionReceiver, filter2);
+
 
         discovDevicesListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -444,7 +449,7 @@ public class BluetoothPairingPage extends AppCompatActivity {
                     // while the device remains disconnected, check every 5 seconds if connection was successful.
                     // if no, start a new client thread.
                     //(code is commented out for amd. amd reconnection must be initiated from the amd itself, only server thread should be running)
-                    //clientReconnectionRunnable.run();
+                    clientReconnectionRunnable.run();
                 }
 
             }

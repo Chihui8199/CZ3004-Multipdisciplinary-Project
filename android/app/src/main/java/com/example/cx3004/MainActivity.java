@@ -171,11 +171,12 @@ public class MainActivity extends AppCompatActivity {
         Log.d(ROBOTTAG,
                 String.format("Robot has been moved to (%f, %f) on the map and is facing %s.",
                         xCoord, yCoord, direction));
-        refreshRobotState(xCoord, yCoord, direction);
+        refreshRobotState(xCoord, yCoord, direction, null);
     }
 
-    private static void refreshRobotState(double xCoord, double yCoord, String direction) {
-        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction, "MOVING");
+    private static void refreshRobotState(double xCoord, double yCoord, String direction, String status) {
+        if (status == null) status = "MOVING";
+        sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction, status);
     }
 
     public void start(View v){
@@ -316,7 +317,13 @@ public class MainActivity extends AppCompatActivity {
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        } else {
+        } else if (receivedText.equals("READY")){
+            moveRobot(1.5, 1.5, "up");
+            refreshRobotState(1.5, 1.5, "up", "READY TO MOVE");
+        } else if (receivedText.equals("IMAGE")){
+            refreshRobotState(robotView.getGridX(), robotView.getGridY(), robotView.getRobotDirection(), "LOOKING FOR IMAGE");
+        }
+        else {
             Log.d(BTTAG, "Msg does not contain readable cmd");
         }
     }
