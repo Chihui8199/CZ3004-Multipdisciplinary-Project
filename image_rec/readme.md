@@ -1,11 +1,13 @@
 ## Source Code Information for Algo Team  
 1. All python files required to run EXCEPT main.py, it is for my own testing purpose
 2. Algo team need to only worry about img_rec.py
-3. 2 functions to be used is detect() and stitch(), ignore the rest of functions
-4. object_name ,object_id, dist, angle = detect(), detect() function returns 4 values
-5. detect() function flow: take photo -> save photo in data/images -> run model on said photo -> if detected draw bounding box and save in  runs/detect/exp -> return object_name ,object_id, dist, angle
-7. stitch() function combines images in runs/detect/exp and save in result, to be used at the end of run
-8. requirements.txt, all dependencies needed
+3. 5 functions to be used is detect(),cstitch(), start_async(), stop_async(), numdetected(), ignore the rest of functions
+4. detect() function flow: take photo -> save photo in data/images -> run model on said photo -> if detected draw bounding box and save in  runs/detect/exp -> return object_name ,object_id, dist, angle
+5. stitch() function combines images in runs/detect/exp and save in result, to be used at the end of run
+6. start_async() starts a thread that does image recognition every 5 seconds
+7. stop_async() stops the thread started by start_async()
+8. numdetected() returns the number of different images detected so far
+9. requirements.txt, all dependencies needed
 
 ## Directory Information  
 1. Raw Image taken by Pi Camera and stored in data/images
