@@ -1,5 +1,5 @@
-from image_rec.img_rec import detect
-from image_rec.img_rec import stitch
+from image_rec.img_rec import *
+from image_rec.detect import *
 import time
 
 

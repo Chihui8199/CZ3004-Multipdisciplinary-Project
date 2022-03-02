@@ -1,11 +1,16 @@
 
 #from detect import *
-from image_rec.detect import *
+#from img_rec import *
 from image_rec.detect import *
 from cv2 import *
 import uuid
 import os
 import numpy as np
+import threading
+from multiprocessing.dummy import Process
+import time
+
+
 def run_model(filename):#IGNORE
     id, box_size, angle = run(source=ROOT / filename)
     return id, box_size, angle
@@ -18,11 +23,11 @@ def detect():
     imageId = {"1":11,"2":12,"3":13, "4":14,"5":15,"6":16,"7":17,"8":18,"9":19, 
                     "A":20, "B":21,"C":22,"D":23,"E":24 ,"F":25,"G":26, "H":27, 
                     "S":28,"T":29,"U":30,"V":31, "W":32, "X":33 ,"Y":34,"Z":35, 
-                    "up_arrow":36, "down_arrow":37,"right_arrow":38,"left_arrow":39,"circle":40}
+                    "up_arrow":36, "down_arrow":37,"right_arrow":38,"left_arrow":39,"circle":40,"bullseye":-1}
     ROOT = FILE.parents[0]
     filename = str(uuid.uuid4())
     #filename = "data/images/" + filename + ".png
-    save_dir = increment_path(Path('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/data/images') / "img", exist_ok=False)
+    save_dir =increment_path(Path('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/data/images') / "img", exist_ok=False)
     save_dir.mkdir(parents=True, exist_ok=True)
     #print(str(save_dir))
     img_file = str(save_dir)+'/'+filename+'.png'
@@ -147,4 +152,34 @@ def detectbullseye():
     print("DIST FROM ROBOT IS: ", int(box_size))
     print("ANGLE IS: ", int(angle))
     return id, int(box_size), int(angle)
+
+
+class sync:
+    exit_flag = False
+    detect_sem = threading.Lock()
+    def stop_async(thread):
+        sync.exit_flag = True
+        thread.join()
+
+    def async_detect(stop):
+        while(True):
+            time.sleep(5)    
+            sync.detect_sem.acquire()
+            id, id_num, dist, angle = detect()
+            sync.detect_sem.release()
+            if sync.exit_flag:
+                break
+
+    #async_detect_thread = Process(target= sync.asyc_detect,args=(lambda: sync.exit_flag,))
+    #async_detect_thread.start()
+    #ALGO CODE
+    #END OF ALGO
+    #sync.stop_async(async_detect_thread)
+
+    #call detect in algo
+    #sync.detect_sem.acquire()
+    #id, id_num, dist, angle = detect()
+    #sync.detect_sem.release()
+
+
 

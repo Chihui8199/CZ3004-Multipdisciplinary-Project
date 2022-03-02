@@ -50,12 +50,12 @@ from utils.torch_utils import select_device, time_sync
 
 
 @torch.no_grad()
-def run(weights=ROOT / 'test.pt',  # model.pt path(s)
+def run(weights=ROOT / 'best60.pt',  # model.pt path(s)
         #source=0,
         source=ROOT / 'data/images',  # file/dir/URL/glob, 0 for webcam
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(320, 416),  # inference size (height, width)
-        conf_thres=0.2,  # confidence threshold
+        conf_thres=0.4,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
@@ -82,6 +82,8 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
     idd = None
     box_size = 0
     angle = 1000
+    bullseye = False
+    numdetect = 0
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -166,7 +168,7 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
                 for c in det[:, -1].unique():
                     n = (det[:, -1] == c).sum()  # detections per class
                     s += f"{n} {names[int(c)]}{'s' * (n > 1)}, "  # add to string
-                    idd = names[int(c)]
+                    #idd = names[int(c)]
 
                 # Write results
                 for *xyxy, conf, cls in reversed(det):
@@ -178,14 +180,27 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
 
                     if save_img or save_crop or view_img:  # Add bbox to image
                         c = int(cls)  # integer class
-                        imageId = {"1":11,"2":12,"3":13, "4":14,"5":15,"6":16,"7":17,"8":18,"9":19, 
-                    "A":20, "B":21,"C":22,"D":23,"E":24 ,"F":25,"G":26, "H":27, 
-                    "S":28,"T":29,"U":30,"V":31, "W":32, "X":33 ,"Y":34,"Z":35, 
-                    "up_arrow":36, "down_arrow":37,"right_arrow":38,"left_arrow":39,"circle":40}
+                        imagename = {"Number_1":"1","Number_2":"2","Number_3":"3", "Number_4":"4","Number_5":"5","Number_6":"6","Number_7":"7","Number_8":"8","Number_9":"9", 
+                    "Letter_A":"A", "Letter_B":"B","Letter_C":"C","Letter_D":"D","Letter_E":"E" ,"Letter_F":"F","Letter_G":"G", "Letter_H":"H", 
+                    "Letter_S":"S","Letter_T":"T","Letter_U":"U","Letter_V":"V", "Letter_W":"W", "Letter_X":"X" ,"Letter_Y":"Y","Letter_Z":"Z", 
+                    "Arrow_U":"up_arrow", "Arrow_D":"down_arrow","Arrow_R":"right_arrow","Arrow_L":"left_arrow","Circle_Yellow":"circle","bullseye":"bullseye","Bullseye":"bullseye"}
 
-                        id_num = imageId[names[c]]
-                        id_num = names[c]+",ID:"+str(id_num)
-                        label = None if hide_labels else (id_num if hide_conf else f'{names[c]} {conf:.2f}')
+                        imageId = {"1":11,"2":12,"3":13, "4":14,"5":15,"6":16,"7":17,"8":18,"9":19, 
+                        "A":20, "B":21,"C":22,"D":23,"E":24 ,"F":25,"G":26, "H":27, 
+                        "S":28,"T":29,"U":30,"V":31, "W":32, "X":33 ,"Y":34,"Z":35, 
+                        "up_arrow":36, "down_arrow":37,"right_arrow":38,"left_arrow":39,"circle":40,"bullseye":-1}
+                        image_name = imagename[names[c]]
+                        id_num_check = imageId[image_name]
+                        id_num_check = image_name+",ID:"+str(id_num_check)
+                        
+                        if id_num_check == "bullseye,ID:-1":
+                            bullseye = True
+                        else:
+                            id_num = id_num_check
+                            idd = image_name
+
+                        numdetect = numdetect + 1
+                        label = None if hide_labels else (id_num_check if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
                         if save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
@@ -200,7 +215,9 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
                     #print("IMAGE DETECTED IS: ",id)
                     #print("BOX SIZE IS: ", box_size)
                     #print("ANGLE IS: ", angle)
-
+            if(bullseye and numdetect == 1):
+                id_num = "bullseye,ID:-1"
+                idd = "bullseye"
             # Print time (inference-only)
             LOGGER.info(f'{s}Done. ({t3 - t2:.3f}s)')
 
@@ -213,7 +230,7 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
             # Save results (image with detections)
             if save_img:
                 if dataset.mode == 'image':
-                    if idd != None:
+                    if idd != None and id_num != "bullseye,ID:-1":
                         save_path = str(save_dir)+'/'+str(idd)+'.png'
                         cv2.imwrite(save_path, im0)
                 else:  # 'video' or 'stream'
@@ -249,11 +266,11 @@ def run(weights=ROOT / 'test.pt',  # model.pt path(s)
 
 def parse_opt():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'test.pt', help='model path(s)')
-    parser.add_argument('--source', type=str, default='http://192.168.16.16/html/cam_pic_new.php', help='file/dir/URL/glob, 0 for webcam')
+    parser.add_argument('--weights', nargs='+', type=str, default=ROOT / 'best60.pt', help='model path(s)')
+    parser.add_argument('--source', type=str, default=0, help='file/dir/URL/glob, 0 for webcam')
     parser.add_argument('--data', type=str, default=ROOT / 'data/coco128.yaml', help='(optional) dataset.yaml path')
     parser.add_argument('--imgsz', '--img', '--img-size', nargs='+', type=int, default=[416], help='inference size h,w')
-    parser.add_argument('--conf-thres', type=float, default=0.40, help='confidence threshold')
+    parser.add_argument('--conf-thres', type=float, default=0.70, help='confidence threshold')
     parser.add_argument('--iou-thres', type=float, default=0.45, help='NMS IoU threshold')
     parser.add_argument('--max-det', type=int, default=1000, help='maximum detections per image')
     parser.add_argument('--device', default='', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
