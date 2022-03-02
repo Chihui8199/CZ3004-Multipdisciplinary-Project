@@ -1,7 +1,7 @@
 ## Source Code Information for Algo Team  
 1. All python files required to run EXCEPT main.py, it is for my own testing purpose
 2. Algo team need to only worry about img_rec.py
-3. 5 functions to be used is detect(),cstitch(), start_async(), stop_async(), numdetected(), ignore the rest of functions
+3. 5 functions to be used is detect(),stitch(), start_async(), stop_async(), numdetected(), ignore the rest of functions
 4. detect() function flow: take photo -> save photo in data/images -> run model on said photo -> if detected draw bounding box and save in  runs/detect/exp -> return object_name ,object_id, dist, angle
 5. stitch() function combines images in runs/detect/exp and save in result, to be used at the end of run
 6. start_async() starts a thread that does image recognition every 5 seconds
