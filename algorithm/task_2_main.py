@@ -23,10 +23,10 @@ DIRECTION_SET = {
 }
 
 DISTANCE_SET = {
-    "5cm": "",
-    "10cm": "",
-    "20cm": "",
-    "30cm": "",
+    5: "",
+    10: "",
+    20: "",
+    30: "",
 }
 
 
@@ -60,6 +60,7 @@ class Server:
         stages:
         0: no sensor data received; obstacle distance, size unknown;
         1: obstacle distance located, otw to it
+        ** 2 ** was accidentally skipped...
         3: adjusting position, parallel to the obstacle, to make right turn and pass obstacle
         4: half way passing the obstacle, need another 90 degree right turn to go to the back of obs
         5: at the back of the obstacle, heading to the position for another right turn
@@ -167,6 +168,10 @@ class Server:
         # Step 5
         self._act()
 
+    @staticmethod
+    def _get_biggest_smaller_number(candidates, target):
+        pass
+
     def _act(self, msg: str = None):
         # TODO: based on the current stage and status, choose action
         #  e.g.
@@ -175,15 +180,58 @@ class Server:
         #   if closer and about to take turn, move with medium speed and shorter distance
         #   if closer enough to the obs, turn; if too close then reverse a bit
         #   if
-        if self.stage == 0:
-            pass
-        elif self.stage == 1:
-            pass
-        elif self.stage == 2:
-            pass
+        cmd = ""
+        if self.stage in [0, 1]:
+            if 70 < self.current_distance_to_obstacle < 80:  # already can make the turn
+                self.stage = 3
+                # make left turn
+            else:
+                self.stage = 1
+                buffer_dist = self.current_distance_to_obstacle - 75
+                # find biggest in [5, 10, 20, 30]
+                # determine speed based on dist
+                # form command
         elif self.stage == 3:
-            pass
-        # TODO: more to be done
+            if self.current_distance_to_left_side_wall < 55:
+                # reverse until > 55
+                pass
+            else:
+                self.stage = 4
+                # make 90 right turn
+        elif self.stage == 4:
+            self.stage = 5
+            # make 90 right turn
+        elif self.stage == 5:
+            if self.current_distance_to_right_side_wall > 55:
+                # get biggest distance in [5, 10, 20, 30] by distance - 55
+                # speed based on distance
+                pass
+            else:
+                self.stage = 6
+                # make right turn
+        elif self.stage == 6:
+            self.stage = 7
+            # make 90 right turn
+        elif self.stage == 7:
+            ideal_dist = self.left_side_wall_distance + self.obstacle_size / 2 + 40
+            if self.current_distance_to_left_side_wall < ideal_dist - 10:
+                # backward, slow speed, get biggest distance
+                pass
+            elif self.current_distance_to_left_side_wall > ideal_dist + 10:
+                # backward, ...
+                pass
+            else:
+                self.stage = 8
+                # make left turn
+        elif self.stage == 8:
+            movable_dist = self.current_distance_to_garage - 15  # car's length / 2
+            if movable_dist < 5:
+                self.stage = 9
+                self.terminated = True
+                return  # end of task
+            # fast forward + biggest movable_dist
+
+        self.write(message="I" + cmd)
 
 
 if __name__ == '__main__':
