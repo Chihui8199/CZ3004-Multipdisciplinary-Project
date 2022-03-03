@@ -109,7 +109,8 @@ class Server:
 
     def _handle_add_obstacles_msg(self, msg: str):
         def _generate_graph():
-            self.target_points, self.obs_seq = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[1:]
+            self.target_points = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[0][1:]
+            self.obs_seq = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[1]
             self.current_target_idx = 0
             # self.graph = GraphBuilder(self.env.reset(), self.env)
             # self.graph.createGraph()
