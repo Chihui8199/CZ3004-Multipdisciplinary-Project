@@ -18,6 +18,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -87,7 +88,7 @@ public class CommsFragment extends Fragment {
                 typeBoxEditText.setText("");
 
                 if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
-                    byte[] bytes = sentText.getBytes(Charset.defaultCharset());
+                    byte[] bytes = sentText.getBytes(StandardCharsets.UTF_8);
                     BluetoothConnectionService.write(bytes);
                 }
                 showLog("Exiting sendTextBtn");

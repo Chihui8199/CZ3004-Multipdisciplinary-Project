@@ -31,6 +31,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -389,7 +390,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(BTTAG, String.format("Entering remoteSendMessage: %s", message));
         editor = sharedPreferences.edit();
         if (BluetoothConnectionService.BluetoothConnectionStatus == true) {
-            byte[] bytes = message.getBytes(Charset.defaultCharset());
+            byte[] bytes = message.getBytes(StandardCharsets.UTF_8);
             BluetoothConnectionService.write(bytes);
         }
         editor.putString("message", CommsFragment.getMessageReceivedTextView().getText() + "\n" + message);
