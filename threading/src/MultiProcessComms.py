@@ -181,7 +181,7 @@ class MultiProcessComms:
                         continue
                     
                     if message[0] == ord(RobotToRpi.ROBOT_STOP):
-                        data = str(sensor_values)
+                        data = "Y" + str(sensor_values)
                         data = data.encode()
                         self.message_queue.put_nowait(self._format_for(
                             ALGORITHM_HEADER, data))
