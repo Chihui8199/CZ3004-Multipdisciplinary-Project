@@ -13,6 +13,7 @@ from envs import make_env
 from envs.models import Car
 from graph import GraphBuilder
 from helpers import ShortestHamiltonianPathFinder
+from image_rec.img_rec import sync
 
 RPI_IP = '192.168.16.16'
 RPI_PORT = 8080
@@ -23,7 +24,7 @@ logging.getLogger().setLevel(logging.DEBUG)
 # noinspection PyBroadException
 class Server:
     def __init__(self):
-        self.host = ''
+        self.host = '127.0.0.1'
         self.port = HOST_PORT
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -41,12 +42,16 @@ class Server:
         #  1. controllers
         #  2. graph builders
         #  3. cv module
+        self.detection = None
+        self.sync = sync()
+        self.sensor_data = None
 
         self.incoming_msg_handlers = {
             "F": self._plan_and_act,
             "T": self._handle_add_obstacles_msg,
             "Y": self._handle_end_of_step_msg,
-            "D": self._handle_end_msg
+            "D": self._handle_end_msg,
+            "R": self._handle_arrive_obstacles_msg
         }
 
         self.terminated = False
@@ -154,6 +159,7 @@ class Server:
         self._plan_and_act(None)
 
     def _plan_and_act(self, msg: str):
+        thread = self.sync.start_async()
         if self.graph_building_thread is not None:
             self.graph_building_thread.join()
             self.graph_building_thread = None
@@ -164,6 +170,30 @@ class Server:
                                          graph=self.graph)
             
             if action is None:
+                # handle error, to confirm usage
+                detection = self.sync.stop_async(thread=thread)
+                # call detect in algo
+                self.sync.detect_sem.acquire()
+                id, id_num, dist, angle = detect()
+                self.sync.detect_sem.release()
+                if id != 0:
+                    stitch()
+                    exit(0)
+
+                while self.sensor_data is None:
+                    pass
+
+                # OBS = 20
+                # diff = dist - OBS
+                #
+                # if diff > 0:
+                #     # msg move forward
+                #     pass
+                # else:
+                #     # msg move backward
+                #     pass
+
+
                 self.current_target_idx += 1
                 if self.current_target_idx == len(self.target_points):
                     print("done")
@@ -198,6 +228,16 @@ class Server:
         assert msg is None, "Eng message should not contain any body"
         self.socket.close()
         self.terminated = True
+
+    def _handle_arrive_obstacles_msg(self, msg: str):
+        with self.socket as s:
+            s.bind((self.host, self.port))
+            s.listen()
+            conn, addr = s.accept()
+            data = conn.recv(2048)
+
+            data = data.decode('utf-8')
+            self.sensor_data = eval(data)
 
 
 if __name__ == '__main__':

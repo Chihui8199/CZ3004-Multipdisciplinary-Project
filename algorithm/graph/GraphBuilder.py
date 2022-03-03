@@ -45,30 +45,28 @@ class GraphBuilder:
             # print(f">>> {current}, {target} ({new_x},{new_y},{new_dir},{rotation})")
             # print(f"<{current}->{target}>")
             if rotation:
-                self.graph.addEdge(current, target, 10 * math.pi)
+                self.graph.addEdge(current, target, rotation_cost)
             else:
-                self.graph.addEdge(current, target, 5)
+                self.graph.addEdge(current, target, forward_cost)
             self.action_map[f'{current}_{target}'] = action
 
             msg = ''
             if action[0] > 0:
                 msg += 'f0001000'
+                if action[1] < 0:
+                    msg += '210'
+                elif action[1] == 0:
+                    msg += '149'
+                else:
+                    msg += '109'
             else:
                 msg += 'b0001000'
-            # if abs(abs(action[0]*action[2])-31)< 2:
-            #     if action[0] > 0:
-            #         dis = 60
-            #     else:
-            #         dis = 46
-            # else:
-            #     dis = action[0] * action[2]
-            # distance = "{0:03d}1000".format(math.floor(abs(dis)))
-            if action[1] < 0:
-                msg += '250'
-            elif action[1] == 0:
-                msg += '149'
-            else:
-                msg += '100'
+                if action[1] < 0:
+                    msg += '200'
+                elif action[1] == 0:
+                    msg += '149'
+                else:
+                    msg += '114'
             self.robot_msg[f'{current}_{target}'] = msg
 
     def createGraph(self):
