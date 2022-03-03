@@ -177,7 +177,7 @@ class Server:
                 id, id_num, dist, angle = detect()
                 self.sync.detect_sem.release()
                 if id != 0:
-                    stitch()
+                    #stitch()
                     exit(0)
                 # fetch sensor data from rpi
                 # while self.sensor_data is None:
@@ -228,6 +228,7 @@ class Server:
 
     def _handle_end_msg(self, msg: str):
         assert msg is None, "Eng message should not contain any body"
+        stitch()
         self.socket.close()
         self.terminated = True
 
