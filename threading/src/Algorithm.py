@@ -93,7 +93,7 @@ class Algorithm:
         try:
             print('To Algorithm:')
             print(message)
-            self.client_sock.send(message.encode())
+            self.client_sock.send(message)
 
         except Exception as error:
             logging.exception("Algorithm write failed")

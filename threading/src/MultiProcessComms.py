@@ -287,7 +287,7 @@ class MultiProcessComms:
 
                     elif message[0] == ord(AndroidToAlgorithm.OBSTACLE_INTO):
                         self.message_queue.put_nowait(self._format_for(
-                            ALGORITHM_HEADER, message[1:]
+                            ALGORITHM_HEADER, message
                         ))
                         
                     elif message[0] == ord(AndroidToRpi.START):
