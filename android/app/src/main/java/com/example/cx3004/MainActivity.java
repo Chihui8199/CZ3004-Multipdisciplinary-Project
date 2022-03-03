@@ -323,8 +323,8 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         } else if (receivedText.equals("READY")){
-            moveRobot(1.5, 1.5, "up");
-            refreshRobotState(1.5, 1.5, "up", "READY TO MOVE");
+            moveRobot(robotView.getInitCoord(), robotView.getInitCoord(), "up");
+            refreshRobotState(robotView.getInitCoord(), robotView.getInitCoord(), "up", "READY TO MOVE");
         } else if (receivedText.equals("IMAGE")){
             refreshRobotState(robotView.getGridX(), robotView.getGridY(), robotView.getRobotDirection(), "LOOKING FOR IMAGE");
         }
@@ -344,13 +344,13 @@ public class MainActivity extends AppCompatActivity {
     private static void parseCoordsCmd(JSONArray coordsArray) throws JSONException {
         // retrieves x,y,angle from algo msg
         Log.d(BTTAG, String.format("Started parsing coords from Algo team msg"));
-        double xCoord = coordsArray.getDouble(0);
-        double yCoord = coordsArray.getDouble(1);
+        double xCoord = (coordsArray.getDouble(0) - 5) / 10;
+        double yCoord = (coordsArray.getDouble(1) - 5) / 10;
         double angleRad = coordsArray.getDouble(2);
 
         // process angle into android application readable directions
         String direction = "up";
-        double angleDeg = angleRad / (2 * Math.PI) * 360;
+        double angleDeg = (angleRad / (2 * Math.PI) * 360) % 360;
         if ((0 <= angleDeg & angleDeg <= 45) | (315 < angleDeg & angleDeg < 360))
             direction = "left";
         else if (45 < angleDeg & angleDeg <= 135) direction = "up";

@@ -17,6 +17,9 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
     public double gridX;
     public double gridY;
     public String direction;
+    private final int SIZE_SCALE = 3; // no of boxes the robot should take up
+    private final double MIN_COORD = 1;
+    private final double MAX_COORD = 18;
 
     public RobotView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -46,14 +49,14 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
 
         // resize view
         ViewGroup.LayoutParams params = getLayoutParams();
-        params.height = 4 * gridInterval;
-        params.width = 4 * gridInterval;
+        params.height = SIZE_SCALE * gridInterval;
+        params.width = SIZE_SCALE * gridInterval;
         setLayoutParams(params);
 
         // set robot at 0, 0
         //setX(0);
         //setY(0);
-        move(1.5, 1.5, "up");
+        move(MIN_COORD, MIN_COORD, "up");
     }
 
 
@@ -79,14 +82,14 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
         }
 
         // set coordinates
-        setX((float) ((x - 1.5) * gridInterval));
-        setY((float) ((19 - y - 1.5) * gridInterval));
+        setX((float) ((x - MIN_COORD) * gridInterval));
+        setY((float) ((19 - y - MIN_COORD) * gridInterval));
         this.gridX = x;
         this.gridY = y;
     }
 
     public boolean checkBoundary(double x, double y){
-        return (1.5<= x & x <= 17.5) & (1.5 <= y & y <= 17.5);
+        return (MIN_COORD<= x & x <= MAX_COORD) & (MIN_COORD <= y & y <= MAX_COORD);
     }
 
     public double getGridX(){
@@ -100,4 +103,6 @@ public class RobotView extends androidx.appcompat.widget.AppCompatTextView {
     public String getRobotDirection(){
         return direction;
     }
+
+    public double getInitCoord(){ return MIN_COORD; }
 }

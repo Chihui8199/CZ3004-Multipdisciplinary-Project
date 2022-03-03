@@ -184,7 +184,7 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
                 imageFaceNo = 0;
                 break;
         }
-        return String.format("[%d, %d, %d]", x, y, imageFaceNo);
+        return String.format("[%d, %d, %d]", x*10+5, y*10+5, imageFaceNo);
     }
 
     public int getObstacleId() {
