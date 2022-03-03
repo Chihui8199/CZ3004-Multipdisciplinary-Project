@@ -1,6 +1,6 @@
 # from detect import *
 # from img_rec import *
-from image_rec.detect import *
+from detect import *
 from cv2 import *
 import uuid
 import os
@@ -28,13 +28,13 @@ def detect():
     ROOT = FILE.parents[0]
     filename = str(uuid.uuid4())
     # filename = "data/images/" + filename + ".png
-    save_dir = increment_path(Path('C:/Users/mdzak/Desktop/mdpFINAL/image_rec/data/images') / "img", exist_ok=False)
+    save_dir = increment_path(Path('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/data/images') / "img", exist_ok=False)
     save_dir.mkdir(parents=True, exist_ok=True)
     # print(str(save_dir))
     img_file = str(save_dir) + '/' + filename + '.png'
     filepath = str(save_dir)
-    # cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
-    cam_port = 0  # LAPTOP CAMERA
+    cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
+    #cam_port = 0  # LAPTOP CAMERA
     cam = cv2.VideoCapture(cam_port)
     result, image = cam.read()
     if result:
@@ -67,7 +67,7 @@ def detect():
 
 
 def stitch():
-    directory = 'C:/Users/mdzak/Desktop/mdpFINAL/image_rec/runs/detect/exp'  # NEED TO BE CHANGED TO DIRECTORY OF DETECTED IMAGES
+    directory = 'C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/runs/detect/exp'  # NEED TO BE CHANGED TO DIRECTORY OF DETECTED IMAGES
     count = 0
     for filename in os.listdir(directory):
         f = os.path.join(directory, filename)
@@ -113,7 +113,7 @@ def stitch():
 
         count = count + 1
 
-    cv2.imwrite('C:/Users/mdzak/Desktop/mdpFINAL/image_rec/result/result.png',
+    cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result/result.png',
                 combine)  # CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
     cv2.imshow("Final Collage", combine)
     cv2.waitKey(0)
