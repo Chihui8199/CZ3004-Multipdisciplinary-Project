@@ -24,7 +24,7 @@ class ShortestHamiltonianPathFinder:
             return []  # nothing to be visited, just/even no starting point
         distance_matrix = euclidean_distance_matrix(np.array(_points))
         permutation, _ = solve_tsp_dynamic_programming(distance_matrix)
-        return [points[idx] for idx in permutation]
+        return [points[idx] for idx in permutation], [idx - 1 for idx in permutation[1:]]
 
 
 if __name__ == '__main__':

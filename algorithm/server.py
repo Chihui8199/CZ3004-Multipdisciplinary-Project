@@ -31,13 +31,14 @@ class Server:
         self._connect()
 
         self.env = make_env("RobotMove-v0")
-        self.env.set_car(x=10, y=10)
+        self.env.set_car(x=15, y=15)
         self.controller = MainController()
         self.graph = None
         self.graph_building_thread = None
         self.target_points = None
         self.current_target_idx = None
         self.ideal_position = None
+        self.obs_seq = None
         # TODO: include
         #  1. controllers
         #  2. graph builders
@@ -108,7 +109,7 @@ class Server:
 
     def _handle_add_obstacles_msg(self, msg: str):
         def _generate_graph():
-            self.target_points = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[1:]
+            self.target_points, self.obs_seq = ShortestHamiltonianPathFinder.get_visit_sequence(self.env)[1:]
             self.current_target_idx = 0
             # self.graph = GraphBuilder(self.env.reset(), self.env)
             # self.graph.createGraph()
@@ -162,6 +163,8 @@ class Server:
         #     stitch()
         #     exit(0)
 
+        self.write('P' + self.env.get_current_obs())   # send the observation
+        self.env.clear_sensor_data()
         self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
                                               z=self.ideal_position[0][2]))
         self._plan_and_act(None)
@@ -184,6 +187,9 @@ class Server:
                 self.sync.detect_sem.acquire()
                 id, id_num, dist, angle = detect()  # distance got ±3cm diff
                 self.sync.detect_sem.release()
+                self.env.obstacles[self.obs_seq[self.current_target_idx]]\
+                    .recognize_face(self.target_points[self.current_target_idx][-1], id)
+                self.write('P' + self.env.get_current_obs())
                 # if id != 0:
                 #     stitch()
                 #     exit(0)

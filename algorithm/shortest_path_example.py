@@ -17,19 +17,24 @@ def round_to_two(l: list):
 
 def main():
     env = make_env("RobotMove-v0")
-    env.set_car(x=20, y=20)
-    env.add_obstacle(x=170, y=80, target_face_id=1)
-    env.add_obstacle(x=40, y=40, target_face_id=3)
-    env.add_obstacle(x=75, y=75, target_face_id=1)
-    env.add_obstacle(x=150, y=150, target_face_id=1)
-    env.add_obstacle(x=40, y=100, target_face_id=2)
+    env.set_car(x=15, y=15)
+    # 6 0 up
+    # 2 19 down
+    # 17 16 left
+    # 13 4 left
+    # 9 13 right
+    env.add_obstacle(x=6*10+5, y=0*10+5, target_face_id=0)
+    env.add_obstacle(x=2*10+5, y=19*10+5, target_face_id=2)
+    env.add_obstacle(x=17*10+5, y=16*10+5, target_face_id=1)
+    env.add_obstacle(x=13*10+5, y=4*10+5, target_face_id=1)
+    env.add_obstacle(x=9*10+5, y=13*10+5, target_face_id=3)
     obs = env.reset()
 
     file_path = 'graph.pickle'
     os.path.exists(file_path)
     graph = None
 
-    overwrite = True
+    overwrite = False
 
     try:
         if os.path.exists(file_path) and not overwrite:
@@ -53,8 +58,11 @@ def main():
     # graph.revert()  # reset graph
 
     controller = MainController()
-    env.path = ShortestHamiltonianPathFinder.get_visit_sequence(env)
-    seq = ShortestHamiltonianPathFinder.get_visit_sequence(env)[1:]
+    env.path = ShortestHamiltonianPathFinder.get_visit_sequence(env)[0]
+    seq = ShortestHamiltonianPathFinder.get_visit_sequence(env)[0][1:]
+    obs_seq = ShortestHamiltonianPathFinder.get_visit_sequence(env)[1]
+    print(obs_seq)
+    print(seq)
 
     env.render()
 
