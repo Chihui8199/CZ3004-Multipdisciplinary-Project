@@ -31,7 +31,7 @@ class Server:
         self._connect()
 
         self.env = make_env("RobotMove-v0")
-        self.env.set_car(x=100, y=20)
+        self.env.set_car(x=10, y=10)
         self.controller = MainController()
         self.graph = None
         self.graph_building_thread = None
