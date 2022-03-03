@@ -179,9 +179,9 @@ class Server:
                 if id != 0:
                     stitch()
                     exit(0)
-
-                while self.sensor_data is None:
-                    pass
+                # fetch sensor data from rpi
+                # while self.sensor_data is None:
+                #     pass
 
                 # OBS = 20
                 # diff = dist - OBS
@@ -198,6 +198,8 @@ class Server:
                 if self.current_target_idx == len(self.target_points):
                     print("done")
                     exit(0)
+
+                self.sensor_data = None # reset sensor data
                 continue
             self.ideal_position, _, _, _ = self.env.step(action)
 

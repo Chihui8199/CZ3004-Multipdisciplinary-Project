@@ -169,7 +169,6 @@ class sync:
     def __init__(self):
         self.exit_flag = False
         self.detect_sem = threading.Lock()
-        self.detection = []
 
     def stop_async(self, thread):
         self.exit_flag = True
@@ -179,8 +178,7 @@ class sync:
         while True:
             time.sleep(3)  # take photo every x + 2 seconds
             self.detect_sem.acquire()
-            # id, id_num, dist, angle = detect()
-            self.detection.append(detect())
+            id, id_num, dist, angle = detect()
             print("ASYNC TAKE PHOTO")
             self.detect_sem.release()
             if self.exit_flag:
