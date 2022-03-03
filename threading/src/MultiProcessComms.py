@@ -184,8 +184,8 @@ class MultiProcessComms:
                         data = str(sensor_values)
                         data = data.encode()
                         self.message_queue.put_nowait(self._format_for(
-                            ALGORITHM_HEADER, data
-                    ))
+                            ALGORITHM_HEADER, data))
+                        sensor_values.clear()
 
                     else: 
                         sensor_values.extend(message)
