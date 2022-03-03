@@ -122,7 +122,7 @@ class Server:
             # os.path.exists(file_path)
             # graph = None
 
-            overwrite = True
+            overwrite = False
 
             try:
                 if os.path.exists(file_path) and not overwrite:
@@ -164,7 +164,7 @@ class Server:
         #     stitch()
         #     exit(0)
 
-        self.write('P' + self.env.get_current_obs())   # send the observation
+        self.write('P' + str(self.env.get_current_obs()))   # send the observation
         self.env.clear_sensor_data()
         self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
                                               z=self.ideal_position[0][2]))
@@ -187,10 +187,12 @@ class Server:
                 # call detect in algo
                 self.sync.detect_sem.acquire()
                 id, id_num, dist, angle = detect()  # distance got ±3cm diff
+                if(id_num ==0):
+                    id_num = self.sync.id_prev
                 self.sync.detect_sem.release()
                 self.env.obstacles[self.obs_seq[self.current_target_idx]]\
-                    .recognize_face(self.target_points[self.current_target_idx][-1], Sign(id))
-                self.write('P' + self.env.get_current_obs())
+                    .recognize_face(self.target_points[self.current_target_idx][-1], Sign(id_num))
+                self.write('P' + str(self.env.get_current_obs()))
                 # if id != 0:
                 #     stitch()
                 #     exit(0)
@@ -223,6 +225,7 @@ class Server:
 
                 self.current_target_idx += 1
                 if self.current_target_idx == len(self.target_points):
+                    stitch()
                     print("done")
                     exit(0)
 
@@ -260,7 +263,6 @@ class Server:
 
     def _handle_end_msg(self, msg: str):
         assert msg is None, "Eng message should not contain any body"
-        stitch()
         self.socket.close()
         self.terminated = True
 
