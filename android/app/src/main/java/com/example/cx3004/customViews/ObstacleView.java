@@ -198,4 +198,6 @@ public class ObstacleView extends androidx.appcompat.widget.AppCompatTextView {
     public int getGridY() {
         return y;
     }
+
+    public String getImageFace(){ return imageFace; }
 }

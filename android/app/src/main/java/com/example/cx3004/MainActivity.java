@@ -251,6 +251,10 @@ public class MainActivity extends AppCompatActivity {
                                     obstacle.getObstacleId(), face));
                     obstacle.setOnMap = true;
                     popupWindow.dismiss();
+                    Toast.makeText(MainActivity.this,
+                            String.format("Obstacle %d has been set at (%d, %d) with image face '%s'.",
+                                    obstacle.getObstacleId(), obstacle.getGridX(), obstacle.getGridY(), obstacle.getImageFace()),
+                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
