@@ -1,6 +1,6 @@
 # from detect import *
 # from img_rec import *
-from detect import *
+from image_rec.detect import *
 from cv2 import *
 import uuid
 import os
