@@ -12,12 +12,14 @@ class Car(Entity):
     Represents the robot car
     """
     # TODO: these bounds are just placeholders, the numbers/units are unclear
-    VELOCITY_LB = -2
-    VELOCITY_UP = 2
-    ANGLE_LB = -0.73
-    ANGLE_UB = 0.73
-    TIME_LB = 0.5
-    TIME_UP = 2
+    # VELOCITY_LB = -2
+    # VELOCITY_UP = 2
+    # ANGLE_LB = -0.73
+    # ANGLE_UB = 0.73
+    # TIME_LB = 0.5
+    # TIME_UP = 2
+
+    TURNING_RADIUS = 40     # multiple of 5
 
     def __init__(self, rectification_model: torch.nn.Module = None,
                  x: float = 15, y: float = 15,
@@ -73,9 +75,9 @@ class Car(Entity):
         else:
             # hardcode
             if angle > 0:
-                radius = -40
+                radius = -Car.TURNING_RADIUS
             else:
-                radius = 40
+                radius = Car.TURNING_RADIUS
 
             for i in range(samples + 1):
                 time = i * sample_rate

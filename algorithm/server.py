@@ -10,7 +10,7 @@ from image_rec.img_rec import stitch
 
 from controllers import MainController
 from envs import make_env
-from envs.models import Car
+from envs.models import Car, Obstacle
 from graph import GraphBuilder
 from helpers import ShortestHamiltonianPathFinder
 from image_rec.img_rec import sync
@@ -51,7 +51,7 @@ class Server:
             "T": self._handle_add_obstacles_msg,
             "Y": self._handle_end_of_step_msg,
             "D": self._handle_end_msg,
-            "R": self._handle_arrive_obstacles_msg
+            "US": self._handle_arrive_obstacles_msg
         }
 
         self.terminated = False
@@ -120,11 +120,19 @@ class Server:
             # os.path.exists(file_path)
             # graph = None
 
-            if os.path.exists(file_path):
-                with open(file_path, 'rb') as f:
-                    self.graph = pickle.load(f)
-                self.env.reset()
-            else:
+            overwrite = True
+
+            try:
+                if os.path.exists(file_path) and not overwrite:
+                    with open(file_path, 'rb') as f:
+                        self.graph = pickle.load(f)
+                    self.env.reset()
+                else:
+                    with open(file_path, 'wb') as f:
+                        self.graph = GraphBuilder(self.env.reset(), self.env)
+                        self.graph.createGraph()
+                        pickle.dump(self.graph, f)
+            except:
                 with open(file_path, 'wb') as f:
                     self.graph = GraphBuilder(self.env.reset(), self.env)
                     self.graph.createGraph()
@@ -149,10 +157,10 @@ class Server:
         #  6. clear env sensor data
         #  7. call _plan_and_act
         # TODO: now just use the ideal one
-        object_name, object_id, dist, angle = detect()
-        if object_id != 0:
-            stitch()
-            exit(0)
+        # object_name, object_id, dist, angle = detect()
+        # if object_id != 0:
+        #     stitch()
+        #     exit(0)
 
         self.env.update(rectified_car_pos=Car(x=self.ideal_position[0][0], y=self.ideal_position[0][1],
                                               z=self.ideal_position[0][2]))
@@ -171,26 +179,38 @@ class Server:
             
             if action is None:
                 # handle error, to confirm usage
-                detection = self.sync.stop_async(thread=thread)
+                self.sync.stop_async(thread=thread)
                 # call detect in algo
                 self.sync.detect_sem.acquire()
-                id, id_num, dist, angle = detect()
+                id, id_num, dist, angle = detect()  # distance got ±3cm diff
                 self.sync.detect_sem.release()
-                if id != 0:
-                    #stitch()
-                    exit(0)
+                # if id != 0:
+                #     stitch()
+                #     exit(0)
                 # fetch sensor data from rpi
+                # ultra_msg = 'u' + '00000000000'
+                # self.write(ultra_msg)
+
                 # while self.sensor_data is None:
                 #     pass
 
-                # OBS = 20
-                # diff = dist - OBS
+                # picture_dist = dist + Obstacle.OBS_LEN // 2
+                # ultra_dist = self.sensor_data
+
+                # compare with camera dist and ultrasonic sensor distance
+                # if the difference is too big, then we choose the picture taken distance instead of ultra_dist
+
+                # diff = dist - Obstacle.BEST_VIEW_DISTANCE
                 #
                 # if diff > 0:
                 #     # msg move forward
+                #     msg += 'f00220350149'
+                #     self.write("I" + msg)
                 #     pass
                 # else:
                 #     # msg move backward
+                #     msg += 'b00220350149'
+                #     self.write("I" + msg)
                 #     pass
 
 
@@ -205,23 +225,28 @@ class Server:
 
 
             # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
+            # instruction sent to robot team
+            # forward 5cm: f01071000149
+            # fr: f19501000215
+            # fl: f13301000111
+            # bl: b15201000116
+            # br: b21301000199
+            # f1cm: f00220350149
             msg = ''
             if action[0] > 0:
-                msg += 'f0001000'
                 if action[1] < 0:
-                    msg += '210'
+                    msg += 'f19501000215'
                 elif action[1] == 0:
-                    msg += '149'
+                    msg += 'f01071000149'
                 else:
-                    msg += '109'
+                    msg += 'f13301000111'
             else:
-                msg += 'b0001000'
                 if action[1] < 0:
-                    msg += '200'
+                    msg += 'b21301000199'
                 elif action[1] == 0:
-                    msg += '149'
+                    msg += 'b01071000149'
                 else:
-                    msg += '114'
+                    msg += 'b15201000116'
 
             self.write("I" + msg)
             break
@@ -233,14 +258,15 @@ class Server:
         self.terminated = True
 
     def _handle_arrive_obstacles_msg(self, msg: str):
-        with self.socket as s:
-            s.bind((self.host, self.port))
-            s.listen()
-            conn, addr = s.accept()
-            data = conn.recv(2048)
-
-            data = data.decode('utf-8')
-            self.sensor_data = eval(data)
+        # with self.socket as s:
+        #     s.bind((self.host, self.port))
+        #     s.listen()
+        #     conn, addr = s.accept()
+        #     data = conn.recv(2048)
+        #
+        #     data = data.decode('utf-8')
+        #     self.sensor_data = eval(data)
+        self.sensor_data = eval(msg)
 
 
 if __name__ == '__main__':
