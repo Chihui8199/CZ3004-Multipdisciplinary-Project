@@ -10,7 +10,7 @@ from image_rec.img_rec import stitch
 
 from controllers import MainController
 from envs import make_env
-from envs.models import Car, Obstacle
+from envs.models import Car, Obstacle, Sign
 from graph import GraphBuilder
 from helpers import ShortestHamiltonianPathFinder
 from image_rec.img_rec import sync
@@ -189,7 +189,7 @@ class Server:
                 id, id_num, dist, angle = detect()  # distance got ±3cm diff
                 self.sync.detect_sem.release()
                 self.env.obstacles[self.obs_seq[self.current_target_idx]]\
-                    .recognize_face(self.target_points[self.current_target_idx][-1], id)
+                    .recognize_face(self.target_points[self.current_target_idx][-1], Sign(id))
                 self.write('P' + self.env.get_current_obs())
                 # if id != 0:
                 #     stitch()
