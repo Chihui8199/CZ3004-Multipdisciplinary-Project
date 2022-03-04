@@ -248,21 +248,21 @@ class Server:
             f5, b5, f1, b1 = 'f01071000149', 'b01071000149', 'f00220350149', 'b00220350149'
             if action[0] > 0:
                 if action[1] < 0:
-                    msg_set = [f1, fr, b1]
+                    msg_set = [fr, b1]
                 elif action[1] == 0:    
                     msg_set = [f5]
                 else:
-                    msg_set = [f1, fl]
+                    msg_set = [fl]
             else:
                 if action[1] < 0:
-                    msg_set = [f1, br, b1, b1]
+                    msg_set = [br, b1, b1]
                 elif action[1] == 0:
                     msg_set = [b5]
                 else:
                     msg_set = [bl, b1, b1]
 
             if len(msg_set) == 1:
-                self.write("I" + msg)
+                self.write("I" + msg_set[0])
             else:
                 for msg in msg_set:
                     self.write("I" + msg)
