@@ -55,7 +55,7 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
         source=ROOT / 'data/images',  # file/dir/URL/glob, 0 for webcam
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(320, 416),  # inference size (height, width)
-        conf_thres=0.4,  # confidence threshold
+        conf_thres=0.5,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
@@ -84,6 +84,9 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
     angle = 1000
     bullseye = False
     numdetect = 0
+    conf_level = []
+    for i in range(45):
+        conf_level[i]=0
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -247,7 +250,9 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
                 if dataset.mode == 'image':
                     if idd != None and id_num != "bullseye,ID:-1":
                         save_path = str(save_dir)+'/'+str(idd)+'.png'
-                        cv2.imwrite(save_path, im0)
+                        if(conf > conf_level[imageId[idd]]):
+                            conf_level[id_num] = conf
+                            cv2.imwrite(save_path, im0)
                 else:  # 'video' or 'stream'
                     if vid_path[i] != save_path:  # new video
                         vid_path[i] = save_path
