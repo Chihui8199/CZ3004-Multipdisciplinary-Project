@@ -264,7 +264,6 @@ class Server:
             for msg in msg_set:
                 if len(msg_set) == 1:
                     self.write("I" + msg)
-                    break
                 self.write("I" + msg)
                 time.sleep(1)
             break
