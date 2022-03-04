@@ -40,8 +40,8 @@ def detect(conf_obj):
     # print(str(save_dir))
     img_file = str(save_dir) + '/' + filename + '.png'
     filepath = str(save_dir)
-    #cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
-    cam_port = 0  # LAPTOP CAMERA
+    cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
+    #cam_port = 0  # LAPTOP CAMERA
     cam = cv2.VideoCapture(cam_port)
     result, image = cam.read()
     if result:
@@ -137,8 +137,8 @@ def detectbullseye():
     # print(str(save_dir))
     img_file = str(save_dir) + '/' + filename + '.png'
     filepath = str(save_dir)
-    #cam_port = 'http://192.168.16.16/html/cam_pic_new.php'
-    cam_port = 0
+    cam_port = 'http://192.168.16.16/html/cam_pic_new.php'
+    #cam_port = 0
     cam = cv2.VideoCapture(cam_port)
     result, image = cam.read()
     if result:
@@ -231,16 +231,18 @@ class sync:
         self.exit_flag = False
         self.detect_sem = threading.Lock()
         self.id_prev = 0
+        self.obj = None
 
     def stop_async(self, thread):
         self.exit_flag = True
         thread.join()
 
-    def async_detect(self, stop):
+    def async_detect(self):
         while True:
             time.sleep(5)  # take photo every x + 2 seconds
             self.detect_sem.acquire()
-            id, id_num, dist, angle,conf = detect()
+            print(self.obj)
+            id, id_num, dist, angle,conf = detect(self.obj)
             if(id_num !=0 and id_num !=-1):
                 self.id_prev = id_num
             print("ASYNC TAKE PHOTO")
@@ -248,8 +250,9 @@ class sync:
             if self.exit_flag:
                 break
 
-    def start_async(self):
-        async_detect_thread = Process(target=self.async_detect, args=(lambda: self.exit_flag,))
+    def start_async(self,obj):
+        self.obj = obj
+        async_detect_thread = Process(target=self.async_detect)
         async_detect_thread.start()
         return async_detect_thread
 

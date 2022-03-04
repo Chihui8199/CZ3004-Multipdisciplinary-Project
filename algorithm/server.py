@@ -172,7 +172,7 @@ class Server:
         self._plan_and_act(None)
 
     def _plan_and_act(self, msg: str):
-        thread = self.sync.start_async()
+        thread = self.sync.start_async(self.conf_level)
         if self.graph_building_thread is not None:
             self.graph_building_thread.join()
             self.graph_building_thread = None
@@ -187,7 +187,7 @@ class Server:
                 self.sync.stop_async(thread=thread)
                 # call detect in algo
                 self.sync.detect_sem.acquire()
-                id, id_num, dist, angle = detect(self.conf_level)  # distance got ±3cm diff
+                id, id_num, dist, angle,conf = detect(self.conf_level)  # distance got ±3cm diff
                 if(id_num ==0 or id_num == -1):
                     id_num = self.sync.id_prev
                 self.sync.detect_sem.release()
