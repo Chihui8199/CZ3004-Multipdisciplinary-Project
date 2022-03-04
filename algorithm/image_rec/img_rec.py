@@ -33,8 +33,8 @@ def detect():
     # print(str(save_dir))
     img_file = str(save_dir) + '/' + filename + '.png'
     filepath = str(save_dir)
-    cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
-    #cam_port = 0  # LAPTOP CAMERA
+    #cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
+    cam_port = 0  # LAPTOP CAMERA
     cam = cv2.VideoCapture(cam_port)
     result, image = cam.read()
     if result:

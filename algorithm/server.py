@@ -187,7 +187,7 @@ class Server:
                 # call detect in algo
                 self.sync.detect_sem.acquire()
                 id, id_num, dist, angle = detect()  # distance got ±3cm diff
-                if(id_num ==0):
+                if(id_num ==0 or id_num == -1):
                     id_num = self.sync.id_prev
                 self.sync.detect_sem.release()
                 self.env.obstacles[self.obs_seq[self.current_target_idx]]\
