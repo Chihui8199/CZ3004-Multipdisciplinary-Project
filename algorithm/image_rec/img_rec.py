@@ -10,9 +10,16 @@ from multiprocessing.dummy import Process
 import time
 
 
-def run_model(filename):  # IGNORE
-    id, box_size, angle = run(source=ROOT / filename)
-    return id, box_size, angle
+class conf_level:
+    max_conf = [0]*45
+
+    def change_conf(self,index,value):
+        self.max_conf[index]=value
+
+conf_obj = conf_level()
+def run_model(conf_obj,filename):  # IGNORE
+    id, box_size, angle,conf = run(conf_obj,source=ROOT / filename)
+    return id, box_size, angle,conf
 
 
 def run_bullseye(filename):  # IGNORE
@@ -20,7 +27,7 @@ def run_bullseye(filename):  # IGNORE
     return id, box_size, angle
 
 
-def detect():
+def detect(conf_obj):
     imageId = {"1": 11, "2": 12, "3": 13, "4": 14, "5": 15, "6": 16, "7": 17, "8": 18, "9": 19,
                "A": 20, "B": 21, "C": 22, "D": 23, "E": 24, "F": 25, "G": 26, "H": 27,
                "S": 28, "T": 29, "U": 30, "V": 31, "W": 32, "X": 33, "Y": 34, "Z": 35,
@@ -33,13 +40,13 @@ def detect():
     # print(str(save_dir))
     img_file = str(save_dir) + '/' + filename + '.png'
     filepath = str(save_dir)
-    cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
-    #cam_port = 0  # LAPTOP CAMERA
+    #cam_port = 'http://192.168.16.16/html/cam_pic_new.php' #PI CAMERA
+    cam_port = 0  # LAPTOP CAMERA
     cam = cv2.VideoCapture(cam_port)
     result, image = cam.read()
     if result:
         cv2.imwrite(img_file, image)  # save captured image to file path
-    id, box_size, angle = run_model(filepath)  # run detection model on image in filepath
+    id, box_size, angle,conf = run_model(conf_obj,filepath)  # run detection model on image in filepath
 
     if (box_size != 0):
         box_size = int(int(box_size) / 1000)
@@ -63,7 +70,8 @@ def detect():
     print("IMAGE ID IS: ", id_num)
     print("DIST FROM ROBOT IS: ", int(box_size))
     print("ANGLE IS: ", int(angle))
-    return id, id_num, int(box_size), int(angle)
+    print("CONF LEVEL IS: ", float(conf))
+    return id, id_num, int(box_size), int(angle),float(conf)
 
 
 def stitch():
@@ -129,8 +137,8 @@ def detectbullseye():
     # print(str(save_dir))
     img_file = str(save_dir) + '/' + filename + '.png'
     filepath = str(save_dir)
-    cam_port = 'http://192.168.16.16/html/cam_pic_new.php'
-    # cam_port = 0
+    #cam_port = 'http://192.168.16.16/html/cam_pic_new.php'
+    cam_port = 0
     cam = cv2.VideoCapture(cam_port)
     result, image = cam.read()
     if result:
@@ -232,7 +240,7 @@ class sync:
         while True:
             time.sleep(5)  # take photo every x + 2 seconds
             self.detect_sem.acquire()
-            id, id_num, dist, angle = detect()
+            id, id_num, dist, angle,conf = detect()
             if(id_num !=0 and id_num !=-1):
                 self.id_prev = id_num
             print("ASYNC TAKE PHOTO")
@@ -255,6 +263,8 @@ class sync:
     # sync.detect_sem.acquire()
     # id, id_num, dist, angle = detect()
     # sync.detect_sem.release()
+
+    
 
 
 

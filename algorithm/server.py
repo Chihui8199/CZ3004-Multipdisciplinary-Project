@@ -4,7 +4,7 @@ import socket
 import time
 from multiprocessing.dummy import Process
 from typing import Union
-from image_rec.img_rec import detect
+from image_rec.img_rec import conf_level, detect
 from image_rec.img_rec import stitch
 
 
@@ -45,6 +45,7 @@ class Server:
         #  3. cv module
         self.detection = None
         self.sync = sync()
+        self.conf_level = conf_level()
         self.sensor_data = None
 
         self.incoming_msg_handlers = {
@@ -186,7 +187,7 @@ class Server:
                 self.sync.stop_async(thread=thread)
                 # call detect in algo
                 self.sync.detect_sem.acquire()
-                id, id_num, dist, angle = detect()  # distance got ±3cm diff
+                id, id_num, dist, angle = detect(self.conf_level)  # distance got ±3cm diff
                 if(id_num ==0 or id_num == -1):
                     id_num = self.sync.id_prev
                 self.sync.detect_sem.release()

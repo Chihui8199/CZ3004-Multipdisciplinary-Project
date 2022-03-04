@@ -28,7 +28,7 @@ import argparse
 import os
 import sys
 from pathlib import Path
-
+from image_rec.img_rec import *
 from sqlalchemy import null
 
 import cv2
@@ -50,12 +50,13 @@ from utils.torch_utils import select_device, time_sync
 
 
 @torch.no_grad()
-def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
+def run(conf_obj,
+        weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
         #source=0,
         source=ROOT / 'data/images',  # file/dir/URL/glob, 0 for webcam
         data=ROOT / 'data/coco128.yaml',  # dataset.yaml path
         imgsz=(320, 416),  # inference size (height, width)
-        conf_thres=0.5,  # confidence threshold
+        conf_thres=0.6,  # confidence threshold
         iou_thres=0.45,  # NMS IOU threshold
         max_det=1000,  # maximum detections per image
         device='',  # cuda device, i.e. 0 or 0,1,2,3 or cpu
@@ -84,9 +85,8 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
     angle = 1000
     bullseye = False
     numdetect = 0
-    conf_level = []
-    for i in range(45):
-        conf_level[i]=0
+    confidence = 0
+    
     save_img = not nosave and not source.endswith('.txt')  # save inference images
     is_file = Path(source).suffix[1:] in (IMG_FORMATS + VID_FORMATS)
     is_url = source.lower().startswith(('rtsp://', 'rtmp://', 'http://', 'https://'))
@@ -209,7 +209,10 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
                             id_num = id_num_check
                             idd = image_name
 
+                            confidence = float(f'{conf:.2f}')
+
                         numdetect = numdetect + 1
+                        
                         label = None if hide_labels else (id_num_check if hide_conf else f'{names[c]} {conf:.2f}')
                         annotator.box_label(xyxy, label, color=colors(c, True))
                         if save_crop:
@@ -247,11 +250,12 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
 
             # Save results (image with detections)
             if save_img:
+                
                 if dataset.mode == 'image':
                     if idd != None and id_num != "bullseye,ID:-1":
                         save_path = str(save_dir)+'/'+str(idd)+'.png'
-                        if(conf > conf_level[imageId[idd]]):
-                            conf_level[id_num] = conf
+                        if(confidence > conf_obj.max_conf[imageId[idd]]):
+                            conf_obj.max_conf[imageId[idd]] = confidence
                             cv2.imwrite(save_path, im0)
                 else:  # 'video' or 'stream'
                     if vid_path[i] != save_path:  # new video
@@ -278,10 +282,10 @@ def run(weights=ROOT / 'withbulls50.pt',  # model.pt path(s)
         strip_optimizer(weights)  # update model (to fix SourceChangeWarning)
     if(idd != None):
         #print(idd)
-        return str(idd),int(box_size),int(angle)
+        return str(idd),int(box_size),int(angle),float(confidence)
         
     else:
-        return "None",0,0
+        return "None",0,0,int(confidence)
 
 
 def parse_opt():
@@ -322,6 +326,7 @@ def parse_opt():
 def main(opt):
     check_requirements(exclude=('tensorboard', 'thop'))
     run(**vars(opt))
+
 
 
 if __name__ == "__main__":
