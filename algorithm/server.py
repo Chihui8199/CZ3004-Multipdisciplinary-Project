@@ -249,7 +249,7 @@ class Server:
             if action[0] > 0:
                 if action[1] < 0:
                     msg_set = [f1, fr, b1]
-                elif action[1] == 0:
+                elif action[1] == 0:    
                     msg_set = [f5]
                 else:
                     msg_set = [f1, fl]
