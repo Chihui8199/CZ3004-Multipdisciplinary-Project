@@ -245,18 +245,18 @@ class Server:
             msg = ''
             if action[0] > 0:
                 if action[1] < 0:
-                    msg += 'f19501000215'
+                    msg += 'f19701000215'
                 elif action[1] == 0:
                     msg += 'f01071000149'
                 else:
-                    msg += 'f13301000111'
+                    msg += 'f13001000111'
             else:
                 if action[1] < 0:
-                    msg += 'b21301000199'
+                    msg += 'b21701000199'
                 elif action[1] == 0:
                     msg += 'b01071000149'
                 else:
-                    msg += 'b15201000116'
+                    msg += 'b15401000116'
 
             self.write("I" + msg)
             break
