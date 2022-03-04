@@ -15,13 +15,17 @@ nodes = (side_len // step_count + 1) * 4  # 41 * 4 directions
 # list all actions
 forward_cost = 5
 radius = Car.TURNING_RADIUS
-rotation_cost = radius / 2 * math.pi
+rotation_cost = radius / 2 * math.pi    # a rough rotation cost
 forward = [1, 0, forward_cost]
 backward = [-1, 0, forward_cost]
 angle = 5 / 36 * math.pi
+# fr: car x: 35 + 10; car y: 40 - 11
 fr = [1, -angle, rotation_cost]
+# fl: car x: 34 + 10; car y: 40 - 11
 fl = [1, angle, rotation_cost]
+# br: car x: 44 - 11; car y: 39 + 11 = 50
 br = [-1, -angle, rotation_cost]
+# bl: car x: 44 - 11; car y: 11 + 40 = 51
 bl = [-1, angle, rotation_cost]
 
 sample_rate = 0.5
@@ -36,12 +40,20 @@ class GraphBuilder:
         self.robot_msg = {}
 
     def checkValidAction(self, action, current, target, x, y, new_x, new_y, dir, new_dir, rotation=False):
+        action_ = action[:]
+        action_.append(((dir + 1) * math.pi / 2) % (2 * math.pi))
         traj, path_cost = Car().get_traj(x=x * 5, y=y * 5, z=((dir + 1) * math.pi / 2) % (2 * math.pi),
-                                         sample_rate=sample_rate, action=action)
+                                         sample_rate=sample_rate, action=action_)
         collision = self.env.check_collision(traj=traj)
         # print(x, y, dir, new_x, new_y, new_dir, collision)
         # time.sleep(1)
+        if current == 1547:
+            print(f"{current}->{target}, {x, y}, {new_x, new_y}, {collision}")
         if collision is False:
+            if current == 1547:
+                print(f"{current}->{target}, {x, y}, {new_x, new_y}")
+            if current == 3212:
+                print(f"{current}->{target}, {x, y}, {new_x, new_y}")
             # print(f">>> {current}, {target} ({new_x},{new_y},{new_dir},{rotation})")
             # print(f"<{current}->{target}>")
             if rotation:
@@ -95,54 +107,54 @@ class GraphBuilder:
                         self.checkValidAction(forward, id, nodes * (y + 1) + 4 * x + dir, x, y, x, y + 1, dir, dir)
                         self.checkValidAction(backward, id, nodes * (y - 1) + 4 * x + dir, x, y, x, y - 1, dir, dir)
                         # rotation
-                        self.checkValidAction(fr, id, nodes * (y + radius // 5) + 4 * (x + radius // 5) + 3, x, y,
-                                              x + radius // 5, y + radius // 5, dir, 3, rotation=True)
-                        self.checkValidAction(fl, id, nodes * (y + radius // 5) + 4 * (x - radius // 5) + 1, x, y,
-                                              x - radius // 5, y + radius // 5, dir, 1, rotation=True)
-                        self.checkValidAction(br, id, nodes * (y - radius // 5) + 4 * (x + radius // 5) + 1, x, y,
-                                              x + radius // 5, y - radius // 5, dir, 1, rotation=True)
-                        self.checkValidAction(bl, id, nodes * (y - radius // 5) + 4 * (x - radius // 5) + 3, x, y,
-                                              x - radius // 5, y - radius // 5, dir, 3, rotation=True)
+                        self.checkValidAction(fr, id, nodes * (y + 30 // 5) + 4 * (x + 45 // 5) + 3, x, y,
+                                              x + 45 // 5, y + 30 // 5, dir, 3, rotation=True)
+                        self.checkValidAction(fl, id, nodes * (y + 30 // 5) + 4 * (x - 45 // 5) + 1, x, y,
+                                              x - 45 // 5, y + 30 // 5, dir, 1, rotation=True)
+                        self.checkValidAction(br, id, nodes * (y - 50 // 5) + 4 * (x + 35 // 5) + 1, x, y,
+                                              x + 35 // 5, y - 50 // 5, dir, 1, rotation=True)
+                        self.checkValidAction(bl, id, nodes * (y - 50 // 5) + 4 * (x - 35 // 5) + 3, x, y,
+                                              x - 35 // 5, y - 50 // 5, dir, 3, rotation=True)
 
                     # similarly
                     elif dir == 1:
                         self.checkValidAction(forward, id, nodes * y + 4 * (x - 1) + dir, x, y, x - 1, y, dir, dir)
                         self.checkValidAction(backward, id, nodes * y + 4 * (x + 1) + dir, x, y, x + 1, y, dir, dir)
 
-                        self.checkValidAction(fr, id, nodes * (y + radius // 5) + 4 * (x - radius // 5) + 0, x, y,
-                                              x - radius // 5, y + radius // 5, dir, 0, rotation=True)
-                        self.checkValidAction(fl, id, nodes * (y - radius // 5) + 4 * (x - radius // 5) + 2, x, y,
-                                              x - radius // 5, y - radius // 5, dir, 2, rotation=True)
-                        self.checkValidAction(br, id, nodes * (y + radius // 5) + 4 * (x + radius // 5) + 2, x, y,
-                                              x + radius // 5, y + radius // 5, dir, 2, rotation=True)
-                        self.checkValidAction(bl, id, nodes * (y - radius // 5) + 4 * (x + radius // 5) + 0, x, y,
-                                              x + radius // 5, y - radius // 5, dir, 0, rotation=True)
+                        self.checkValidAction(fr, id, nodes * (y + 45 // 5) + 4 * (x - 30 // 5) + 0, x, y,
+                                              x - 30 // 5, y + 45 // 5, dir, 0, rotation=True)
+                        self.checkValidAction(fl, id, nodes * (y - 45 // 5) + 4 * (x - 30 // 5) + 2, x, y,
+                                              x - 30 // 5, y - 45 // 5, dir, 2, rotation=True)
+                        self.checkValidAction(br, id, nodes * (y + 35 // 5) + 4 * (x + 50 // 5) + 2, x, y,
+                                              x + 50 // 5, y + 35 // 5, dir, 2, rotation=True)
+                        self.checkValidAction(bl, id, nodes * (y - 35 // 5) + 4 * (x + 50 // 5) + 0, x, y,
+                                              x + 50 // 5, y - 35 // 5, dir, 0, rotation=True)
 
                     elif dir == 2:
                         self.checkValidAction(forward, id, nodes * (y - 1) + 4 * x + dir, x, y, x, y - 1, dir, dir)
                         self.checkValidAction(backward, id, nodes * (y + 1) + 4 * x + dir, x, y, x, y + 1, dir, dir)
 
-                        self.checkValidAction(fr, id, nodes * (y - radius // 5) + 4 * (x - radius // 5) + 1, x, y,
-                                              x - radius // 5, y - radius // 5, dir, 1, rotation=True)
-                        self.checkValidAction(fl, id, nodes * (y - radius // 5) + 4 * (x + radius // 5) + 3, x, y,
-                                              x + radius // 5, y - radius // 5, dir, 3, rotation=True)
-                        self.checkValidAction(br, id, nodes * (y + radius // 5) + 4 * (x - radius // 5) + 3, x, y,
-                                              x - radius // 5, y + radius // 5, dir, 3, rotation=True)
-                        self.checkValidAction(bl, id, nodes * (y + radius // 5) + 4 * (x + radius // 5) + 1, x, y,
-                                              x + radius // 5, y + radius // 5, dir, 1, rotation=True)
+                        self.checkValidAction(fr, id, nodes * (y - 30 // 5) + 4 * (x - 45 // 5) + 1, x, y,
+                                              x - 45 // 5, y - 30 // 5, dir, 1, rotation=True)
+                        self.checkValidAction(fl, id, nodes * (y - 30 // 5) + 4 * (x + 45 // 5) + 3, x, y,
+                                              x + 45 // 5, y - 30 // 5, dir, 3, rotation=True)
+                        self.checkValidAction(br, id, nodes * (y + 50 // 5) + 4 * (x - 35 // 5) + 3, x, y,
+                                              x - 35 // 5, y + 50 // 5, dir, 3, rotation=True)
+                        self.checkValidAction(bl, id, nodes * (y + 50 // 5) + 4 * (x + 35 // 5) + 1, x, y,
+                                              x + 35 // 5, y + 50 // 5, dir, 1, rotation=True)
 
                     elif dir == 3:
                         self.checkValidAction(forward, id, nodes * y + 4 * (x + 1) + dir, x, y, x + 1, y, dir, dir)
                         self.checkValidAction(backward, id, nodes * y + 4 * (x - 1) + dir, x, y, x - 1, y, dir, dir)
 
-                        self.checkValidAction(fr, id, nodes * (y - radius // 5) + 4 * (x + radius // 5) + 2, x, y,
-                                              x + radius // 5, y - radius // 5, dir, 2, rotation=True)
-                        self.checkValidAction(fl, id, nodes * (y + radius // 5) + 4 * (x + radius // 5) + 0, x, y,
-                                              x + radius // 5, y + radius // 5, dir, 0, rotation=True)
-                        self.checkValidAction(br, id, nodes * (y - radius // 5) + 4 * (x - radius // 5) + 0, x, y,
-                                              x - radius // 5, y - radius // 5, dir, 0, rotation=True)
-                        self.checkValidAction(bl, id, nodes * (y + radius // 5) + 4 * (x - radius // 5) + 2, x, y,
-                                              x - radius // 5, y + radius // 5, dir, 2, rotation=True)
+                        self.checkValidAction(fr, id, nodes * (y - 45 // 5) + 4 * (x + 30 // 5) + 2, x, y,
+                                              x + 30 // 5, y - 45 // 5, dir, 2, rotation=True)
+                        self.checkValidAction(fl, id, nodes * (y + 45 // 5) + 4 * (x + 30 // 5) + 0, x, y,
+                                              x + 30 // 5, y + 45 // 5, dir, 0, rotation=True)
+                        self.checkValidAction(br, id, nodes * (y - 35 // 5) + 4 * (x - 50 // 5) + 0, x, y,
+                                              x - 50 // 5, y - 35 // 5, dir, 0, rotation=True)
+                        self.checkValidAction(bl, id, nodes * (y + 35 // 5) + 4 * (x - 50 // 5) + 2, x, y,
+                                              x - 50 // 5, y + 35 // 5, dir, 2, rotation=True)
         print("done")
 
     def getGraph(self):

@@ -39,6 +39,7 @@ class Car(Entity):
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
         the simplest way is to return a list of sampled positions (as entities)
         """
+        action, dir = action[:-1], action[-1]
         # traj is a array of car positions, cost is the length of the path
         v, angle, t = action[0], action[1], action[2]
         # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
@@ -91,16 +92,184 @@ class Car(Entity):
                         -v * time / radius + z + math.pi / 2)
                     new_y = y - radius * math.sin(z + math.pi / 2) + radius * math.sin(
                         -v * time / radius + z + math.pi / 2)
+                new_z = (-v * time / radius + z) % (2 * math.pi)
                 traj = Entity(
                     x=new_x,
                     y=new_y,
-                    z=(-v * time / radius + z)%(2*math.pi),
+                    z=new_z,
                     length=self.length,
                     width=self.width
                 )
                 if noise:
                     traj.add_noise()
                 traj_list.append(traj)
+
+            sample_rate = 5 / samples
+            for i in range(samples+1):
+                if i == samples:
+                    time = i * sample_rate
+                    traj = Entity(
+                        x=new_x + round(1 * time * math.cos(new_z)),
+                        y=new_y + round(1 * time * math.sin(new_z)),
+                        z=new_z,
+                        length=self.length,
+                        width=self.width
+                    )
+                else:
+                    time = i * sample_rate
+                    traj = Entity(
+                        x=new_x + (1 * time * math.cos(new_z)),
+                        y=new_y + (1 * time * math.sin(new_z)),
+                        z=new_z,
+                        length=self.length,
+                        width=self.width
+                    )
+                if noise:
+                    traj.add_noise()
+                traj_list.append(traj)
+            # hardcode for the final position
+            dir = round(dir / (math.pi / 2))
+            if dir == 0: # E
+                if action[0] > 0: # forward
+                    if action[1] < 0: # right
+                        entity = Entity(
+                            x=x+30,
+                            y=y-45,
+                            z=math.pi * 3 / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x + 30,
+                            y=y + 45,
+                            z=math.pi / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+                else:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x-50,
+                            y=y-35,
+                            z=math.pi / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x-50,
+                            y=y+35,
+                            z=math.pi * 3 / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+            elif dir == 1: # N
+                if action[0] > 0:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x+45,
+                            y=y+30,
+                            z=0,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x-45,
+                            y=y+30,
+                            z=math.pi,
+                            length=self.length,
+                            width=self.width
+                        )
+                else:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x+35,
+                            y=y-50,
+                            z=math.pi,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x-35,
+                            y=y-50,
+                            z=0,
+                            length=self.length,
+                            width=self.width
+                        )
+            elif dir == 2: # W
+                if action[0] > 0:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x-30,
+                            y=y+45,
+                            z=math.pi/2,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x-30,
+                            y=y-45,
+                            z=math.pi * 3 / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+                else:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x+50,
+                            y=y+35,
+                            z=math.pi * 3 / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x+50,
+                            y=y-35,
+                            z=math.pi / 2,
+                            length=self.length,
+                            width=self.width
+                        )
+            elif dir == 3: # S
+                if action[0] > 0:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x-45,
+                            y=y-30,
+                            z=math.pi,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x+45,
+                            y=y-30,
+                            z=0,
+                            length=self.length,
+                            width=self.width
+                        )
+                else:
+                    if action[1] < 0:
+                        entity = Entity(
+                            x=x-35,
+                            y=y+50,
+                            z=0,
+                            length=self.length,
+                            width=self.width
+                        )
+                    else:
+                        entity = Entity(
+                            x=x+35,
+                            y=y+50,
+                            z=math.pi,
+                            length=self.length,
+                            width=self.width
+                        )
+            traj_list.append(entity)
 
         return traj_list, cost
 

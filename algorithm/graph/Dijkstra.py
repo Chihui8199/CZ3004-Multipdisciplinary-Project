@@ -140,20 +140,21 @@ class Graph():
         self.graph = defaultdict(list)
 
     # Adds an edge to an undirected graph
-    def addEdge(self, src, dest, weight, action=None):
+    def addEdge(self, src, dest, weight):
 
         # Add an edge from src to dest.  A new node
         # is added to the adjacency list of src. The
         # node is added at the beginning. The first
         # element of the node has the destination
         # and the second elements has the weight
-        newNode = [dest, weight, action]
+        newNode = [dest, weight]
         self.graph[src].insert(0, newNode)
 
         # Since graph is undirected, add an edge
         # from dest to src also
-        newNode = [src, weight, action]
-        self.graph[dest].insert(0, newNode)
+        # in our case the graph is directed
+        # newNode = [src, weight]
+        # self.graph[dest].insert(0, newNode)
 
     # The main function that calculates distances
     # of shortest paths from src to all vertices.
@@ -224,7 +225,7 @@ if __name__ == '__main__':
     # Driver program to test the above functions
     graph = Graph(9)
     graph.addEdge(0, 1, 4)
-    graph.addEdge(0, 7, 8)
+    graph.addEdge(7, 0, 8)
     graph.addEdge(1, 2, 8)
     graph.addEdge(1, 7, 11)
     graph.addEdge(2, 3, 7)
