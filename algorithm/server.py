@@ -231,7 +231,9 @@ class Server:
 
                 self.sensor_data = None # reset sensor data
                 continue
-            self.ideal_position, _, _, _ = self.env.step(action)
+            action_ = action[:]
+            action_.append(self.env.get_current_obs()[0][-1])
+            self.ideal_position, _, _, _ = self.env.step(action_)
 
 
             # FIXME: [0] cuz at this moment its a series of actions, need to be changed after
