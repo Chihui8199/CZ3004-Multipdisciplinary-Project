@@ -244,23 +244,25 @@ class Server:
             # bl: b15201000116
             # br: b21301000199
             # f1cm: f00220350149
-            msg = ''
+            fr, fl, bl, br = 'f19701000215', 'f13001000111', 'b15401000116', 'b21701000199'
+            f5, b5, f1, b1 = 'f01071000149', 'b01071000149', 'f00220350149', 'b00220350149'
             if action[0] > 0:
                 if action[1] < 0:
-                    msg += 'f19701000215'
+                    msg_set = [f1, fr, b1]
                 elif action[1] == 0:
-                    msg += 'f01071000149'
+                    msg_set = [f5]
                 else:
-                    msg += 'f13001000111'
+                    msg_set = [f1, fl]
             else:
                 if action[1] < 0:
-                    msg += 'b21701000199'
+                    msg_set = [f1, br, b1, b1]
                 elif action[1] == 0:
-                    msg += 'b01071000149'
+                    msg_set = [b5]
                 else:
-                    msg += 'b15401000116'
+                    msg_set = [bl, b1, b1]
 
-            self.write("I" + msg)
+            for msg in msg_set:
+                self.write("I" + msg)
             break
 
     def _handle_end_msg(self, msg: str):
