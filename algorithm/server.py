@@ -190,7 +190,8 @@ class Server:
                 id, id_num, dist, angle,conf = detect(self.conf_level)  # distance got ±3cm diff
                 stitch_save()
                 if(id_num ==0 or id_num == -1):
-                    id_num = self.sync.id_prev
+                    if(self.sync.id_prev != 0 and self.sync.id_prev!= -1):
+                        id_num = self.sync.id_prev
                 self.sync.detect_sem.release()
                 self.env.obstacles[self.obs_seq[self.current_target_idx]]\
                     .recognize_face(self.target_points[self.current_target_idx][-1], Sign(id_num))
