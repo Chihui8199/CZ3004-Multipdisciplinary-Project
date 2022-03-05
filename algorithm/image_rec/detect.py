@@ -212,9 +212,9 @@ def run(conf_obj,
                             confidence = float(f'{conf:.2f}')
 
                         numdetect = numdetect + 1
-                        
-                        label = None if hide_labels else (id_num_check if hide_conf else f'{names[c]} {conf:.2f}')
-                        annotator.box_label(xyxy, label, color=colors(c, True))
+                        if(id_num_check != "bullseye,ID:-1"):
+                            label = None if hide_labels else (id_num_check if hide_conf else f'{names[c]} {conf:.2f}')
+                            annotator.box_label(xyxy, label, color=colors(c, True))
                         if save_crop:
                             save_one_box(xyxy, imc, file=save_dir / 'crops' / names[c] / f'{p.stem}.jpg', BGR=True)
                     if(id_num_check == "bullseye,ID:-1" and numdetect == 1):

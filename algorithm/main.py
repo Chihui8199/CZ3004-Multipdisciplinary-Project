@@ -3,6 +3,6 @@ from image_rec.img_rec import stitch
 import time
 conf_obj = conf_level()
 
-
-stitch_save()
-#stitch()
+a,b,c,d,e = detect(conf_obj)
+#stitch_save()
+stitch()
