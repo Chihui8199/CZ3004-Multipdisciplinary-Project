@@ -4,7 +4,7 @@ import socket
 import time
 from multiprocessing.dummy import Process
 from typing import Union
-from image_rec.img_rec import conf_level, detect
+from image_rec.img_rec import conf_level, detect, stitch_save
 from image_rec.img_rec import stitch
 
 
@@ -188,6 +188,7 @@ class Server:
                 # call detect in algo
                 self.sync.detect_sem.acquire()
                 id, id_num, dist, angle,conf = detect(self.conf_level)  # distance got ±3cm diff
+                stitch_save()
                 if(id_num ==0 or id_num == -1):
                     id_num = self.sync.id_prev
                 self.sync.detect_sem.release()

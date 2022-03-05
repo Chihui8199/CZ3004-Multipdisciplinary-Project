@@ -120,12 +120,12 @@ def stitch():
             combine = np.vstack([h1, h2, h3])
 
         count = count + 1
-
-    cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result/result.png',
-                combine)  # CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
-    cv2.imshow("Final Collage", combine)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    if(count > 0):
+        cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result/result.png',
+                    combine)  # CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
+        cv2.imshow("Final Collage", combine)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
 
 
 def detectbullseye():
@@ -218,8 +218,8 @@ def stitch_save():
             combine = np.vstack([h1, h2, h3])
 
         count = count + 1
-
-    cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result/result.png',
+    if(count > 0):
+        cv2.imwrite('C:/Users/mdzak/Documents/GitHub/cx3004/algorithm/image_rec/result/result.png',
                 combine)  # CHANGE TO DIRECTORY WHERE STITCHED IMAGE IS SAVED
     #cv2.imshow("Final Collage", combine)
     #cv2.waitKey(0)
