@@ -47,6 +47,7 @@ class Server:
         self.sync = sync()
         self.conf_level = conf_level()
         self.sensor_data = None
+        self.detect_array = [0]*45
 
         self.incoming_msg_handlers = {
             "F": self._plan_and_act,
@@ -189,9 +190,12 @@ class Server:
                 self.sync.detect_sem.acquire()
                 id, id_num, dist, angle,conf = detect(self.conf_level)  # distance got ±3cm diff
                 stitch_save()
+                if(id_num != 0 and id_num!=-1):
+                    self.detect_array[id_num] = 1
                 if(id_num ==0 or id_num == -1):
-                    if(self.sync.id_prev != 0 and self.sync.id_prev!= -1):
+                    if(self.sync.id_prev != 0 and self.sync.id_prev!= -1 and self.detect_array[self.sync.id_prev]==0):
                         id_num = self.sync.id_prev
+                        self.detect_array[id_num] = 1
                 self.sync.detect_sem.release()
                 self.env.obstacles[self.obs_seq[self.current_target_idx]]\
                     .recognize_face(self.target_points[self.current_target_idx][-1], Sign(id_num))
