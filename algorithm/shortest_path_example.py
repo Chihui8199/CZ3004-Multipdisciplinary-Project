@@ -26,15 +26,15 @@ def main():
     env.add_obstacle(x=6*10+5, y=0*10+5, target_face_id=0)
     env.add_obstacle(x=2*10+5, y=19*10+5, target_face_id=2)
     env.add_obstacle(x=17*10+5, y=16*10+5, target_face_id=1)
-    env.add_obstacle(x=13*10+5, y=4*10+5, target_face_id=1)
-    env.add_obstacle(x=9*10+5, y=13*10+5, target_face_id=3)
+    env.add_obstacle(x=10*10+5, y=13*10+5, target_face_id=1)
+    env.add_obstacle(x=11*10+5, y=10*10+5, target_face_id=3)
     obs = env.reset()
 
     file_path = 'graph.pickle'
     os.path.exists(file_path)
     graph = None
 
-    overwrite = False
+    overwrite = True
 
     try:
         if os.path.exists(file_path) and not overwrite:
@@ -77,7 +77,9 @@ def main():
             continue
 
     # for action in actions:
-        obs_, cost, done, _ = env.step(action)
+        action_ = action[:]
+        action_.append(env.get_current_obs()[0][-1])
+        obs_, cost, done, _ = env.step(action_)
 
         if done:
             if env.completed:
