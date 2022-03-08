@@ -15,18 +15,19 @@ nodes = (side_len // step_count + 1) * 4  # 41 * 4 directions
 # list all actions
 forward_cost = 5
 radius = Car.TURNING_RADIUS
-rotation_cost = radius / 2 * math.pi    # a rough rotation cost
+rotation_cost = 100    # a rough rotation cost, prefer more straight line than rotation
+actual_radius = radius * math.pi / 2
 forward = [1, 0, forward_cost]
 backward = [-1, 0, forward_cost]
 angle = 5 / 36 * math.pi
 # fr: car x: 35 + 10; car y: 40 - 11
-fr = [1, -angle, rotation_cost]
+fr = [1, -angle, actual_radius]
 # fl: car x: 34 + 10; car y: 40 - 11
-fl = [1, angle, rotation_cost]
+fl = [1, angle, actual_radius]
 # br: car x: 44 - 11; car y: 39 + 11 = 50
-br = [-1, -angle, rotation_cost]
+br = [-1, -angle, actual_radius]
 # bl: car x: 44 - 11; car y: 11 + 40 = 51
-bl = [-1, angle, rotation_cost]
+bl = [-1, angle, actual_radius]
 
 sample_rate = 0.5
 
@@ -47,13 +48,7 @@ class GraphBuilder:
         collision = self.env.check_collision(traj=traj)
         # print(x, y, dir, new_x, new_y, new_dir, collision)
         # time.sleep(1)
-        if current == 1547:
-            print(f"{current}->{target}, {x, y}, {new_x, new_y}, {collision}")
         if collision is False:
-            if current == 1547:
-                print(f"{current}->{target}, {x, y}, {new_x, new_y}")
-            if current == 3212:
-                print(f"{current}->{target}, {x, y}, {new_x, new_y}")
             # print(f">>> {current}, {target} ({new_x},{new_y},{new_dir},{rotation})")
             # print(f"<{current}->{target}>")
             if rotation:
@@ -62,24 +57,37 @@ class GraphBuilder:
                 self.graph.addEdge(current, target, forward_cost)
             self.action_map[f'{current}_{target}'] = action
 
-            msg = ''
+            fr, fl, bl, br = 'f19701000215', 'f13301000111', 'b15401000116', 'b21701000199'
+            f5, b5, f1, b1 = 'f01071000149', 'b01071000149', 'f00220350149', 'b00220350149'
+            # if action[0] > 0:
+            #     if action[1] < 0:
+            #         msg_set = [f1, fr, b1]
+            #     elif action[1] == 0:
+            #         msg_set = [f5]
+            #     else:
+            #         msg_set = [f1, fl]
+            # else:
+            #     if action[1] < 0:
+            #         msg_set = [f1, br, b1, b1]
+            #     elif action[1] == 0:
+            #         msg_set = [b5]
+            #     else:
+            #         msg_set = [bl, b1, b1]
             if action[0] > 0:
-                msg += 'f0001000'
                 if action[1] < 0:
-                    msg += '210'
+                    msg_set = [fr]
                 elif action[1] == 0:
-                    msg += '149'
+                    msg_set = [f5]
                 else:
-                    msg += '109'
+                    msg_set = [fl]
             else:
-                msg += 'b0001000'
                 if action[1] < 0:
-                    msg += '200'
+                    msg_set = [br]
                 elif action[1] == 0:
-                    msg += '149'
+                    msg_set = [b5]
                 else:
-                    msg += '114'
-            self.robot_msg[f'{current}_{target}'] = msg
+                    msg_set = [bl]
+            self.robot_msg[f'{current}_{target}'] = msg_set[0]
 
     def createGraph(self):
         # the node to consider: format is like (1, 1, N) -> "11N"
@@ -92,7 +100,7 @@ class GraphBuilder:
         # "00N" -> 0+0+0=0 "10N" -> 0+1*4+0=4 "01W" -> 21*4+0+1=85 "xyA" -> 21*4*y+4*x+A
         print("building graph...")
         for y in range(3, side_len // step_count + 2 - 3):
-            print("y: ", y)
+            print(f">>> {y-3}/{side_len // step_count+2-3-3}")
             for x in range(3, side_len // step_count + 2 - 3):
                 # print(f"node: ({x}, {y})")
                 for dir in range(4):  # N W S E
