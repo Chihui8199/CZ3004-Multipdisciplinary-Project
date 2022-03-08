@@ -6,8 +6,8 @@ from envs.models import Direction, Sign, Entity
 
 
 class Obstacle(Entity):
-    ACTUAL_OBS, OBS_LEN = 10, 20
-    BEST_VIEW_DISTANCE = 30 - (OBS_LEN - ACTUAL_OBS) / 2
+    ACTUAL_OBS, OBS_LEN = 10, 10
+    BEST_VIEW_DISTANCE = 25 - (OBS_LEN - ACTUAL_OBS) / 2
 
     """
     Represents the robot car
