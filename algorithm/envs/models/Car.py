@@ -24,7 +24,7 @@ class Car(Entity):
     def __init__(self, rectification_model: torch.nn.Module = None,
                  x: float = 15, y: float = 15,
                  z: float = Direction.NORTH.value,
-                 length: float = 22, width: float = 20):  # TODO: the exact default values need to be confirmed
+                 length: float = 25, width: float = 25):  # TODO: the exact default values need to be confirmed
         """
         :param rectification_model: model used to rectify the position of the car after moving
         """
