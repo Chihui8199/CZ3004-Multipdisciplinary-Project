@@ -175,7 +175,7 @@ class Server:
 
     def _plan_and_act(self, msg: str):
         if self.start:
-            self.write('I' + 'f00000000111')
+            self.write('I' + 'f00000000199')
             time.sleep(1)
             self.start = False
         thread = self.sync.start_async(self.conf_level)
