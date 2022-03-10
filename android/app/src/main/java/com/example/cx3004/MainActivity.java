@@ -180,9 +180,7 @@ public class MainActivity extends AppCompatActivity {
         sectionsPagerAdapter.robotStateFragment.setRobotState(xCoord, yCoord, direction, status);
     }
 
-    public void start(View v){
-        remoteSendMsg("Gstart");
-    }
+    public void start(View v){ remoteSendMsg("Gstart"); }
 
     public void sendObstacleMsg(View v) {
         Log.d("OBSTACLE", "Set obstacle button clicked.");
@@ -349,12 +347,13 @@ public class MainActivity extends AppCompatActivity {
         double angleRad = coordsArray.getDouble(2);
 
         // process angle into android application readable directions
+        // angle starts at right and goes counter-clockwise
         String direction = "up";
         double angleDeg = (angleRad / (2 * Math.PI) * 360) % 360;
         if ((0 <= angleDeg & angleDeg <= 45) | (315 < angleDeg & angleDeg < 360))
-            direction = "left";
+            direction = "right";
         else if (45 < angleDeg & angleDeg <= 135) direction = "up";
-        else if (135 < angleDeg & angleDeg <= 255) direction = "right";
+        else if (135 < angleDeg & angleDeg <= 255) direction = "left";
         else if (255 < angleDeg & angleDeg <= 315) direction = "down";
         else Log.d(BTTAG, "Unknown direction passed. Direction set to 'up' by default");
 
