@@ -30,6 +30,7 @@ class Server:
         self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self._connect()
 
+        self.start = True
         self.env = make_env("RobotMove-v0")
         self.env.set_car(x=15, y=15)
         self.controller = MainController()
@@ -173,6 +174,10 @@ class Server:
         self._plan_and_act(None)
 
     def _plan_and_act(self, msg: str):
+        if self.start:
+            self.write('I' + 'f00000000111')
+            time.sleep(1)
+            self.start = False
         thread = self.sync.start_async(self.conf_level)
         if self.graph_building_thread is not None:
             self.graph_building_thread.join()
