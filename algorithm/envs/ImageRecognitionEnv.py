@@ -276,10 +276,10 @@ class ImageRecognitionEnv(gym.Env):
         if self.mock:
             logging.warning("you should not use update in a mock env")
         self.steps += 1
-        if self.check_collision([rectified_car_pos]):
-            # ideally this should not happen, but we need to handle it
-            # TODO: in case the position is really not valid, we should have a fallback strategy
-            raise ValueError(f"invalid car position! x: {rectified_car_pos.get_positioning_status()};\n ")
+        # if self.check_collision([rectified_car_pos]):
+        #     # ideally this should not happen, but we need to handle it
+        #     # TODO: in case the position is really not valid, we should have a fallback strategy
+        #     raise ValueError(f"invalid car position! x: {rectified_car_pos.get_positioning_status()};\n ")
         self.car.set(rectified_car_pos.x, rectified_car_pos.y, rectified_car_pos.z)
 
     def get_current_obs(self):
