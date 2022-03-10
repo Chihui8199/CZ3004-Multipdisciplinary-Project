@@ -3,8 +3,6 @@ import math
 import socket
 import time
 from typing import Union
-from image_rec.img_rec import detectbullseye
-
 
 RPI_IP = '192.168.16.16'
 RPI_PORT = 8080
@@ -30,6 +28,13 @@ DISTANCE_SET = {
     30: "",
 }
 
+ANGLE_SET = {
+    "Left": '111',
+    "Right": '199',
+    "Straight": '149',
+}
+
+
 # straight line commands: direction + speed + distance
 # turn 90 degree right and left as in task 1
 
@@ -54,7 +59,12 @@ class Server:
         self.has_thing_at_left = None
         self.has_thing_at_right = None
 
-        self.horizontal_distance_to_cover = 0.
+        self.horizontal_shift = 0.
+        self.moved = 0.
+        self.found_the_obs_at_side = None
+
+        self.left_turn_command = 'f12601000111'
+        self.right_turn_command = 'f19801000215'
 
         # path planning related
         self.flipped = False  # default to be clockwise turn
@@ -130,6 +140,10 @@ class Server:
             logging.exception('Algorithm write failed')
 
     @staticmethod
+    def _form_command(direction, distance, speed, angle="Straight"):
+        return DIRECTION_SET[direction] + DISTANCE_SET[distance] + SPEED_SET[speed] + ANGLE_SET[angle]
+
+    @staticmethod
     def _parse_sensor_data(msg: str):
         pass
 
@@ -158,7 +172,7 @@ class Server:
 
         # Step 3
         if self.stage in [0, 1]:
-            id, distance, angle = detectbullseye()
+            # id, distance, angle = detectbullseye()
             # if angle is small, means right in front of the car, flip the strategy
             pass
 
@@ -172,75 +186,131 @@ class Server:
 
     def _act(self, msg: str = None):
         # TODO: based on the current stage and status, choose action
-        cmd = ""
+        cmd = None
         if self.stage == 0:
             if self.current_distance_to_front is None:
                 # never moves
                 # slowly move 1 cm forward
                 # return
-                pass
+                cmd = self._form_command("f", 5, "SlowSpeed")
             if abs(self.current_distance_to_front - 200) > 15:
                 # moved but the obstacle is not in front of the car
                 # move back and force?
                 logging.critical("Didn't find obstacle in front!")
-                pass
+                exit(-1)
         if self.stage in [0, 1]:
             if abs(self.current_distance_to_obstacle - 75) < 5:  # already can make the turn
                 self.stage = 3
                 # make left turn
+                cmd = self.left_turn_command
             else:
                 self.stage = 1
                 buffer_dist = self.current_distance_to_obstacle - 75
                 dist = self._get_biggest_smaller_dist(buffer_dist)
                 # determine speed based on dist
                 # form command
+                cmd = self._form_command("f", dist, "HighSpeed")
         elif self.stage == 2:
-            if self.current_distance_to_left_side_wall < 55:
-                # reverse slowly by 5
-                pass
-            if abs(self.current_distance_to_left_side_wall - 55) < 5:
-                self.stage = 4
-                # make 90 right turn
-                pass
-            if not self.has_thing_at_right:
+            # if self.current_distance_to_left_side_wall < 55:
+            #     # reverse slowly by 5
+            #     pass
+            # if abs(self.current_distance_to_left_side_wall - 55) < 5:
+            #     self.stage = 4
+            #     # make 90 right turn
+            #     pass
+            if self.has_thing_at_right is None:
+                self.found_the_obs_at_side = self.has_thing_at_right
+            if self.has_thing_at_right != self.found_the_obs_at_side:
                 self.stage = 3
+                # (originally no, now just found the edge), or (originally yes, after driving forward, now no)
+                # anyways it's now at the edge
                 # reverse 10 cm to make the turn
-                pass
+                cmd = self._form_command("b", 10, "MediumSpeed")
             else:
-                # move slowly forward 5 cm
-                pass
+                if self.has_thing_at_right is True:
+                    # move slowly forward 5 cm
+                    self.horizontal_shift -= 5
+                    cmd = self._form_command("f", 5, "SlowSpeed")
+                    pass
+                else:
+                    # move slowly backward 5 cm
+                    self.horizontal_shift += 5
+                    cmd = self._form_command("b", 5, "SlowSpeed")
+                    pass
         elif self.stage == 3:
             self.stage = 4
             # make 90 degree right turn
+            cmd = self.right_turn_command
         elif self.stage == 4:
             self.stage = 5
             # make 90 right turn
+            cmd = self.right_turn_command
         elif self.stage == 5:
             # calculate the distance to the ideal turning position
-            # fast move towards it
             self.stage = 6
+            # fast move towards it
+            cmd = self._form_command("f", 30, "HighSpeed")
         elif self.stage == 6:
             self.stage = 7
             # make right turn
+            cmd = self.right_turn_command
         elif self.stage == 7:
-            if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2: # garage right in front
+            if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2:  # garage right in front
                 self.stage = 10
                 self.current_distance_to_garage = self.current_distance_to_front
                 # stage 10 logic
                 movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
                 dist = self._get_biggest_smaller_dist(movable_dist)
                 # fast forward + biggest movable_dist
+                cmd = self._form_command("f", dist, "HighSpeed")
             else:
                 self.stage = 8
                 # make 90 right turn
+                cmd = self.right_turn_command
         elif self.stage == 8:
-            # calculate the distance to move based on previously moved distance
-            # if distance = 0, reached, then to stage 9
-            # else move slowly forward  # not gonna be far
-            pass
+            """
+            calculate the distance to move based on previously moved distance
+            if distance = 0, reached, then to stage 9
+            else move slowly forward  # not gonna be far
+            
+            original position after the 1st turn: x
+            x + self.horizontal_shift = 10 ~ 15, moving right is +, moving left is -, take obstacle left end as 0
+            now the car is estimated to be at x0 after coming back from the back of the obstacle
+            x0 = 40
+            we want it to move distance y s.t.
+            x0 + y = x - 40 (the position that when making one left turn, it is exactly on the coming way)
+            
+            we have:
+            x0 + y = (10 ~ 15) - self.horizontal_shift - 40
+            y = (10 ~ 15) - self.horizontal_shift - x0 - 40
+            
+            since x0 should roughly be 40
+            so:
+            
+            y = (-65 ~ -70) - self.horizontal_shift
+            
+            if y < 0, move left abs(y)
+            if y > 0, move right abs(y)
+            """
+            # ideally should be
+            y = -67.5 - self.horizontal_shift + self.moved
+            if abs(y) < 5:
+                self.stage = 9
+                pass
+            movable_dist = self._get_biggest_smaller_dist(abs(y))
+            if y < 0:
+                # mid move fwd movable_dist
+                self.moved -= movable_dist
+                cmd = self._form_command("f", movable_dist, "MediumSpeed")
+            else:
+                # mid move back movable_dist
+                self.moved += movable_dist
+                cmd = self._form_command("b", movable_dist, "MediumSpeed")
+                pass
         elif self.stage == 9:
             self.stage = 10
             # make left turn
+            cmd = self.left_turn_command
         elif self.stage == 10:
             movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
             if movable_dist < 5:
@@ -249,6 +319,7 @@ class Server:
                 return  # end of task
             dist = self._get_biggest_smaller_dist(movable_dist)
             # fast forward + biggest movable_dist
+            cmd = self._form_command("f", dist, "HighSpeed")
 
         self.write(message="I" + cmd)
 
