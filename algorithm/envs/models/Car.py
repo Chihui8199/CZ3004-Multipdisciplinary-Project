@@ -39,9 +39,7 @@ class Car(Entity):
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
         the simplest way is to return a list of sampled positions (as entities)
         """
-        # print(action)
         action, dir = action[:-1], action[-1]
-
         # traj is a array of car positions, cost is the length of the path
         v, angle, t = action[0], action[1], action[2]
         # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
@@ -77,17 +75,10 @@ class Car(Entity):
                 traj_list.append(traj)
         else:
             # hardcode
-            if action[0] > 0: # forward
-                if angle > 0:
-                    radius = -32.5
-                else:
-                    radius = 32.5
+            if angle > 0:
+                radius = -Car.TURNING_RADIUS
             else:
-                if angle > 0:
-                    radius = -42.5
-                else:
-                    radius = 42.5
-            sample_rate = abs(radius) * math.pi / 2 / samples
+                radius = Car.TURNING_RADIUS
 
             for i in range(samples + 1):
                 time = i * sample_rate
