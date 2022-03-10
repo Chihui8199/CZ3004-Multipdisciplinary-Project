@@ -80,7 +80,10 @@ class Server:
         6: ready to make right turn from the back
         7: half way passing the obstacle, check if garage in front
         8: adjusting position, parallel to the obstacle front
+        
+        (stage 9 is actually unreachable, as is handled by 8)
         9: ready to make the left turn to face the garage 
+        
         10: on the way to the garage
         11: stopped
         """
@@ -272,45 +275,45 @@ class Server:
             calculate the distance to move based on previously moved distance
             if distance = 0, reached, then to stage 9
             else move slowly forward  # not gonna be far
-            
+
             original position after the 1st turn: x
             x + self.horizontal_shift = 10 ~ 15, moving right is +, moving left is -, take obstacle left end as 0
             now the car is estimated to be at x0 after coming back from the back of the obstacle
             x0 = 40
             we want it to move distance y s.t.
             x0 + y = x - 40 (the position that when making one left turn, it is exactly on the coming way)
-            
+
             we have:
             x0 + y = (10 ~ 15) - self.horizontal_shift - 40
             y = (10 ~ 15) - self.horizontal_shift - x0 - 40
-            
+
             since x0 should roughly be 40
             so:
-            
+
             y = (-65 ~ -70) - self.horizontal_shift
-            
+
             if y < 0, move left abs(y)
             if y > 0, move right abs(y)
             """
             # ideally should be
             y = -67.5 - self.horizontal_shift + self.moved
             if abs(y) < 5:
-                self.stage = 9
-                pass
-            movable_dist = self._get_biggest_smaller_dist(abs(y))
-            if y < 0:
-                # mid move fwd movable_dist
-                self.moved -= movable_dist
-                cmd = self._form_command("f", movable_dist, "MediumSpeed")
+                self.stage = 10
+                cmd = self.left_turn_command
             else:
-                # mid move back movable_dist
-                self.moved += movable_dist
-                cmd = self._form_command("b", movable_dist, "MediumSpeed")
-                pass
-        elif self.stage == 9:
-            self.stage = 10
-            # make left turn
-            cmd = self.left_turn_command
+                movable_dist = self._get_biggest_smaller_dist(abs(y))
+                if y < 0:
+                    # mid move fwd movable_dist
+                    self.moved -= movable_dist
+                    cmd = self._form_command("f", movable_dist, "MediumSpeed")
+                else:
+                    # mid move back movable_dist
+                    self.moved += movable_dist
+                    cmd = self._form_command("b", movable_dist, "MediumSpeed")
+        # elif self.stage == 9:
+        #     self.stage = 10
+        #     # make left turn
+        #     cmd = self.left_turn_command
         elif self.stage == 10:
             movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
             if movable_dist < 5:
