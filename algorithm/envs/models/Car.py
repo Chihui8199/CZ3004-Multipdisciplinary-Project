@@ -77,10 +77,17 @@ class Car(Entity):
                 traj_list.append(traj)
         else:
             # hardcode
-            if angle > 0:
-                radius = -Car.TURNING_RADIUS
+            if action[0] > 0: # forward
+                if angle > 0:
+                    radius = -32.5
+                else:
+                    radius = 32.5
             else:
-                radius = Car.TURNING_RADIUS
+                if angle > 0:
+                    radius = -42.5
+                else:
+                    radius = 42.5
+            sample_rate = abs(radius) * math.pi / 2 / samples
 
             for i in range(samples + 1):
                 time = i * sample_rate
