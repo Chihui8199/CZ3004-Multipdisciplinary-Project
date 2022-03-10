@@ -240,13 +240,15 @@ class sync:
     def async_detect(self):
         while True:
             time.sleep(5)  # take photo every x + 2 seconds
+            '''
             self.detect_sem.acquire()
             print(self.obj)
             id, id_num, dist, angle,conf = detect(self.obj)
             if(id_num !=0 and id_num !=-1):
                 self.id_prev = id_num
+                '''
             print("ASYNC TAKE PHOTO")
-            self.detect_sem.release()
+            #self.detect_sem.release()
             if self.exit_flag:
                 break
 
