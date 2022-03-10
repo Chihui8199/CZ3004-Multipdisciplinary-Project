@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class BluetoothConnectionService {
@@ -247,7 +248,7 @@ public class BluetoothConnectionService {
             while (true) {
                 try {
                     bytes = inStream.read(buffer);
-                    String incomingmessage = new String(buffer, 0, bytes);
+                    String incomingmessage = new String(buffer, 0, bytes, StandardCharsets.UTF_8);
                     Log.d(TAG, "InputStream: " + incomingmessage);
 
                     Intent incomingMessageIntent = new Intent("incomingMessage");
@@ -264,7 +265,7 @@ public class BluetoothConnectionService {
         }
 
         public void write(byte[] bytes) {
-            String text = new String(bytes, Charset.defaultCharset());
+            String text = new String(bytes, StandardCharsets.UTF_8);
             Log.d(TAG, "write: Writing to output stream: " + text);
             try {
                 outStream.write(bytes);
