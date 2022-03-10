@@ -24,7 +24,7 @@ class Car(Entity):
     def __init__(self, rectification_model: torch.nn.Module = None,
                  x: float = 15, y: float = 15,
                  z: float = Direction.NORTH.value,
-                 length: float = 22, width: float = 22):  # TODO: the exact default values need to be confirmed
+                 length: float = 22, width: float = 20):  # TODO: the exact default values need to be confirmed
         """
         :param rectification_model: model used to rectify the position of the car after moving
         """
@@ -39,7 +39,9 @@ class Car(Entity):
         TODO: not yet sure how/what to record, essentially we need this to do the collision detection
         the simplest way is to return a list of sampled positions (as entities)
         """
+        # print(action)
         action, dir = action[:-1], action[-1]
+
         # traj is a array of car positions, cost is the length of the path
         v, angle, t = action[0], action[1], action[2]
         # traj should be divided into samples with a sample rate # TODO: default value to be confirmed
@@ -75,10 +77,17 @@ class Car(Entity):
                 traj_list.append(traj)
         else:
             # hardcode
-            if angle > 0:
-                radius = -Car.TURNING_RADIUS
+            if action[0] > 0: # forward
+                if angle > 0:
+                    radius = -32.5
+                else:
+                    radius = 32.5
             else:
-                radius = Car.TURNING_RADIUS
+                if angle > 0:
+                    radius = -42.5
+                else:
+                    radius = 42.5
+            sample_rate = abs(radius) * math.pi / 2 / samples
 
             for i in range(samples + 1):
                 time = i * sample_rate
