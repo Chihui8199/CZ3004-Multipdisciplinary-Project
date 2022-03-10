@@ -100,7 +100,7 @@ class GraphBuilder:
         # "00N" -> 0+0+0=0 "10N" -> 0+1*4+0=4 "01W" -> 21*4+0+1=85 "xyA" -> 21*4*y+4*x+A
         print("building graph...")
         for y in range(3, side_len // step_count + 2 - 3):
-            print(f">>> {y-3}/{side_len // step_count+2-3-3}")
+            print(f">>> {y-3}/{side_len // step_count+2-3-3-1}")
             for x in range(3, side_len // step_count + 2 - 3):
                 # print(f"node: ({x}, {y})")
                 for dir in range(4):  # N W S E

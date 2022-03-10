@@ -6,7 +6,7 @@ from envs.models import Direction, Sign, Entity
 
 
 class Obstacle(Entity):
-    ACTUAL_OBS, OBS_LEN = 10, 10
+    ACTUAL_OBS, OBS_LEN = 10, 12
     BEST_VIEW_DISTANCE = 25 - (OBS_LEN - ACTUAL_OBS) / 2
 
     """
