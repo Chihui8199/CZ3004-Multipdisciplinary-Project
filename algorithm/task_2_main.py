@@ -63,8 +63,10 @@ class Server:
         self.moved = 0.
         self.found_the_obs_at_side = None
 
-        self.left_turn_command = 'f12601000111'
-        self.right_turn_command = 'f19801000215'
+        self.left_turn_command = 'f1260100011100'
+        self.left_turn_with_ir_command = 'f1260100011100'
+        self.right_turn_command = 'f1980100021500'
+        self.right_turn_with_us_command = 'f1980100021510'
 
         # path planning related
         self.flipped = False  # default to be clockwise turn
@@ -143,19 +145,23 @@ class Server:
             logging.exception('Algorithm write failed')
 
     @staticmethod
-    def _form_command(direction, distance, speed, angle="Straight"):
-        return DIRECTION_SET[direction] + DISTANCE_SET[distance] + SPEED_SET[speed] + ANGLE_SET[angle]
+    def _form_command(direction, distance, speed, angle="Straight", take_us: bool = False, take_ir: bool = True):
+        return DIRECTION_SET[direction] + DISTANCE_SET[distance] + SPEED_SET[speed] + ANGLE_SET[angle] + \
+               "1" if take_us else "0" + "1" if take_ir else "0"
 
     @staticmethod
     def _parse_sensor_data(msg: str):
         """
-        HUS200False
         H200,False
         :param msg:
         :return:
         """
         us, ir = msg.split(",")
-        return int(us), eval(ir)
+        try:
+            ir = eval(ir)
+        except Exception:
+            ir = False
+        return int(us), ir
 
     def _handle_end_of_step_msg(self, msg: str):
         # TODO:
@@ -164,16 +170,17 @@ class Server:
         #  3. (optional at stage 3) ask cv module to take pic, see if bulls eyes
         #  4. call _plan_and_act
         # Step 1 & 2
-        distance_to_front, self.has_thing_at_left, self.has_thing_at_right = self._parse_sensor_data(msg)
-        self.current_distance_to_front = distance_to_front
-        if self.stage in [0, 1]:
-            self.current_distance_to_obstacle = distance_to_front
-        elif self.stage in [3, 7]:
-            self.current_distance_to_left_side_wall = distance_to_front
-        elif self.stage == 5:
-            self.current_distance_to_right_side_wall = distance_to_front
-        elif self.stage == 8:
-            self.current_distance_to_garage = distance_to_front
+        distance_to_front, self.has_thing_at_right = self._parse_sensor_data(msg)
+        if distance_to_front != 0:  # when it has a valid reading
+            self.current_distance_to_front = distance_to_front
+            if self.stage in [0, 1]:
+                self.current_distance_to_obstacle = distance_to_front
+            elif self.stage in [3, 7]:
+                self.current_distance_to_left_side_wall = distance_to_front
+            elif self.stage == 5:
+                self.current_distance_to_right_side_wall = distance_to_front
+            elif self.stage == 8:
+                self.current_distance_to_garage = distance_to_front
 
         if self.stage == 0:
             # first impression abt the environment
@@ -202,7 +209,7 @@ class Server:
                 # never moves
                 # slowly move 1 cm forward
                 # return
-                cmd = self._form_command("f", 5, "SlowSpeed")
+                cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
             if abs(self.current_distance_to_front - 200) > 15:
                 # moved but the obstacle is not in front of the car
                 # move back and force?
@@ -212,14 +219,14 @@ class Server:
             if abs(self.current_distance_to_obstacle - 75) < 5:  # already can make the turn
                 self.stage = 3
                 # make left turn
-                cmd = self.left_turn_command
+                cmd = self.left_turn_with_ir_command
             else:
                 self.stage = 1
                 buffer_dist = self.current_distance_to_obstacle - 75
                 dist = self._get_biggest_smaller_dist(buffer_dist)
                 # determine speed based on dist
                 # form command
-                cmd = self._form_command("f", dist, "HighSpeed")
+                cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
         elif self.stage == 2:
             # if self.current_distance_to_left_side_wall < 55:
             #     # reverse slowly by 5
@@ -240,12 +247,12 @@ class Server:
                 if self.has_thing_at_right is True:
                     # move slowly forward 5 cm
                     self.horizontal_shift -= 5
-                    cmd = self._form_command("f", 5, "SlowSpeed")
+                    cmd = self._form_command("f", 5, "SlowSpeed", take_ir=True)
                     pass
                 else:
                     # move slowly backward 5 cm
                     self.horizontal_shift += 5
-                    cmd = self._form_command("b", 5, "SlowSpeed")
+                    cmd = self._form_command("b", 5, "SlowSpeed", take_ir=True)
                     pass
         elif self.stage == 3:
             self.stage = 4
@@ -263,7 +270,7 @@ class Server:
         elif self.stage == 6:
             self.stage = 7
             # make right turn
-            cmd = self.right_turn_command
+            cmd = self.right_turn_with_us_command
         elif self.stage == 7:
             if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2:  # garage right in front
                 self.stage = 10
@@ -272,7 +279,7 @@ class Server:
                 movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
                 dist = self._get_biggest_smaller_dist(movable_dist)
                 # fast forward + biggest movable_dist
-                cmd = self._form_command("f", dist, "HighSpeed")
+                cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
             else:
                 self.stage = 8
                 # make 90 right turn
@@ -329,7 +336,7 @@ class Server:
                 return  # end of task
             dist = self._get_biggest_smaller_dist(movable_dist)
             # fast forward + biggest movable_dist
-            cmd = self._form_command("f", dist, "HighSpeed")
+            cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
 
         self.write(message="I" + cmd)
 
