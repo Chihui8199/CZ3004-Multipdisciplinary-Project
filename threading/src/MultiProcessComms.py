@@ -162,7 +162,40 @@ class MultiProcessComms:
         self.write_android_process.start()
 
         print('Reconnected to Android')
-        
+    
+    # FOR TASK 1
+    # def _read_robot(self):
+    #     while True:
+    #         try:
+    #             raw_message = self.robot.read()
+                
+    #             if raw_message is None:
+    #                 continue
+
+    #             message_list = raw_message.splitlines()
+                
+    #             sensor_values = []
+
+    #             for message in message_list:
+                
+    #                 if len(message) <= 0:
+    #                     continue
+                    
+    #                 if message[0] == ord(RobotToRpi.ROBOT_STOP):
+    #                     data = "Y" + str(sensor_values)
+    #                     data = data.encode()
+    #                     self.message_queue.put_nowait(self._format_for(
+    #                         ALGORITHM_HEADER, data))
+    #                     sensor_values.clear()
+
+    #                 else: 
+    #                     sensor_values.extend(message)
+                    
+    #         except Exception:
+    #             logging.exception("Process read_robot failed")
+    #             break    
+
+    # For Task 2
     def _read_robot(self):
         while True:
             try:
@@ -173,7 +206,6 @@ class MultiProcessComms:
 
                 message_list = raw_message.splitlines()
                 
-                sensor_values = []
 
                 for message in message_list:
                 
@@ -181,18 +213,14 @@ class MultiProcessComms:
                         continue
                     
                     if message[0] == ord(RobotToRpi.ROBOT_STOP):
-                        data = "Y" + str(sensor_values)
+                        data = "Y" + str(message)
                         data = data.encode()
                         self.message_queue.put_nowait(self._format_for(
                             ALGORITHM_HEADER, data))
-                        sensor_values.clear()
-
-                    else: 
-                        sensor_values.extend(message)
                     
             except Exception:
                 logging.exception("Process read_robot failed")
-                break    
+                break
 
     def _read_algorithm(self):
         while True:
