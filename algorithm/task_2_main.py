@@ -279,20 +279,23 @@ class Server:
         elif self.stage == 6:
             self.stage = 7
             # make right turn
-            cmd = self.right_turn_with_us_command
+#             cmd = self.right_turn_with_us_command
+            cmd = self.right_turn_command
         elif self.stage == 7:
-            if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2:  # garage right in front
-                self.stage = 10
-                self.current_distance_to_garage = self.current_distance_to_front
-                # stage 10 logic
-                movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
-                dist = self._get_biggest_smaller_dist("HighSpeed", movable_dist)
-                # fast forward + biggest movable_dist
-                cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
-            else:
-                self.stage = 8
-                # make 90 right turn
-                cmd = self.right_turn_command
+#             if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2:  # garage right in front
+#                 self.stage = 10
+#                 self.current_distance_to_garage = self.current_distance_to_front
+#                 # stage 10 logic
+#                 movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
+#                 dist = self._get_biggest_smaller_dist("HighSpeed", movable_dist)
+#                 # fast forward + biggest movable_dist
+#                 cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
+#             else:
+#                 self.stage = 8
+#                 # make 90 right turn
+#                 cmd = self.right_turn_command
+            self.stage = 8
+            cmd = self.right_turn_command
         elif self.stage == 8:
             """
             calculate the distance to move based on previously moved distance
