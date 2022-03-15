@@ -10,9 +10,9 @@ HOST_PORT = 8080
 logging.getLogger().setLevel(logging.DEBUG)
 
 SPEED_SET = {
-    "HighSpeed": "",
-    "MediumSpeed": "",
-    "SlowSpeed": "",
+    "HighSpeed": "3500",
+    "MediumSpeed": "2500",
+    "SlowSpeed": "1000",
 }
 
 DIRECTION_SET = {
@@ -21,16 +21,16 @@ DIRECTION_SET = {
 }
 
 DISTANCE_SET = {
-    1: "",
-    5: "",
-    10: "",
-    20: "",
-    30: "",
+    1: "0099",
+    5: "0107",
+    10: "0150",
+    20: "0340",
+    30: "0660",
 }
 
 ANGLE_SET = {
     "Left": '111',
-    "Right": '199',
+    "Right": '215',
     "Straight": '149',
 }
 
@@ -148,7 +148,14 @@ class Server:
 
     @staticmethod
     def _parse_sensor_data(msg: str):
-        pass
+        """
+        HUS200False
+        H200,False
+        :param msg:
+        :return:
+        """
+        us, ir = msg.split(",")
+        return int(us), eval(ir)
 
     def _handle_end_of_step_msg(self, msg: str):
         # TODO:
