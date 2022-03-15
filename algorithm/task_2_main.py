@@ -16,8 +16,8 @@ SPEED_SET = {
 }
 
 DIRECTION_SET = {
-    "Forward": "f",
-    "Backward": "b",
+    "f": "f",
+    "b": "b",
 }
 
 DISTANCE_SET = {
@@ -205,23 +205,23 @@ class Server:
         # TODO: based on the current stage and status, choose action
         cmd = None
         if self.stage == 0:
-            if self.current_distance_to_front is None:
+            # if self.current_distance_to_front is None:
                 # never moves
                 # slowly move 1 cm forward
                 # return
-                cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
-            if abs(self.current_distance_to_front - 200) > 15:
-                # moved but the obstacle is not in front of the car
-                # move back and force?
-                logging.critical("Didn't find obstacle in front!")
-                exit(-1)
-        if self.stage in [0, 1]:
+            self.stage = 1
+            cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
+            # elif abs(self.current_distance_to_front - 200) > 15:
+            #     # moved but the obstacle is not in front of the car
+            #     # move back and force?
+            #     logging.critical("Didn't find obstacle in front!")
+            #     exit(-1)
+        elif self.stage == 1:
             if abs(self.current_distance_to_obstacle - 75) < 5:  # already can make the turn
                 self.stage = 3
                 # make left turn
                 cmd = self.left_turn_with_ir_command
             else:
-                self.stage = 1
                 buffer_dist = self.current_distance_to_obstacle - 75
                 dist = self._get_biggest_smaller_dist(buffer_dist)
                 # determine speed based on dist
