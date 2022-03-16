@@ -3,10 +3,12 @@ import socket
 import time
 from typing import Union
 
+logging.basicConfig(format='%(asctime)s.%(msecs)03d %(message)s',
+                    datefmt='%Y-%m-%d,%H:%M:%S',
+                    level=logging.DEBUG)
 
-MAGIC_NUMBER_WHEN_RETURNING_FROM_BACK = 40
+MAGIC_NUMBER_WHEN_RETURNING_FROM_BACK = 60
 MAGIC_NUMBER_WHEN_RUNNING_AT_BACK = 20
-
 
 RPI_IP = '192.168.16.16'
 RPI_PORT = 8080
@@ -24,14 +26,14 @@ DISTANCE_SET = {
         1: "0099",
         5: "0107",
         10: "0150",
-        20: "0340",
+        20: "0420",
         30: "0660",
     },
     "MediumSpeed": {
         1: "0099",
         5: "0107",
-        10: "0150",
-        20: "0420",
+        10: "0190",
+        20: "0460",
         30: "0660",
     },
     "SlowSpeed": {
@@ -86,10 +88,10 @@ class Server:
         self.moved = 0.
         self.found_the_obs_at_side = None
 
-        self.left_turn_command = 'f1260250011100'
-        self.left_turn_with_ir_command = 'f1260250011100'
-        self.right_turn_command = 'f1980250021500'
-        self.right_turn_with_us_command = 'f1980250021510'
+        self.left_turn_command = 'f1500250011100'
+        self.left_turn_with_ir_command = 'f1500250011100'
+        self.right_turn_command = 'f2000250021500'
+        self.right_turn_with_us_command = 'f2000250021510'
 
         # path planning related
         self.flipped = False  # default to be clockwise turn
@@ -105,10 +107,10 @@ class Server:
         6: ready to make right turn from the back
         7: half way passing the obstacle, check if garage in front
         8: adjusting position, parallel to the obstacle front
-        
+
         (stage 9 is actually unreachable, as is handled by 8)
         9: ready to make the left turn to face the garage 
-        
+
         10: on the way to the garage
         11: stopped
         """
@@ -135,6 +137,7 @@ class Server:
 
     def listen(self):
         while not self.terminated:
+            logging.info("Listening msg from RPI...")
             msg = self.read()
             if not msg:
                 continue
@@ -143,7 +146,9 @@ class Server:
                 msg_type, actual_msg = msg[0], msg[1:] if len(msg) > 1 else None
                 if msg_type not in self.incoming_msg_handlers:
                     raise ValueError(f"Unexpected msg type {msg_type}! msg: {msg}")
+                logging.info("Start handling message...")
                 self.incoming_msg_handlers[msg_type](msg=actual_msg)
+                logging.info("Done handling message...")
             except:
                 logging.exception("Failed to handle incoming message")
 
@@ -232,12 +237,12 @@ class Server:
             self.stage = 1
             cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
         elif self.stage == 1:
-            if (self.current_distance_to_obstacle - 55) < 5:  # already can make the turn
+            if (self.current_distance_to_obstacle - 60) < 5:  # already can make the turn
                 self.stage = 2
                 # make left turn
                 cmd = self.left_turn_with_ir_command
             else:
-                buffer_dist = self.current_distance_to_obstacle - 55
+                buffer_dist = self.current_distance_to_obstacle - 60
                 dist = self._get_biggest_smaller_dist("HighSpeed", buffer_dist)
                 # determine speed based on dist
                 # form command
@@ -279,21 +284,21 @@ class Server:
         elif self.stage == 6:
             self.stage = 7
             # make right turn
-#             cmd = self.right_turn_with_us_command
+            #             cmd = self.right_turn_with_us_command
             cmd = self.right_turn_command
         elif self.stage == 7:
-#             if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2:  # garage right in front
-#                 self.stage = 10
-#                 self.current_distance_to_garage = self.current_distance_to_front
-#                 # stage 10 logic
-#                 movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
-#                 dist = self._get_biggest_smaller_dist("HighSpeed", movable_dist)
-#                 # fast forward + biggest movable_dist
-#                 cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
-#             else:
-#                 self.stage = 8
-#                 # make 90 right turn
-#                 cmd = self.right_turn_command
+            #             if abs(self.current_distance_to_front - (self.obstacle_distance + 50)) < 2:  # garage right in front
+            #                 self.stage = 10
+            #                 self.current_distance_to_garage = self.current_distance_to_front
+            #                 # stage 10 logic
+            #                 movable_dist = self.current_distance_to_garage - 20  # car's length / 2 with buffer
+            #                 dist = self._get_biggest_smaller_dist("HighSpeed", movable_dist)
+            #                 # fast forward + biggest movable_dist
+            #                 cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
+            #             else:
+            #                 self.stage = 8
+            #                 # make 90 right turn
+            #                 cmd = self.right_turn_command
             self.stage = 8
             cmd = self.right_turn_command
         elif self.stage == 8:
