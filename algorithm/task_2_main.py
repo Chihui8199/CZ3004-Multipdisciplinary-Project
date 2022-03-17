@@ -16,7 +16,7 @@ HOST_PORT = 8080
 logging.getLogger().setLevel(logging.DEBUG)
 
 SPEED_SET = {
-    "HighSpeed": "3500",
+    "HighSpeed": "5000",
     "MediumSpeed": "2500",
     "SlowSpeed": "1000",
 }
@@ -25,15 +25,16 @@ DISTANCE_SET = {
     "HighSpeed": {
         1: "0099",
         5: "0107",
-        10: "0150",
-        20: "0420",
-        30: "0660",
+        10: "0090",
+        20: "0260",
+        30: "0580",
+        50: "1150",
     },
     "MediumSpeed": {
         1: "0099",
         5: "0107",
-        10: "0190",
-        20: "0460",
+        10: "0150",
+        20: "0340",
         30: "0660",
     },
     "SlowSpeed": {
@@ -88,10 +89,10 @@ class Server:
         self.moved = 0.
         self.found_the_obs_at_side = None
 
-        self.left_turn_command = 'f1500250011100'
-        self.left_turn_with_ir_command = 'f1500250011100'
-        self.right_turn_command = 'f2000250021500'
-        self.right_turn_with_us_command = 'f2000250021510'
+        self.left_turn_command = 'f1720500011100'
+        self.left_turn_with_ir_command = 'f1720500011101'
+        self.right_turn_command = 'f2000500021500'
+        self.right_turn_with_us_command = 'f2000500021510'
 
         # path planning related
         self.flipped = False  # default to be clockwise turn
@@ -174,7 +175,7 @@ class Server:
 
     @staticmethod
     def _form_command(direction, distance, speed, angle="Straight", take_us: bool = False, take_ir: bool = False):
-        print(direction, distance, speed)
+        # print(direction, distance, speed)
         return DIRECTION_SET[direction] + DISTANCE_SET[speed][distance] + SPEED_SET[speed] + ANGLE_SET[angle] + \
                ("1" if take_us else "0") + ("1" if take_ir else "0")
 
@@ -237,12 +238,12 @@ class Server:
             self.stage = 1
             cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
         elif self.stage == 1:
-            if (self.current_distance_to_obstacle - 60) < 5:  # already can make the turn
+            if (self.current_distance_to_obstacle - 65) < 5:  # already can make the turn
                 self.stage = 2
                 # make left turn
                 cmd = self.left_turn_with_ir_command
             else:
-                buffer_dist = self.current_distance_to_obstacle - 60
+                buffer_dist = self.current_distance_to_obstacle - 65
                 dist = self._get_biggest_smaller_dist("HighSpeed", buffer_dist)
                 # determine speed based on dist
                 # form command
@@ -256,7 +257,7 @@ class Server:
                 # anyways it's now at the edge
                 # reverse 10 cm to make the turn
                 self.horizontal_shift += 5
-                cmd = self._form_command("b", 5, "MediumSpeed")
+                cmd = self._form_command("b", 5, "HighSpeed")
             else:
                 if self.has_thing_at_right is True:
                     # move slowly forward 5 cm
@@ -332,15 +333,15 @@ class Server:
                 self.stage = 10
                 cmd = self.left_turn_command
             else:
-                movable_dist = self._get_biggest_smaller_dist("MediumSpeed", abs(y))
+                movable_dist = self._get_biggest_smaller_dist("HighSpeed", abs(y))
                 if y < 0:
                     # mid move fwd movable_dist
                     self.moved += movable_dist
-                    cmd = self._form_command("f", movable_dist, "MediumSpeed")
+                    cmd = self._form_command("f", movable_dist, "HighSpeed")
                 else:
                     # mid move back movable_dist
                     self.moved -= movable_dist
-                    cmd = self._form_command("b", movable_dist, "MediumSpeed")
+                    cmd = self._form_command("b", movable_dist, "HighSpeed")
         # elif self.stage == 9:
         #     self.stage = 10
         #     # make left turn
@@ -355,7 +356,7 @@ class Server:
             # fast forward + biggest movable_dist
             cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
 
-        print(self.stage)
+        # print(self.stage)
         self.write(message="I" + cmd)
 
 
