@@ -28,20 +28,20 @@ class MultiProcessComms:
 
         self.robot = Robot()  # handles connection to Robot
         self.algorithm = Algorithm()  # handles connection to Algorithm
-        # self.android = Android()  # handles connection to Android
+        self.android = Android()  # handles connection to Android
         
         self.manager = Manager()
 
         # messages from Robot, Algorithm and Android are placed in this queue before being read
         self.message_queue = self.manager.Queue()
-        # self.to_android_message_queue = self.manager.Queue()
+        self.to_android_message_queue = self.manager.Queue()
 
         self.read_robot_process = Process(target=self._read_robot)
         self.read_algorithm_process = Process(target=self._read_algorithm)
-        # self.read_android_process = Process(target=self._read_android)
+        self.read_android_process = Process(target=self._read_android)
         
         self.write_process = Process(target=self._write_target)
-        # self.write_android_process = Process(target=self._write_android)
+        self.write_android_process = Process(target=self._write_android)
 
         # For task 1 only
         # self.timer = Timer(6 * 60, self._timeout)
@@ -53,21 +53,20 @@ class MultiProcessComms:
         try:
             self.robot.connect()
             self.algorithm.connect()
-            # self.android.connect()
+            self.android.connect()
 
             print('Connected to Robot, Algorithm and Android')
 
             self.read_robot_process.start()
             self.read_algorithm_process.start()
-            # self.read_android_process.start()
+            self.read_android_process.start()
             self.write_process.start()
-            # self.write_android_process.start()
+            self.write_android_process.start()
             
             print('Started all processes: read-Robot, read-algorithm, read-android, write')
+
             print('Multiprocess communication session started')
 
-            # for task 2 only
-            self.message_queue.put_nowait(self._format_for(ALGORITHM_HEADER, "F".encode()))
 
         except Exception as error:
             logging.exception('Multiprocess communication start failed')
@@ -78,7 +77,7 @@ class MultiProcessComms:
     def end(self):
         # children processes should be killed once this parent process is killed
         self.algorithm.disconnect_all()
-        # self.android.disconnect_all()
+        self.android.disconnect_all()
         print('Multiprocess communication session ended')
 
     def _allow_reconnection(self):
@@ -92,8 +91,8 @@ class MultiProcessComms:
                 if not self.read_algorithm_process.is_alive():
                     self._reconnect_algorithm()
                     
-                # if not self.read_android_process.is_alive():
-                #     self._reconnect_android()
+                if not self.read_android_process.is_alive():
+                    self._reconnect_android()
                     
                 if not self.write_process.is_alive():
                     if self.dropped_connection.value == 0:
@@ -101,8 +100,8 @@ class MultiProcessComms:
                     elif self.dropped_connection.value == 1:
                         self._reconnect_algorithm()
                         
-                # if not self.write_android_process.is_alive():
-                #     self._reconnect_android()
+                if not self.write_android_process.is_alive():
+                    self._reconnect_android()
                                     
             except Exception as error:
                 logging.exception("Error during reconnection")
@@ -148,25 +147,25 @@ class MultiProcessComms:
 
         print('Reconnected to Algorithm')
 
-    # def _reconnect_android(self):
-    #     self.android.disconnect()
+    def _reconnect_android(self):
+        self.android.disconnect()
         
-    #     self.read_android_process.terminate()
-    #     self.write_process.terminate()
-    #     self.write_android_process.terminate()
+        self.read_android_process.terminate()
+        self.write_process.terminate()
+        self.write_android_process.terminate()
         
-    #     self.android.connect()
+        self.android.connect()
         
-    #     self.read_android_process = Process(target=self._read_android)
-    #     self.read_android_process.start()
+        self.read_android_process = Process(target=self._read_android)
+        self.read_android_process.start()
 
-    #     self.write_process = Process(target=self._write_target)
-    #     self.write_process.start()
+        self.write_process = Process(target=self._write_target)
+        self.write_process.start()
         
-    #     self.write_android_process = Process(target=self._write_android)
-    #     self.write_android_process.start()
+        self.write_android_process = Process(target=self._write_android)
+        self.write_android_process.start()
 
-    #     print('Reconnected to Android')
+        print('Reconnected to Android')
     
     # FOR TASK 1
     # def _read_robot(self):
@@ -223,8 +222,7 @@ class MultiProcessComms:
                         data[0] = 'Y'
                         str = "".join(data)
                         str = str.encode()
-                        self.message_queue.put_nowait(self._format_for(
-                            ALGORITHM_HEADER, str))
+                        self.message_queue.put_nowait(self._format_for(ALGORITHM_HEADER, str))
                     
             except Exception:
                 logging.exception("Process read_robot failed")
@@ -246,9 +244,7 @@ class MultiProcessComms:
                         continue
 
                     if message[0] == ord(AlgorithmToRobot.SEND_COMMAND):
-                        self.message_queue.put_nowait(self._format_for(
-                            ROBOT_HEADER, 
-                            message[1:]))
+                        self.message_queue.put_nowait(self._format_for(ROBOT_HEADER, message[1:]))
 
             except Exception:
                 logging.exception("Process read_algorithm failed")
@@ -283,80 +279,34 @@ class MultiProcessComms:
     #             logging.exception("Process read_algorithm failed")
     #             break
 
-    # def _read_android(self):
-    #     while True:
-    #         try:
-    #             raw_message = self.android.read()
-                
-    #             if raw_message is None:
-    #                 continue
-                
-    #             message_list = raw_message.splitlines()
-                
-    #             for message in message_list:
-    #                 if len(message) <= 0:
-    #                     continue
-
-    #                 if message[0] == ord(AndroidToRobot.MOVE_UP):
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                     ROBOT_HEADER, "f0001000149".encode() 
-    #                 ))
-    #                 elif message[0] == ord(AndroidToRobot.MOVE_BACK):
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                     ROBOT_HEADER, "b0001000149".encode()
-    #                 ))
-    #                 elif message[0] == ord(AndroidToRobot.TURN_LEFT): # forward turn left
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                     ROBOT_HEADER, "f0001000100".encode()
-    #                 ))
-    #                 elif message[0] == ord(AndroidToRobot.TURN_RIGHT): # forward turn right
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                     ROBOT_HEADER, "f0001000250".encode()
-    #                 ))
-    #                 elif message[0] == ord(AndroidToRpi.START):
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                         ALGORITHM_HEADER, 
-    #                         "G"
-    #                     ))
-    #                     self.timer.start()
-
-    #                 else:
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                         ALGORITHM_HEADER, 
-    #                         message[1:]
-    #                     ))
-
-    #         except Exception:
-    #             logging.exception("Process read_android failed")
-    #             break
     
-    # def _read_android(self):
-    #     while True:
-    #         try:
-    #             raw_message = self.android.read()
+    def _read_android(self):
+        while True:
+            try:
+                raw_message = self.android.read()
                 
-    #             if raw_message is None:
-    #                 continue
+                if raw_message is None:
+                    continue
                 
-    #             message_list = raw_message.splitlines()
+                message_list = raw_message.splitlines()
                 
-    #             for message in message_list:
-    #                 if len(message) <= 0:
-    #                     continue
+                for message in message_list:
+                    if len(message) <= 0:
+                        continue
 
-    #                 elif message[0] == ord(AndroidToAlgorithm.OBSTACLE_INTO):
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                         ALGORITHM_HEADER, message
-    #                     ))
+                    elif message[0] == ord(AndroidToAlgorithm.OBSTACLE_INTO):
+                        self.message_queue.put_nowait(self._format_for(
+                            ALGORITHM_HEADER, message
+                        ))
                         
-    #                 elif message[0] == ord(AndroidToRpi.START):
-    #                     self.message_queue.put_nowait(self._format_for(
-    #                         ALGORITHM_HEADER, RpiToAlgorithm.START
-    #                     ))
+                    elif message[0] == ord(AndroidToRpi.START):
+                        self.message_queue.put_nowait(self._format_for(
+                            ALGORITHM_HEADER, RpiToAlgorithm.START
+                        ))
                     
-    #         except Exception:
-    #             logging.exception('Process read_android failed')
-    #             break
+            except Exception:
+                logging.exception('Process read_android failed')
+                break
 
     def _write_target(self):
         while True:
@@ -368,10 +318,11 @@ class MultiProcessComms:
 
                     if target == ROBOT_HEADER:
                         self.robot.write(payload)
-                        print("Successful write")
+                        print("Successful write to Robot")
                         
                     elif target == ALGORITHM_HEADER:
                         self.algorithm.write(payload)
+                        print("Successful write to Algo")
                         
                     else:
                         print("Invalid header", target)
@@ -387,17 +338,17 @@ class MultiProcessComms:
 
                 break
                 
-    # def _write_android(self):
-    #     while True:
-    #         try:
-    #             if not self.to_android_message_queue.empty():
-    #                 message = self.to_android_message_queue.get_nowait()
+    def _write_android(self):
+        while True:
+            try:
+                if not self.to_android_message_queue.empty():
+                    message = self.to_android_message_queue.get_nowait()
                     
-    #                 self.android.write(message)
+                    self.android.write(message)
                 
-    #         except Exception:
-    #             logging.exception("Process write_android failed")
-    #             break
+            except Exception:
+                logging.exception("Process write_android failed")
+                break
 
     def _format_for(self, target, payload):
         return {
