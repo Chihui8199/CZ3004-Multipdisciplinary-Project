@@ -9,6 +9,7 @@ logging.basicConfig(format='%(asctime)s.%(msecs)03d %(message)s',
 
 MAGIC_NUMBER_WHEN_RETURNING_FROM_BACK = 60
 MAGIC_NUMBER_WHEN_RUNNING_AT_BACK = 20
+DISTANCE_TO_START_TURN = 65
 
 RPI_IP = '192.168.16.16'
 RPI_PORT = 8080
@@ -80,6 +81,8 @@ class Server:
 
         # current status
         self.current_distance_to_front = None
+        self.prev_distance_to_front = None
+        self.prev_moved_dist = None
         self.current_distance_to_garage = None
         self.current_distance_to_obstacle = None
         self.has_thing_at_left = None
@@ -238,16 +241,21 @@ class Server:
             self.stage = 1
             cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
         elif self.stage == 1:
-            if (self.current_distance_to_obstacle - 65) < 5:  # already can make the turn
+            if self.prev_distance_to_front is not None and self.current_distance_to_obstacle < self.prev_distance_to_front:
+                self.current_distance_to_obstacle = self.prev_distance_to_front - self.prev_moved_dist
+            if (self.current_distance_to_obstacle - DISTANCE_TO_START_TURN) < 5:  # already can make the turn
                 self.stage = 2
                 # make left turn
                 cmd = self.left_turn_with_ir_command
+                self.prev_distance_to_front = None
             else:
-                buffer_dist = self.current_distance_to_obstacle - 65
+                buffer_dist = self.current_distance_to_obstacle - DISTANCE_TO_START_TURN
                 dist = self._get_biggest_smaller_dist("HighSpeed", buffer_dist)
                 # determine speed based on dist
                 # form command
                 cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
+                self.prev_distance_to_front = self.current_distance_to_obstacle
+                self.prev_moved_dist = dist
         elif self.stage == 2:
             if self.found_the_obs_at_side is None:
                 self.found_the_obs_at_side = self.has_thing_at_right
@@ -347,6 +355,8 @@ class Server:
         #     # make left turn
         #     cmd = self.left_turn_command
         elif self.stage == 10:
+            if self.prev_distance_to_front is not None and self.current_distance_to_obstacle < self.prev_distance_to_front:
+                self.current_distance_to_obstacle = self.prev_distance_to_front - self.prev_moved_dist
             movable_dist = self.current_distance_to_front - 20  # car's length / 2 with buffer
             if movable_dist < 5:
                 self.stage = 11
@@ -355,6 +365,8 @@ class Server:
             dist = self._get_biggest_smaller_dist("HighSpeed", movable_dist)
             # fast forward + biggest movable_dist
             cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
+            self.prev_distance_to_front = self.current_distance_to_obstacle
+            self.prev_moved_dist = dist
 
         # print(self.stage)
         self.write(message="I" + cmd)
