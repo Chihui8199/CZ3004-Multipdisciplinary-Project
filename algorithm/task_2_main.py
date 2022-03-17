@@ -7,9 +7,9 @@ logging.basicConfig(format='%(asctime)s.%(msecs)03d %(message)s',
                     datefmt='%Y-%m-%d,%H:%M:%S',
                     level=logging.DEBUG)
 
-MAGIC_NUMBER_WHEN_RETURNING_FROM_BACK = 60
+MAGIC_NUMBER_WHEN_RETURNING_FROM_BACK = 65
 MAGIC_NUMBER_WHEN_RUNNING_AT_BACK = 20
-DISTANCE_TO_START_TURN = 65
+DISTANCE_TO_START_TURN = 60
 
 RPI_IP = '192.168.16.16'
 RPI_PORT = 8080
@@ -25,11 +25,17 @@ SPEED_SET = {
 DISTANCE_SET = {
     "HighSpeed": {
         1: "0099",
-        5: "0107",
+        5: "0015",
         10: "0090",
         20: "0260",
         30: "0580",
+        40: "0900",
         50: "1150",
+        60: "1450",
+        70: "1750",
+        80: "2000",
+        90: "2350",
+        100: "2630",
     },
     "MediumSpeed": {
         1: "0099",
@@ -92,10 +98,10 @@ class Server:
         self.moved = 0.
         self.found_the_obs_at_side = None
 
-        self.left_turn_command = 'f1720500011100'
-        self.left_turn_with_ir_command = 'f1720500011101'
-        self.right_turn_command = 'f2000500021500'
-        self.right_turn_with_us_command = 'f2000500021510'
+        self.left_turn_command = 'f1650500011100'
+        self.left_turn_with_ir_command = 'f1650500011101'
+        self.right_turn_command = 'f1900500021500'
+        self.right_turn_with_us_command = 'f1900500021510'
 
         # path planning related
         self.flipped = False  # default to be clockwise turn
@@ -241,8 +247,9 @@ class Server:
             self.stage = 1
             cmd = self._form_command("f", 5, "SlowSpeed", take_us=True)
         elif self.stage == 1:
-            if self.prev_distance_to_front is not None and self.current_distance_to_obstacle < self.prev_distance_to_front:
-                self.current_distance_to_obstacle = self.prev_distance_to_front - self.prev_moved_dist
+            # FIXME: logic problem and untested
+            # if self.prev_distance_to_front is not None and self.current_distance_to_obstacle < self.prev_distance_to_front:
+            #     self.current_distance_to_obstacle = self.prev_distance_to_front - self.prev_moved_dist
             if (self.current_distance_to_obstacle - DISTANCE_TO_START_TURN) < 5:  # already can make the turn
                 self.stage = 2
                 # make left turn
@@ -254,8 +261,8 @@ class Server:
                 # determine speed based on dist
                 # form command
                 cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
-                self.prev_distance_to_front = self.current_distance_to_obstacle
-                self.prev_moved_dist = dist
+                # self.prev_distance_to_front = self.current_distance_to_obstacle
+                # self.prev_moved_dist = dist
         elif self.stage == 2:
             if self.found_the_obs_at_side is None:
                 self.found_the_obs_at_side = self.has_thing_at_right
@@ -270,12 +277,12 @@ class Server:
                 if self.has_thing_at_right is True:
                     # move slowly forward 5 cm
                     self.horizontal_shift -= 5
-                    cmd = self._form_command("f", 5, "SlowSpeed", take_ir=True)
+                    cmd = self._form_command("f", 5, "HighSpeed", take_ir=True)
                     pass
                 else:
                     # move slowly backward 5 cm
                     self.horizontal_shift += 5
-                    cmd = self._form_command("b", 5, "SlowSpeed", take_ir=True)
+                    cmd = self._form_command("b", 5, "HighSpeed", take_ir=True)
                     pass
         elif self.stage == 3:
             self.stage = 4
@@ -355,9 +362,9 @@ class Server:
         #     # make left turn
         #     cmd = self.left_turn_command
         elif self.stage == 10:
-            if self.prev_distance_to_front is not None and self.current_distance_to_obstacle < self.prev_distance_to_front:
-                self.current_distance_to_obstacle = self.prev_distance_to_front - self.prev_moved_dist
-            movable_dist = self.current_distance_to_front - 20  # car's length / 2 with buffer
+            # if self.prev_distance_to_front is not None and self.current_distance_to_obstacle < self.prev_distance_to_front:
+            #     self.current_distance_to_obstacle = self.prev_distance_to_front - self.prev_moved_dist
+            movable_dist = self.current_distance_to_front - 15  # car's length / 2 with buffer
             if movable_dist < 5:
                 self.stage = 11
                 self.terminated = True
@@ -365,8 +372,8 @@ class Server:
             dist = self._get_biggest_smaller_dist("HighSpeed", movable_dist)
             # fast forward + biggest movable_dist
             cmd = self._form_command("f", dist, "HighSpeed", take_us=True)
-            self.prev_distance_to_front = self.current_distance_to_obstacle
-            self.prev_moved_dist = dist
+            # self.prev_distance_to_front = self.current_distance_to_obstacle
+            # self.prev_moved_dist = dist
 
         # print(self.stage)
         self.write(message="I" + cmd)
